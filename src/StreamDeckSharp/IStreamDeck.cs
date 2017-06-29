@@ -29,12 +29,15 @@ namespace StreamDeckSharp
         /// <summary>
         /// Sets the brightness for this <see cref="IStreamDeck"/>
         /// </summary>
-        /// <param name="level">Brightness level (0 - 80~ish)</param>
+        /// <param name="percent">Brightness in percent (0 - 100)</param>
         /// <remarks>
-        /// At the moment it looks like the maximum level is about 80.
-        /// Higher values seem to have no effect
+        /// The brightness on the device is controlled with PWM (https://en.wikipedia.org/wiki/Pulse-width_modulation).
+        /// This results in a non-linear correlation between set percentage and perceived brightness.
+        /// 
+        /// In a nutshell: changing from 10 - 30 results in a bigger change than 80 - 100 (barely visible change)
+        /// This effect should be compensated outside this library
         /// </remarks>
-        void SetBrightness(byte level);
+        void SetBrightness(byte percent);
 
         /// <summary>
         /// Sets a background image for a given key

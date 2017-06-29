@@ -67,6 +67,7 @@ namespace StreamDeckSharp
         public void SetBrightness(byte percent)
         {
             VerifyNotDisposed();
+            if (percent > 100) throw new ArgumentOutOfRangeException(nameof(percent));
             var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
             buffer[5] = percent;
             device.WriteFeatureData(buffer);
