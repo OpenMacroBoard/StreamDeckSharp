@@ -13,6 +13,7 @@
 		<tags>streamdeck elgato stream deck</tags>
 	</metadata>
 	<files>
+		<file src="bin\Release\StreamDeckSharp.xml" target="lib\net45\" />
 		<file src="bin\Release\StreamDeckSharp.dll" target="lib\net45\" />
 	</files>
 </package>
