@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Allgemeine Informationen über eine Assembly werden über die folgenden
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("StreamDeckSharp.Examples.ConsoleDemo")]
+[assembly: AssemblyTitle("StreamDeckSharp.Examples.Austria")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("StreamDeckSharp.Examples.ConsoleDemo")]
+[assembly: AssemblyProduct("StreamDeckSharp.Examples.Austria")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
-[assembly: Guid("aa895bb3-eb57-4c20-8ba9-0ab0b09ff08e")]
+[assembly: Guid("fc69188a-307d-4029-aa51-4f099e7ab00b")]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
 //

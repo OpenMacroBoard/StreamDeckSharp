@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StreamDeckSharp.Examples.ConsoleDemo
+namespace StreamDeckSharp.Examples.Rainbow
 {
     class Program
     {

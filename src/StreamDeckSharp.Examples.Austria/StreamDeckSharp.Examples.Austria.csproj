@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AA895BB3-EB57-4C20-8BA9-0AB0B09FF08E}</ProjectGuid>
+    <ProjectGuid>{FC69188A-307D-4029-AA51-4F099E7AB00B}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>StreamDeckSharp.Examples.ConsoleDemo</RootNamespace>
-    <AssemblyName>StreamDeckSharp.Examples.ConsoleDemo</AssemblyName>
+    <RootNamespace>StreamDeckSharp.Examples.Austria</RootNamespace>
+    <AssemblyName>StreamDeckSharp.Examples.Austria</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="StreamDeckSharp, Version=3.2.46.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StreamDeckSharp.0.1.0\lib\net45\StreamDeckSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,12 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\StreamDeckSharp\StreamDeckSharp.csproj">
-      <Project>{d06ab787-766e-4b28-89c4-8d948070eb1c}</Project>
-      <Name>StreamDeckSharp</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
