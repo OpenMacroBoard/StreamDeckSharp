@@ -57,11 +57,5 @@ namespace StreamDeckSharp
             info = new Tuple<int, byte[]>(keyId, outdata);
             return true;
         }
-
-        public KeyRepaintQueue()
-        {
-
-        }
     }
-
 }
