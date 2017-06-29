@@ -66,7 +66,7 @@ namespace StreamDeckSharp
 
         public void SetBrightness(byte percent)
         {
-            verifyNotDisposed();
+            VerifyNotDisposed();
             var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
             buffer[5] = percent;
             device.WriteFeatureData(buffer);
@@ -74,7 +74,7 @@ namespace StreamDeckSharp
 
         public void SetKeyBitmap(int keyId, byte[] bitmapData)
         {
-            verifyNotDisposed();
+            VerifyNotDisposed();
             if (bitmapData != null && bitmapData.Length != (iconSize * iconSize * 3)) throw new NotSupportedException();
             qqq.Enqueue(keyId, bitmapData);
         }
@@ -102,7 +102,7 @@ namespace StreamDeckSharp
             if (device == null) throw new ArgumentNullException();
             if (device.IsOpen) throw new NotSupportedException();
             device.MonitorDeviceEvents = true;
-            device.ReadReport(readCallback);
+            device.ReadReport(ReadCallback);
             device.OpenDevice(DeviceMode.Overlapped, DeviceMode.Overlapped, ShareMode.ShareRead | ShareMode.ShareWrite);
             if (!device.IsOpen) throw new Exception("Device could not be opened");
             this.device = device;
@@ -128,31 +128,31 @@ namespace StreamDeckSharp
                         var id = nextBm.Item1;
                         lock (keyLocks[id])
                         {
-                            device.Write(generatePage1(id, nextBm.Item2));
-                            device.Write(generatePage2(id, nextBm.Item2));
+                            device.Write(GeneratePage1(id, nextBm.Item2));
+                            device.Write(GeneratePage2(id, nextBm.Item2));
                         }
                     }
                 }, TaskCreationOptions.LongRunning);
             }
         }
 
-        private void verifyNotDisposed()
+        private void VerifyNotDisposed()
         {
             if (disposed) throw new ObjectDisposedException(nameof(StreamDeckHID));
         }
 
-        private void readCallback(HidReport report)
+        private void ReadCallback(HidReport report)
         {
             var _d = device;
             if (_d == null || disposed) return;
-            processNewStates(report.Data);
-            _d.ReadReport(readCallback);
+            ProcessNewStates(report.Data);
+            _d.ReadReport(ReadCallback);
         }
 
         private readonly object[] keyLocks = new object[numOfKeys];
 
 
-        private void processNewStates(byte[] newStates)
+        private void ProcessNewStates(byte[] newStates)
         {
             for (int i = 0; i < numOfKeys; i++)
             {
@@ -164,7 +164,7 @@ namespace StreamDeckSharp
             }
         }
 
-        private static byte[] generatePage1(int keyId, byte[] imgData)
+        private static byte[] GeneratePage1(int keyId, byte[] imgData)
         {
             var p1 = new byte[pagePacketSize];
             Array.Copy(headerTemplatePage1, p1, headerTemplatePage1.Length);
@@ -176,7 +176,7 @@ namespace StreamDeckSharp
             return p1;
         }
 
-        private static byte[] generatePage2(int keyId, byte[] imgData)
+        private static byte[] GeneratePage2(int keyId, byte[] imgData)
         {
             var p2 = new byte[pagePacketSize];
             Array.Copy(headerTemplatePage2, p2, headerTemplatePage2.Length);
