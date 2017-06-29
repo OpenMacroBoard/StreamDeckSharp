@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
 	<metadata>
-		<id>StreamDeckSharp</id>
+		<id>streamdecksharp</id>
 		<version>0.1.1</version>
 		<title>StreamDeckSharp</title>
 		<authors>Christian Wischenbart</authors>
