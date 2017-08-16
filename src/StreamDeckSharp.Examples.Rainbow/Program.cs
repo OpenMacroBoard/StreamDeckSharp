@@ -19,13 +19,14 @@ namespace StreamDeckSharp.Examples.Rainbow
          
             using (var deck = StreamDeck.FromHID())
             {
+                deck.SetBrightness(100);
+
                 Console.WriteLine("Connected. Now press some keys on the Stream Deck.");
                 deck.ClearKeys();
                 deck.KeyPressed += Deck_KeyPressed;
 
                 Console.WriteLine("To close the console app press Ctrl + C");
                 exitSignal.WaitOne();
-                deck.ClearKeys();
             }
         }
 

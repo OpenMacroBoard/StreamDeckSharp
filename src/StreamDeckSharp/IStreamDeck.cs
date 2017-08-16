@@ -52,5 +52,10 @@ namespace StreamDeckSharp
         /// If you need some help try <see cref="StreamDeckKeyBitmap"/>
         /// </remarks>
         void SetKeyBitmap(int keyId, byte[] bitmapData);
+
+        /// <summary>
+        /// Shows the Stream Deck logo (Fullscreen)
+        /// </summary>
+        void ShowLogo();
     }
 }

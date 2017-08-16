@@ -64,6 +64,8 @@ namespace StreamDeckSharp
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
+        private static readonly byte[] showLogoMsg = new byte[] { 0x0B, 0x63 };
+
         public void SetBrightness(byte percent)
         {
             VerifyNotDisposed();
@@ -92,6 +94,8 @@ namespace StreamDeckSharp
 
             threadCancelSource.Cancel();
             Task.WaitAll(backgroundTasks);
+
+            ShowLogo();
 
             device.CloseDevice();
             device.Dispose();
@@ -187,6 +191,11 @@ namespace StreamDeckSharp
 
             p2[5] = (byte)(keyId + 1);
             return p2;
+        }
+
+        public void ShowLogo()
+        {
+            device.WriteFeatureData(showLogoMsg);
         }
     }
 
