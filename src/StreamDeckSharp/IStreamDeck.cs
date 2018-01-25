@@ -57,5 +57,10 @@ namespace StreamDeckSharp
         /// Shows the Stream Deck logo (Fullscreen)
         /// </summary>
         void ShowLogo();
+
+        /// <summary>
+        /// Size of the icon in pixels
+        /// </summary>
+        int IconSize { get; }
     }
 }

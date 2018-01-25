@@ -66,6 +66,8 @@ namespace StreamDeckSharp
 
         private static readonly byte[] showLogoMsg = new byte[] { 0x0B, 0x63 };
 
+        public int IconSize { get => iconSize; }
+
         public void SetBrightness(byte percent)
         {
             VerifyNotDisposed();
