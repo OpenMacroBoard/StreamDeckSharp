@@ -62,6 +62,8 @@
     <Compile Include="RepaintQueue.cs" />
     <Compile Include="StreamDeck.cs" />
     <Compile Include="ExtensionsForSystemDrawing.cs" />
+    <Compile Include="StreamDeckCom.cs" />
+    <Compile Include="StreamDeckConnectionEventArgs.cs" />
     <Compile Include="StreamDeckHID.cs" />
     <Compile Include="StreamDeckExtensions.cs" />
     <Compile Include="StreamDeckKeyBitmap.cs" />

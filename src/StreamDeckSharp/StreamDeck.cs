@@ -20,7 +20,10 @@ namespace StreamDeckSharp
         /// <exception cref="StreamDeckSharp.Exceptions.StreamDeckNotFoundException">Thrown when no Stream Deck is found</exception>
         public static IStreamDeck FromHID()
         {
-            var dev = HidDevices.Enumerate(StreamDeckHID.vendorId, StreamDeckHID.productId).FirstOrDefault();
+            var dev = HidDevices.Enumerate(
+                StreamDeckCom.VendorId,
+                StreamDeckCom.ProductId
+            ).FirstOrDefault();
 
             if (dev == null)
                 throw new StreamDeckNotFoundException();

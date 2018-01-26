@@ -62,5 +62,15 @@ namespace StreamDeckSharp
         /// Size of the icon in pixels
         /// </summary>
         int IconSize { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the StreamDeck is connected.
+        /// </summary>
+        bool IsConnected { get; }
+
+        /// <summary>
+        /// Is raised when the StreamDeck is beeing disconnected or connected
+        /// </summary>
+        event EventHandler<StreamDeckConnectionEventArgs> ConnectionStateChanged;
     }
 }

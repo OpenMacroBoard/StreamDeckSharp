@@ -25,8 +25,10 @@ namespace StreamDeckSharp
         //At the moment Stream Deck has 15 keys. In the future there may be
         //versions with more or less keys. You should use this property
         //instead of a fixed number or custom const value.
-        public int NumberOfKeys { get { return numOfKeys; } }
+        public int NumberOfKeys => numOfKeys;
+
         public event EventHandler<StreamDeckKeyEventArgs> KeyPressed;
+        public event EventHandler<StreamDeckConnectionEventArgs> ConnectionStateChanged;
 
         private HidDevice device;
         private byte[] keyStates = new byte[numOfKeys];
@@ -35,47 +37,14 @@ namespace StreamDeckSharp
         internal const int numOfKeys = 15;
         internal const int iconSize = 72;
         internal const int rawBitmapDataLength = iconSize * iconSize * 3;
-        internal const int pagePacketSize = 8191;
-        internal const int numFirstPagePixels = 2583;
-        internal const int numSecondPagePixels = 2601;
-
-        internal const int vendorId = 0x0fd9;    //Elgato Systems GmbH
-        internal const int productId = 0x0060;   //Stream Deck
 
         private readonly Task[] backgroundTasks;
         private readonly CancellationTokenSource threadCancelSource = new CancellationTokenSource();
         private readonly KeyRepaintQueue qqq = new KeyRepaintQueue();
         private readonly object disposeLock = new object();
 
-        private static readonly byte[] headerTemplatePage1 = new byte[] {
-            0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
-            0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00,
-            0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e,
-            0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        };
-
-        private static readonly byte[] headerTemplatePage2 = new byte[] {
-            0x02, 0x01, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        };
-
-        private static readonly byte[] showLogoMsg = new byte[] { 0x0B, 0x63 };
-
-        public int IconSize { get => iconSize; }
-
-        public void SetBrightness(byte percent)
-        {
-            VerifyNotDisposed();
-            if (percent > 100) throw new ArgumentOutOfRangeException(nameof(percent));
-            var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-            buffer[5] = percent;
-            device.WriteFeatureData(buffer);
-        }
+        public int IconSize => iconSize;
+        public bool IsConnected => device.IsConnected;
 
         public void SetKeyBitmap(int keyId, byte[] bitmapData)
         {
@@ -114,6 +83,9 @@ namespace StreamDeckSharp
             if (!device.IsOpen) throw new Exception("Device could not be opened");
             this.device = device;
 
+            this.device.Inserted += Device_Inserted;
+            this.device.Removed += Device_Removed;
+
             for (int i = 0; i < numOfKeys; i++)
             {
                 keyLocks[i] = new object();
@@ -135,12 +107,24 @@ namespace StreamDeckSharp
                         var id = nextBm.Item1;
                         lock (keyLocks[id])
                         {
-                            device.Write(GeneratePage1(id, nextBm.Item2));
-                            device.Write(GeneratePage2(id, nextBm.Item2));
+                            device.Write(StreamDeckCom.GeneratePage1(id, nextBm.Item2));
+                            device.Write(StreamDeckCom.GeneratePage2(id, nextBm.Item2));
                         }
                     }
                 }, TaskCreationOptions.LongRunning);
             }
+        }
+
+        private void Device_Removed()
+        {
+            var arg = new StreamDeckConnectionEventArgs(false);
+            ConnectionStateChanged?.Invoke(this, arg);
+        }
+
+        private void Device_Inserted()
+        {
+            var arg = new StreamDeckConnectionEventArgs(true);
+            ConnectionStateChanged?.Invoke(this, arg);
         }
 
         private void VerifyNotDisposed()
@@ -158,7 +142,6 @@ namespace StreamDeckSharp
 
         private readonly object[] keyLocks = new object[numOfKeys];
 
-
         private void ProcessNewStates(byte[] newStates)
         {
             for (int i = 0; i < numOfKeys; i++)
@@ -171,33 +154,16 @@ namespace StreamDeckSharp
             }
         }
 
-        private static byte[] GeneratePage1(int keyId, byte[] imgData)
+        public void SetBrightness(byte percent)
         {
-            var p1 = new byte[pagePacketSize];
-            Array.Copy(headerTemplatePage1, p1, headerTemplatePage1.Length);
-
-            if (imgData != null)
-                Array.Copy(imgData, 0, p1, headerTemplatePage1.Length, numFirstPagePixels * 3);
-
-            p1[5] = (byte)(keyId + 1);
-            return p1;
-        }
-
-        private static byte[] GeneratePage2(int keyId, byte[] imgData)
-        {
-            var p2 = new byte[pagePacketSize];
-            Array.Copy(headerTemplatePage2, p2, headerTemplatePage2.Length);
-
-            if (imgData != null)
-                Array.Copy(imgData, numFirstPagePixels * 3, p2, headerTemplatePage2.Length, numSecondPagePixels * 3);
-
-            p2[5] = (byte)(keyId + 1);
-            return p2;
+            VerifyNotDisposed();
+            device.WriteFeatureData(StreamDeckCom.GetBrightnessMsg(percent));
         }
 
         public void ShowLogo()
         {
-            device.WriteFeatureData(showLogoMsg);
+            VerifyNotDisposed();
+            device.WriteFeatureData(StreamDeckCom.ShowLogoMsg);
         }
     }
 
