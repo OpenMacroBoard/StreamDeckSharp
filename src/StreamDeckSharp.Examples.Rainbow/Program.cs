@@ -36,11 +36,13 @@ namespace StreamDeckSharp.Examples.Rainbow
             if (d == null) return;
 
             if (e.IsDown)
-            {
-                rnd.NextBytes(rgbBuffer);
-                var randomColor = StreamDeckKeyBitmap.FromRGBColor(rgbBuffer[0], rgbBuffer[1], rgbBuffer[2]);
-                d.SetKeyBitmap(e.Key, randomColor);
-            }
+                d.SetKeyBitmap(e.Key, GetRandomColorImage());
+        }
+
+        private static StreamDeckKeyBitmap GetRandomColorImage()
+        {
+            rnd.NextBytes(rgbBuffer);
+            return StreamDeckKeyBitmap.FromRGBColor(rgbBuffer[0], rgbBuffer[1], rgbBuffer[2]);
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
