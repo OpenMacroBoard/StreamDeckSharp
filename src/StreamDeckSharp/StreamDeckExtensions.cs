@@ -40,6 +40,17 @@ namespace StreamDeckSharp
         }
 
         /// <summary>
+        /// Sets a background image for all keys
+        /// </summary>
+        /// <param name="deck"></param>
+        /// <param name="bitmap"></param>
+        public static void SetKeyBitmap(this IStreamDeck deck, byte[] bitmap)
+        {
+            for (int i = 0; i < StreamDeckHID.numOfKeys; i++)
+                deck.SetKeyBitmap(i, bitmap);
+        }
+
+        /// <summary>
         /// Sets background to black for a given key
         /// </summary>
         /// <param name="deck"></param>
