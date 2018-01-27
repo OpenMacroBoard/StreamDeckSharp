@@ -107,8 +107,11 @@ namespace StreamDeckSharp
                         var id = nextBm.Item1;
                         lock (keyLocks[id])
                         {
-                            device.Write(StreamDeckCom.GeneratePage1(id, nextBm.Item2));
-                            device.Write(StreamDeckCom.GeneratePage2(id, nextBm.Item2));
+                            var page1 = StreamDeckCom.GeneratePage1(id, nextBm.Item2);
+                            var page2 = StreamDeckCom.GeneratePage2(id, nextBm.Item2);
+
+                            device.Write(page1, 250);
+                            device.Write(page2, 250);
                         }
                     }
                 }, TaskCreationOptions.LongRunning);
