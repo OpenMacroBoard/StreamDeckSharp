@@ -66,7 +66,7 @@ namespace StreamDeckSharp
             threadCancelSource.Cancel();
             Task.WaitAll(backgroundTasks);
 
-            ShowLogo();
+            ShowLogoWithoutDisposeVerification();
 
             device.CloseDevice();
             device.Dispose();
@@ -163,6 +163,11 @@ namespace StreamDeckSharp
         public void ShowLogo()
         {
             VerifyNotDisposed();
+            ShowLogoWithoutDisposeVerification();
+        }
+
+        private void ShowLogoWithoutDisposeVerification()
+        {
             device.WriteFeatureData(StreamDeckCom.ShowLogoMsg);
         }
     }
