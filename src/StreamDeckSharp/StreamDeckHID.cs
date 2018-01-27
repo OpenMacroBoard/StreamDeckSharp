@@ -46,11 +46,10 @@ namespace StreamDeckSharp
         public int IconSize => iconSize;
         public bool IsConnected => device.IsConnected;
 
-        public void SetKeyBitmap(int keyId, byte[] bitmapData)
+        public void SetKeyBitmap(int keyId, StreamDeckKeyBitmap bitmap)
         {
             VerifyNotDisposed();
-            if (bitmapData != null && bitmapData.Length != (iconSize * iconSize * 3)) throw new NotSupportedException();
-            qqq.Enqueue(keyId, bitmapData);
+            qqq.Enqueue(keyId, bitmap?.rawBitmapData);
         }
 
         public void Dispose()

@@ -43,15 +43,8 @@ namespace StreamDeckSharp
         /// Sets a background image for a given key
         /// </summary>
         /// <param name="keyId">Specifies which key the image will be applied on</param>
-        /// <param name="bitmapData">The raw bitmap pixel data. Details see remarks section. The key will be painted black if this value is null.</param>
-        /// <remarks>
-        /// The raw pixel format is a byte array of length 15552. This number is based on the image
-        /// dimensions used by StreamDeck 72x72 pixels and 3 channels (RGB) for each pixel. 72 x 72 x 3 = 15552.
-        /// 
-        /// The channels are in the order BGR and the pixel rows (stride) are in reverse order.
-        /// If you need some help try <see cref="StreamDeckKeyBitmap"/>
-        /// </remarks>
-        void SetKeyBitmap(int keyId, byte[] bitmapData);
+        /// <param name="bitmapData">Bitmap. The key will be painted black if this value is null.</param>
+        void SetKeyBitmap(int keyId, StreamDeckKeyBitmap bitmapData);
 
         /// <summary>
         /// Shows the Stream Deck logo (Fullscreen)

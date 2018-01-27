@@ -18,33 +18,11 @@ namespace StreamDeckSharp
     public static class StreamDeckExtensions
     {
         /// <summary>
-        /// Sets a background image for a given key
-        /// </summary>
-        /// <param name="deck"></param>
-        /// <param name="keyId"></param>
-        /// <param name="bitmap"></param>
-        public static void SetKeyBitmap(this IStreamDeck deck, int keyId, StreamDeckKeyBitmap bitmap)
-        {
-            deck.SetKeyBitmap(keyId, bitmap.rawBitmapData);
-        }
-
-        /// <summary>
         /// Sets a background image for all keys
         /// </summary>
         /// <param name="deck"></param>
         /// <param name="bitmap"></param>
         public static void SetKeyBitmap(this IStreamDeck deck, StreamDeckKeyBitmap bitmap)
-        {
-            for (int i = 0; i < StreamDeckHID.numOfKeys; i++)
-                deck.SetKeyBitmap(i, bitmap.rawBitmapData);
-        }
-
-        /// <summary>
-        /// Sets a background image for all keys
-        /// </summary>
-        /// <param name="deck"></param>
-        /// <param name="bitmap"></param>
-        public static void SetKeyBitmap(this IStreamDeck deck, byte[] bitmap)
         {
             for (int i = 0; i < StreamDeckHID.numOfKeys; i++)
                 deck.SetKeyBitmap(i, bitmap);
