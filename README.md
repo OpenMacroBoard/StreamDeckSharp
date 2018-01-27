@@ -4,7 +4,7 @@ StreamDeckSharp is a simple (unofficial) .NET interface for the Stream Deck (htt
 This project is not related to _Elgato Systems GmbH_ in any way.
 
 ## Quickstart _(TL;DR)_
-***At the moment only Windows is supported (tested with 10, should also work with 7 and 8)***
+***At the moment only Windows is supported (tested with 10, should also work with 8, 7, Vista and XP)***
 1. Add StreamDeckSharp reference (via nuget or download latest release)
 2. Add a using directive for StreamDeckSharp: `using StreamDeckSharp;`
 
