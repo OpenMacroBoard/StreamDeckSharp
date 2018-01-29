@@ -90,7 +90,7 @@ namespace StreamDeckSharp
                 keyLocks[i] = new object();
             }
 
-            var numberOfWriterThreads = NumberOfKeys;
+            var numberOfWriterThreads = 1;
             var numberOfReadThreads = 1;
             var numberOfThreads = numberOfWriterThreads + numberOfReadThreads;
 
