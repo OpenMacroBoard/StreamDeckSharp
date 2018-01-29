@@ -89,7 +89,7 @@ namespace StreamDeckSharp
         {
             var c = (byte[])bitmapData.Clone();
             FlipHorizontal(c, StreamDeckHID.iconSize);
-            return new StreamDeckKeyBitmap(bitmapData);
+            return new StreamDeckKeyBitmap(c);
         }
 
         private static byte[] GetStreamDeckDataFromBitmap(int iconSize, Bitmap image)
