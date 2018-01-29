@@ -54,3 +54,10 @@ namespace StreamDeckSharp.Examples.Austria
 Here is what the "Rainbow" example looks like after pressing some keys
 
 ![Rainbow example photo](doc/images/rainbow_example.png?raw=true "Rainbow demo after pressing some keys")
+
+### Play video on StreamDeck
+Here is a short demo of playing a video on the stream deck device.
+
+[![Demo video of the example](https://i.imgur.com/8tlkaIg.png)](http://www.youtube.com/watch?v=tNwUG0sPmKw)
+
+More about that in the Wiki: [Play video on StreamDeck](https://github.com/OpenStreamDeck/StreamDeckSharp/wiki/Play-video-on-StreamDeck)
