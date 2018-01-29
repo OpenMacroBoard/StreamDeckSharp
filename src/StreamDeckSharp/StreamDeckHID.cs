@@ -63,6 +63,7 @@ namespace StreamDeckSharp
             if (device == null) return;
 
             threadCancelSource.Cancel();
+            device.SetAllEvents();
             Task.WaitAll(backgroundTasks);
 
             ShowLogoWithoutDisposeVerification();
@@ -77,7 +78,6 @@ namespace StreamDeckSharp
             if (device == null) throw new ArgumentNullException();
             if (device.IsOpen) throw new NotSupportedException();
             device.MonitorDeviceEvents = true;
-            device.ReadReport(ReadCallback);
             device.OpenDevice(DeviceMode.Overlapped, DeviceMode.Overlapped, ShareMode.ShareRead | ShareMode.ShareWrite);
             if (!device.IsOpen) throw new Exception("Device could not be opened");
             this.device = device;
@@ -90,9 +90,12 @@ namespace StreamDeckSharp
                 keyLocks[i] = new object();
             }
 
-            var numberOfTasks = NumberOfKeys;
-            backgroundTasks = new Task[numberOfTasks];
-            for (int i = 0; i < numberOfTasks; i++)
+            var numberOfWriterThreads = NumberOfKeys;
+            var numberOfReadThreads = 1;
+            var numberOfThreads = numberOfWriterThreads + numberOfReadThreads;
+
+            backgroundTasks = new Task[numberOfThreads];
+            for (int i = 0; i < numberOfWriterThreads; i++)
             {
                 backgroundTasks[i] = Task.Factory.StartNew(() =>
                 {
@@ -109,12 +112,24 @@ namespace StreamDeckSharp
                             var page1 = StreamDeckCom.GeneratePage1(id, nextBm.Item2);
                             var page2 = StreamDeckCom.GeneratePage2(id, nextBm.Item2);
 
-                            device.Write(page1, 250);
-                            device.Write(page2, 250);
+                            device.Write(page1);
+                            device.Write(page2);
                         }
                     }
                 }, TaskCreationOptions.LongRunning);
             }
+
+            backgroundTasks[numberOfWriterThreads] = Task.Factory.StartNew(() =>
+            {
+                var cancelToken = threadCancelSource.Token;
+
+                while (true)
+                {
+                    var rep = device.ReadReport();
+                    if (cancelToken.IsCancellationRequested) return;
+                    ProcessNewStates(rep.Data);
+                }
+            }, TaskCreationOptions.LongRunning);
         }
 
         private void Device_Removed()
