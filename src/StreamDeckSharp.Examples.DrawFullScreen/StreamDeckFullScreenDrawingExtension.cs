@@ -13,7 +13,7 @@ namespace StreamDeckSharp.Examples.DrawFullScreen
     public static class StreamDeckFullScreenDrawingExtension
     {
         private const int buttonPxSize = 72;
-        private const int buttonPxDist = 33; //measured
+        private const int buttonPxDist = 25; //measured
         private const int fullPxWidth = 5 * buttonPxSize + 4 * buttonPxDist;
         private const int fullPxHeight = 3 * buttonPxSize + 2 * buttonPxDist;
         private static readonly Brush black = Brushes.Black;
