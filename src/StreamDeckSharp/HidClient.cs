@@ -1,14 +1,5 @@
 ﻿using HidLibrary;
-using StreamDeckSharp.Exceptions;
 using System;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,15 +11,15 @@ namespace StreamDeckSharp
     /// <summary>
     /// A (very simple) .NET Wrapper for the StreamDeck HID
     /// </summary>
-    internal sealed class StreamDeckHID : IStreamDeck
+    internal sealed class HidClient : IStreamDeck
     {
         //At the moment Stream Deck has 15 keys. In the future there may be
         //versions with more or less keys. You should use this property
         //instead of a fixed number or custom const value.
-        public int NumberOfKeys => numOfKeys;
+        public int KeyCount => numOfKeys;
 
-        public event EventHandler<StreamDeckKeyEventArgs> KeyPressed;
-        public event EventHandler<StreamDeckConnectionEventArgs> ConnectionStateChanged;
+        public event EventHandler<KeyEventArgs> KeyStateChanged;
+        public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
 
         private HidDevice device;
         private byte[] keyStates = new byte[numOfKeys];
@@ -46,7 +37,7 @@ namespace StreamDeckSharp
         public int IconSize => iconSize;
         public bool IsConnected => device.IsConnected;
 
-        public void SetKeyBitmap(int keyId, StreamDeckKeyBitmap bitmap)
+        public void SetKeyBitmap(int keyId, KeyBitmap bitmap)
         {
             VerifyNotDisposed();
             qqq.Enqueue(keyId, bitmap?.rawBitmapData);
@@ -73,7 +64,7 @@ namespace StreamDeckSharp
             device = null;
         }
 
-        internal StreamDeckHID(HidDevice device)
+        internal HidClient(HidDevice device)
         {
             if (device == null) throw new ArgumentNullException();
             if (device.IsOpen) throw new NotSupportedException();
@@ -109,8 +100,8 @@ namespace StreamDeckSharp
                         var id = nextBm.Item1;
                         lock (keyLocks[id])
                         {
-                            var page1 = StreamDeckCom.GeneratePage1(id, nextBm.Item2);
-                            var page2 = StreamDeckCom.GeneratePage2(id, nextBm.Item2);
+                            var page1 = HidCommunicationHelper.GeneratePage1(id, nextBm.Item2);
+                            var page2 = HidCommunicationHelper.GeneratePage2(id, nextBm.Item2);
 
                             device.Write(page1);
                             device.Write(page2);
@@ -134,19 +125,19 @@ namespace StreamDeckSharp
 
         private void Device_Removed()
         {
-            var arg = new StreamDeckConnectionEventArgs(false);
+            var arg = new ConnectionEventArgs(false);
             ConnectionStateChanged?.Invoke(this, arg);
         }
 
         private void Device_Inserted()
         {
-            var arg = new StreamDeckConnectionEventArgs(true);
+            var arg = new ConnectionEventArgs(true);
             ConnectionStateChanged?.Invoke(this, arg);
         }
 
         private void VerifyNotDisposed()
         {
-            if (disposed) throw new ObjectDisposedException(nameof(StreamDeckHID));
+            if (disposed) throw new ObjectDisposedException(nameof(HidClient));
         }
 
         private void ReadCallback(HidReport report)
@@ -165,7 +156,7 @@ namespace StreamDeckSharp
             {
                 if (keyStates[i] != newStates[i])
                 {
-                    KeyPressed?.Invoke(this, new StreamDeckKeyEventArgs(i, newStates[i] != 0));
+                    KeyStateChanged?.Invoke(this, new KeyEventArgs(i, newStates[i] != 0));
                     keyStates[i] = newStates[i];
                 }
             }
@@ -174,7 +165,7 @@ namespace StreamDeckSharp
         public void SetBrightness(byte percent)
         {
             VerifyNotDisposed();
-            device.WriteFeatureData(StreamDeckCom.GetBrightnessMsg(percent));
+            device.WriteFeatureData(HidCommunicationHelper.GetBrightnessMsg(percent));
         }
 
         public void ShowLogo()
@@ -185,7 +176,7 @@ namespace StreamDeckSharp
 
         private void ShowLogoWithoutDisposeVerification()
         {
-            device.WriteFeatureData(StreamDeckCom.ShowLogoMsg);
+            device.WriteFeatureData(HidCommunicationHelper.ShowLogoMsg);
         }
     }
 

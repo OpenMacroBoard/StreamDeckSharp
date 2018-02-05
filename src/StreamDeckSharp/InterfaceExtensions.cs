@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace StreamDeckSharp
+﻿namespace StreamDeckSharp
 {
     /// <summary>
     /// </summary>
@@ -15,16 +6,16 @@ namespace StreamDeckSharp
     /// The <see cref="IStreamDeck"/> interface is pretty basic to simplify implementation.
     /// This extension class adds some commonly used functions to make things simpler.
     /// </remarks>
-    public static class StreamDeckExtensions
+    public static class InterfaceExtensions
     {
         /// <summary>
         /// Sets a background image for all keys
         /// </summary>
         /// <param name="deck"></param>
         /// <param name="bitmap"></param>
-        public static void SetKeyBitmap(this IStreamDeck deck, StreamDeckKeyBitmap bitmap)
+        public static void SetKeyBitmap(this IStreamDeck deck, KeyBitmap bitmap)
         {
-            for (int i = 0; i < StreamDeckHID.numOfKeys; i++)
+            for (int i = 0; i < deck.KeyCount; i++)
                 deck.SetKeyBitmap(i, bitmap);
         }
 
@@ -35,7 +26,7 @@ namespace StreamDeckSharp
         /// <param name="keyId"></param>
         public static void ClearKey(this IStreamDeck deck, int keyId)
         {
-            deck.SetKeyBitmap(keyId, StreamDeckKeyBitmap.Black);
+            deck.SetKeyBitmap(keyId, KeyBitmap.Black);
         }
 
         /// <summary>
@@ -44,7 +35,7 @@ namespace StreamDeckSharp
         /// <param name="deck"></param>
         public static void ClearKeys(this IStreamDeck deck)
         {
-            deck.SetKeyBitmap(StreamDeckKeyBitmap.Black);
+            deck.SetKeyBitmap(KeyBitmap.Black);
         }
     }
 }

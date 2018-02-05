@@ -2,11 +2,11 @@
 
 namespace StreamDeckSharp
 {
-    public class StreamDeckConnectionEventArgs : EventArgs
+    public class ConnectionEventArgs : EventArgs
     {
         public bool NewConnectionState { get; }
 
-        public StreamDeckConnectionEventArgs(bool newConnectionState)
+        public ConnectionEventArgs(bool newConnectionState)
         {
             NewConnectionState = newConnectionState;
         }

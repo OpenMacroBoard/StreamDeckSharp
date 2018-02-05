@@ -12,8 +12,8 @@ namespace StreamDeckSharp.Examples.DrawFullScreen
         {
             var testImg = @"C:\testimage.png";
 
-            using (var deck = StreamDeck.FromHID())
-            using (var bmp = (Bitmap)Bitmap.FromFile(testImg))
+            using (var deck = StreamDeck.OpenDevice())
+            using (var bmp = (Bitmap)Image.FromFile(testImg))
             {
                 deck.DrawFullScreenBitmap(bmp);
                 Console.ReadKey();

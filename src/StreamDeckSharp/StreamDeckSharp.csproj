@@ -58,14 +58,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepaintQueue.cs" />
     <Compile Include="StreamDeck.cs" />
-    <Compile Include="StreamDeckCom.cs" />
-    <Compile Include="StreamDeckConnectionEventArgs.cs" />
-    <Compile Include="StreamDeckHID.cs" />
-    <Compile Include="StreamDeckExtensions.cs" />
-    <Compile Include="StreamDeckKeyBitmap.cs" />
-    <Compile Include="StreamDeckKeyBitmap_Drawing.cs" />
-    <Compile Include="StreamDeckKeyBitmap_Wpf.cs" />
-    <Compile Include="StreamDeckKeyEventArgs.cs" />
+    <Compile Include="HidCommunicationHelper.cs" />
+    <Compile Include="ConnectionEventArgs.cs" />
+    <Compile Include="HidClient.cs" />
+    <Compile Include="InterfaceExtensions.cs" />
+    <Compile Include="KeyBitmap.cs" />
+    <Compile Include="KeyBitmap_Drawing.cs" />
+    <Compile Include="KeyBitmap_Wpf.cs" />
+    <Compile Include="KeyEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

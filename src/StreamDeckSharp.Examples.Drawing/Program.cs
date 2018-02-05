@@ -13,7 +13,7 @@ namespace StreamDeckSharp.Examples.Drawing
         static void Main(string[] args)
         {
             //Open the Stream Deck device
-            using (var deck = StreamDeck.FromHID())
+            using (var deck = StreamDeck.OpenDevice())
             {
                 ConsoleWriteAndWait("Press any key to run System.Drawing example");
                 ExampleWithSystemDrawing(deck);
@@ -28,7 +28,7 @@ namespace StreamDeckSharp.Examples.Drawing
         static void ExampleWithSystemDrawing(IStreamDeck deck)
         {
             //Create a key with lambda graphics
-            var key = StreamDeckKeyBitmap.FromGraphics(g =>
+            var key = KeyBitmap.FromGraphics(g =>
             {
                 //See https://stackoverflow.com/questions/6311545/c-sharp-write-text-on-bitmap for details
                 g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -69,7 +69,7 @@ namespace StreamDeckSharp.Examples.Drawing
 
             c.Children.Add(t);
 
-            var k = StreamDeckKeyBitmap.FromWpfElement(c);
+            var k = KeyBitmap.FromWpfElement(c);
             deck.SetKeyBitmap(7, k);
         }
 

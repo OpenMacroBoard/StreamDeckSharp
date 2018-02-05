@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StreamDeckSharp
 {
@@ -19,12 +15,12 @@ namespace StreamDeckSharp
         /// But this may change in the future so please use this property in your
         /// code / for-loops.
         /// </remarks>
-        int NumberOfKeys { get; }
+        int KeyCount { get; }
 
         /// <summary>
         /// Is raised when a key is pressed
         /// </summary>
-        event EventHandler<StreamDeckKeyEventArgs> KeyPressed;
+        event EventHandler<KeyEventArgs> KeyStateChanged;
 
         /// <summary>
         /// Sets the brightness for this <see cref="IStreamDeck"/>
@@ -44,7 +40,7 @@ namespace StreamDeckSharp
         /// </summary>
         /// <param name="keyId">Specifies which key the image will be applied on</param>
         /// <param name="bitmapData">Bitmap. The key will be painted black if this value is null.</param>
-        void SetKeyBitmap(int keyId, StreamDeckKeyBitmap bitmapData);
+        void SetKeyBitmap(int keyId, KeyBitmap bitmapData);
 
         /// <summary>
         /// Shows the Stream Deck logo (Fullscreen)
@@ -64,6 +60,6 @@ namespace StreamDeckSharp
         /// <summary>
         /// Is raised when the StreamDeck is beeing disconnected or connected
         /// </summary>
-        event EventHandler<StreamDeckConnectionEventArgs> ConnectionStateChanged;
+        event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
     }
 }

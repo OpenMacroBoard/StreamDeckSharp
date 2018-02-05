@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace StreamDeckSharp
 {
-    public partial class StreamDeckKeyBitmap
+    public partial class KeyBitmap
     {
         /// <summary>
         /// Uses a WPF FrameworkElement to create a keyImage
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public static StreamDeckKeyBitmap FromWpfElement(FrameworkElement e)
+        public static KeyBitmap FromWpfElement(FrameworkElement e)
         {
             //Do WPF layout process manually (because the element is not a UI element)
             e.Measure(new Size(72, 72));
@@ -32,7 +27,7 @@ namespace StreamDeckSharp
             renderer.CopyPixels(pbgra32, 72 * 4, 0);
 
             var bitmapData = ConvertPbgra32ToStreamDeckKey(pbgra32);
-            return new StreamDeckKeyBitmap(bitmapData);
+            return new KeyBitmap(bitmapData);
         }
 
         /// <summary>

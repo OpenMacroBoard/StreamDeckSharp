@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StreamDeckSharp
 {
-    public partial class StreamDeckKeyBitmap
+    public partial class KeyBitmap
     {
         /// <summary>
         /// Creates a solid color bitmap
@@ -19,12 +15,12 @@ namespace StreamDeckSharp
         /// <param name="G">Green channel</param>
         /// <param name="B">Blue channel</param>
         /// <returns></returns>
-        public static StreamDeckKeyBitmap FromRGBColor(byte R, byte G, byte B)
+        public static KeyBitmap FromRGBColor(byte R, byte G, byte B)
         {
             //If everything is 0 (black) take a shortcut ;-)
             if (R == 0 && G == 0 && B == 0) return Black;
 
-            var buffer = new byte[StreamDeckHID.rawBitmapDataLength];
+            var buffer = new byte[HidClient.rawBitmapDataLength];
             for (int i = 0; i < buffer.Length; i += 3)
             {
                 buffer[i + 0] = B;
@@ -32,7 +28,7 @@ namespace StreamDeckSharp
                 buffer[i + 2] = R;
             }
 
-            return new StreamDeckKeyBitmap(buffer);
+            return new KeyBitmap(buffer);
         }
 
         /// <summary>
@@ -40,7 +36,7 @@ namespace StreamDeckSharp
         /// </summary>
         /// <param name="bitmapStream"></param>
         /// <returns></returns>
-        public static StreamDeckKeyBitmap FromStream(Stream bitmapStream)
+        public static KeyBitmap FromStream(Stream bitmapStream)
         {
             using (Bitmap bitmap = (Bitmap)Image.FromStream(bitmapStream))
             {
@@ -53,7 +49,7 @@ namespace StreamDeckSharp
         /// </summary>
         /// <param name="bitmapFile"></param>
         /// <returns></returns>
-        public static StreamDeckKeyBitmap FromFile(string bitmapFile)
+        public static KeyBitmap FromFile(string bitmapFile)
         {
             using (Bitmap bitmap = (Bitmap)Image.FromFile(bitmapFile))
             {
@@ -66,17 +62,17 @@ namespace StreamDeckSharp
         /// </summary>
         /// <param name="graphicsAction"></param>
         /// <returns></returns>
-        public static StreamDeckKeyBitmap FromGraphics(Action<Graphics> graphicsAction)
+        public static KeyBitmap FromGraphics(Action<Graphics> graphicsAction)
         {
-            using (var bmp = CreateKeyBitmap(StreamDeckHID.iconSize))
+            using (var bmp = CreateKeyBitmap(HidClient.iconSize))
             {
                 using (var g = Graphics.FromImage(bmp))
                 {
                     graphicsAction(g);
                 }
 
-                var bitmapData = GetStreamDeckDataFromBitmap(StreamDeckHID.iconSize, bmp);
-                return new StreamDeckKeyBitmap(bitmapData);
+                var bitmapData = GetStreamDeckDataFromBitmap(HidClient.iconSize, bmp);
+                return new KeyBitmap(bitmapData);
             }
         }
 
@@ -85,11 +81,11 @@ namespace StreamDeckSharp
         /// </summary>
         /// <param name="bitmapData"></param>
         /// <returns></returns>
-        public static StreamDeckKeyBitmap FromRawBitmap(byte[] bitmapData)
+        public static KeyBitmap FromRawBitmap(byte[] bitmapData)
         {
             var c = (byte[])bitmapData.Clone();
-            FlipHorizontal(c, StreamDeckHID.iconSize);
-            return new StreamDeckKeyBitmap(c);
+            FlipHorizontal(c, HidClient.iconSize);
+            return new KeyBitmap(c);
         }
 
         private static byte[] GetStreamDeckDataFromBitmap(int iconSize, Bitmap image)
@@ -104,7 +100,7 @@ namespace StreamDeckSharp
             {
                 var rgbValues = new byte[iconSize * iconSize * 3];
                 Marshal.Copy(lockData.Scan0, rgbValues, 0, rgbValues.Length);
-                FlipHorizontal(rgbValues, StreamDeckHID.iconSize);
+                FlipHorizontal(rgbValues, HidClient.iconSize);
                 return rgbValues;
             }
             finally
@@ -113,15 +109,15 @@ namespace StreamDeckSharp
             }
         }
 
-        private static StreamDeckKeyBitmap FromDrawingBitmap(Bitmap bitmap)
+        private static KeyBitmap FromDrawingBitmap(Bitmap bitmap)
         {
-            if (bitmap.Width != StreamDeckHID.iconSize || bitmap.Height != StreamDeckHID.iconSize) throw new NotSupportedException("Unsupported bitmap dimensions");
+            if (bitmap.Width != HidClient.iconSize || bitmap.Height != HidClient.iconSize) throw new NotSupportedException("Unsupported bitmap dimensions");
 
             BitmapData data = null;
             try
             {
                 data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-                var managedRGB = new byte[StreamDeckHID.rawBitmapDataLength];
+                var managedRGB = new byte[HidClient.rawBitmapDataLength];
 
                 unsafe
                 {
@@ -132,12 +128,12 @@ namespace StreamDeckSharp
                     //copying 90% of the code ;-)
                     if (data.PixelFormat == PixelFormat.Format24bppRgb)
                     {
-                        for (int y = 0; y < StreamDeckHID.iconSize; y++)
+                        for (int y = 0; y < HidClient.iconSize; y++)
                         {
-                            for (int x = 0; x < StreamDeckHID.iconSize; x++)
+                            for (int x = 0; x < HidClient.iconSize; x++)
                             {
                                 var ps = data.Stride * y + x * 3;
-                                var pt = StreamDeckHID.iconSize * 3 * (y + 1) - (x + 1) * 3;
+                                var pt = HidClient.iconSize * 3 * (y + 1) - (x + 1) * 3;
                                 managedRGB[pt + 0] = bdata[ps + 0];
                                 managedRGB[pt + 1] = bdata[ps + 1];
                                 managedRGB[pt + 2] = bdata[ps + 2];
@@ -146,12 +142,12 @@ namespace StreamDeckSharp
                     }
                     else if (data.PixelFormat == PixelFormat.Format32bppArgb)
                     {
-                        for (int y = 0; y < StreamDeckHID.iconSize; y++)
+                        for (int y = 0; y < HidClient.iconSize; y++)
                         {
-                            for (int x = 0; x < StreamDeckHID.iconSize; x++)
+                            for (int x = 0; x < HidClient.iconSize; x++)
                             {
                                 var ps = data.Stride * y + x * 4;
-                                var pt = StreamDeckHID.iconSize * 3 * (y + 1) - (x + 1) * 3;
+                                var pt = HidClient.iconSize * 3 * (y + 1) - (x + 1) * 3;
                                 double alpha = (double)bdata[ps + 3] / 255f;
                                 managedRGB[pt + 0] = (byte)Math.Round(bdata[ps + 0] * alpha);
                                 managedRGB[pt + 1] = (byte)Math.Round(bdata[ps + 1] * alpha);
@@ -165,7 +161,7 @@ namespace StreamDeckSharp
                     }
                 }
 
-                return new StreamDeckKeyBitmap(managedRGB);
+                return new KeyBitmap(managedRGB);
             }
             finally
             {

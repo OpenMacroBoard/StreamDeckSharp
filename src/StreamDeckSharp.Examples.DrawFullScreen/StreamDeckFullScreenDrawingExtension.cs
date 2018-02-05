@@ -26,7 +26,7 @@ namespace StreamDeckSharp.Examples.DrawFullScreen
                 imgData = GetRgbArray(resizedImage);
             }
 
-            for (int i = 0; i < deck.NumberOfKeys; i++)
+            for (int i = 0; i < deck.KeyCount; i++)
             {
                 var img = GetKeyImageFromFull(i, imgData);
                 deck.SetKeyBitmap(i, img);
@@ -71,14 +71,14 @@ namespace StreamDeckSharp.Examples.DrawFullScreen
             }
         }
 
-        static StreamDeckKeyBitmap GetKeyImageFromFull(int keyId, byte[] fullImageData)
+        static KeyBitmap GetKeyImageFromFull(int keyId, byte[] fullImageData)
         {
             var y = keyId / 5;
             var x = 4 - keyId % 5;
             return GetKeyImageFromFull(x, y, fullImageData);
         }
 
-        static StreamDeckKeyBitmap GetKeyImageFromFull(int xPos, int yPos, byte[] fullImageData)
+        static KeyBitmap GetKeyImageFromFull(int xPos, int yPos, byte[] fullImageData)
         {
             var keyImgData = new byte[buttonPxSize * buttonPxSize * 3];
             var xOffset = xPos * (buttonPxSize + buttonPxDist);
@@ -97,7 +97,7 @@ namespace StreamDeckSharp.Examples.DrawFullScreen
                 }
             }
 
-            return StreamDeckKeyBitmap.FromRawBitmap(keyImgData);
+            return KeyBitmap.FromRawBitmap(keyImgData);
         }
     }
 }

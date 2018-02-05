@@ -8,7 +8,7 @@ namespace StreamDeckSharp
     /// <summary>
     /// Internal StreamDeck HID communication class
     /// </summary>
-    internal static class StreamDeckCom
+    internal static class HidCommunicationHelper
     {
         public const int VendorId = 0x0fd9;    //Elgato Systems GmbH
         public const int ProductId = 0x0060;   //Stream Deck
