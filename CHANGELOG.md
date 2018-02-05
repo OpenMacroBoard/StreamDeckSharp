@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
+## [Unreleased]
+### Changed
+  - Major refactoring  
+    _(Some stuff in IStreamDeck was renamed)_
+
 ## [0.1.8] - 2018-01-29
 ### Added
   - Example _"DrawFullScreen"_  
