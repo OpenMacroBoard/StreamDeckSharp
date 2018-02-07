@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
 ## [Unreleased]
+### Added
+  - KeyBitmaps now overrides `Equals`, `GetHashCode`, `==` and `!=` and implements `IEquatable<KeyBitmap>`
 ### Changed
   - Major refactoring  
     _(Some stuff in IStreamDeck was renamed)_
