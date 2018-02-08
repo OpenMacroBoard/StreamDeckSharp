@@ -30,8 +30,8 @@ namespace StreamDeckSharp
         internal const int rawBitmapDataLength = iconSize * iconSize * 3;
 
         private readonly Task[] backgroundTasks;
-        private readonly CancellationTokenSource threadCancelSource = new CancellationTokenSource();
-        private readonly KeyRepaintQueue qqq = new KeyRepaintQueue();
+        private readonly CancellationTokenSource threadCancelSource;
+        private readonly KeyRepaintQueue imageQueue;
         private readonly object disposeLock = new object();
 
         public int IconSize => iconSize;
@@ -40,7 +40,7 @@ namespace StreamDeckSharp
         public void SetKeyBitmap(int keyId, KeyBitmap bitmap)
         {
             VerifyNotDisposed();
-            qqq.Enqueue(keyId, bitmap?.rawBitmapData);
+            imageQueue.Enqueue(keyId, bitmap?.rawBitmapData);
         }
 
         public void Dispose()
@@ -54,7 +54,7 @@ namespace StreamDeckSharp
             if (device == null) return;
 
             threadCancelSource.Cancel();
-            device.SetAllEvents();
+            device.SetAllEvents(true);
             Task.WaitAll(backgroundTasks);
 
             ShowLogoWithoutDisposeVerification();
@@ -73,13 +73,11 @@ namespace StreamDeckSharp
             if (!device.IsOpen) throw new Exception("Device could not be opened");
             this.device = device;
 
+            threadCancelSource = new CancellationTokenSource();
+            imageQueue = new KeyRepaintQueue(threadCancelSource.Token);
+
             this.device.Inserted += Device_Inserted;
             this.device.Removed += Device_Removed;
-
-            for (int i = 0; i < numOfKeys; i++)
-            {
-                keyLocks[i] = new object();
-            }
 
             var numberOfWriterThreads = 1;
             var numberOfReadThreads = 1;
@@ -90,22 +88,19 @@ namespace StreamDeckSharp
             {
                 backgroundTasks[i] = Task.Factory.StartNew(() =>
                 {
-                    var cancelToken = threadCancelSource.Token;
+                    byte[] p1Buffer = new byte[HidCommunicationHelper.PagePacketSize];
+                    byte[] p2Buffer = new byte[HidCommunicationHelper.PagePacketSize];
 
                     while (true)
                     {
-                        var res = qqq.Dequeue(out Tuple<int, byte[]> nextBm, cancelToken);
-                        if (!res) break;
+                        var res = imageQueue.Dequeue();
+                        if (!res.success) break;
 
-                        var id = nextBm.Item1;
-                        lock (keyLocks[id])
-                        {
-                            var page1 = HidCommunicationHelper.GeneratePage1(id, nextBm.Item2);
-                            var page2 = HidCommunicationHelper.GeneratePage2(id, nextBm.Item2);
+                        HidCommunicationHelper.GeneratePage1(p1Buffer, res.keyId, res.data);
+                        HidCommunicationHelper.GeneratePage2(p2Buffer, res.keyId, res.data);
 
-                            device.Write(page1);
-                            device.Write(page2);
-                        }
+                        device.Write(p1Buffer);
+                        device.Write(p2Buffer);
                     }
                 }, TaskCreationOptions.LongRunning);
             }
@@ -147,8 +142,6 @@ namespace StreamDeckSharp
             ProcessNewStates(report.Data);
             _d.ReadReport(ReadCallback);
         }
-
-        private readonly object[] keyLocks = new object[numOfKeys];
 
         private void ProcessNewStates(byte[] newStates)
         {

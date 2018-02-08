@@ -12,8 +12,8 @@ namespace StreamDeckSharp
     {
         public const int VendorId = 0x0fd9;    //Elgato Systems GmbH
         public const int ProductId = 0x0060;   //Stream Deck
+        public const int PagePacketSize = 8191;
 
-        private const int pagePacketSize = 8191;
         private const int numFirstPagePixels = 2583;
         private const int numSecondPagePixels = 2601;
 
@@ -34,28 +34,30 @@ namespace StreamDeckSharp
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        public static byte[] GeneratePage1(int keyId, byte[] imgData)
+        public static void GeneratePage1(byte[] buffer, int keyId, byte[] imgData)
         {
-            var p1 = new byte[pagePacketSize];
-            Array.Copy(headerTemplatePage1, p1, headerTemplatePage1.Length);
+            Array.Copy(headerTemplatePage1, buffer, headerTemplatePage1.Length);
 
             if (imgData != null)
-                Array.Copy(imgData, 0, p1, headerTemplatePage1.Length, numFirstPagePixels * 3);
+                Array.Copy(imgData, 0, buffer, headerTemplatePage1.Length, numFirstPagePixels * 3);
+            else
+                for (int i = headerTemplatePage1.Length; i < numFirstPagePixels * 3; i++)
+                    buffer[i] = 0;
 
-            p1[5] = (byte)(keyId + 1);
-            return p1;
+            buffer[5] = (byte)(keyId + 1);
         }
 
-        public static byte[] GeneratePage2(int keyId, byte[] imgData)
+        public static void GeneratePage2(byte[] buffer, int keyId, byte[] imgData)
         {
-            var p2 = new byte[pagePacketSize];
-            Array.Copy(headerTemplatePage2, p2, headerTemplatePage2.Length);
+            Array.Copy(headerTemplatePage2, buffer, headerTemplatePage2.Length);
 
             if (imgData != null)
-                Array.Copy(imgData, numFirstPagePixels * 3, p2, headerTemplatePage2.Length, numSecondPagePixels * 3);
+                Array.Copy(imgData, numFirstPagePixels * 3, buffer, headerTemplatePage2.Length, numSecondPagePixels * 3);
+            else
+                for (int i = headerTemplatePage2.Length; i < numSecondPagePixels * 3; i++)
+                    buffer[i] = 0;
 
-            p2[5] = (byte)(keyId + 1);
-            return p2;
+            buffer[5] = (byte)(keyId + 1);
         }
 
         public static byte[] GetBrightnessMsg(byte percent)
