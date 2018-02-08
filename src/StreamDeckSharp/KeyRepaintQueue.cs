@@ -14,6 +14,20 @@ namespace StreamDeckSharp
             public readonly Stopwatch lastDraw = Stopwatch.StartNew();
         }
 
+        public struct DequeueElement
+        {
+            public bool success;
+            public int keyId;
+            public byte[] data;
+
+            public DequeueElement(bool success, int keyId, byte[] data)
+            {
+                this.success = success;
+                this.keyId = keyId;
+                this.data = data;
+            }
+        }
+
         public readonly KeyBitmapHolder[] KeyInfo;
         private readonly WaitHandle[] allWaitHandles;
         private readonly WaitHandle cancelWaitHandle;
@@ -53,11 +67,11 @@ namespace StreamDeckSharp
             KeyInfo[keyId].dirtyEvent.Set();
         }
 
-        public (bool success, int keyId, byte[] data) Dequeue()
+        public DequeueElement Dequeue()
         {
             var keyId = WaitForKeyOrExit();
-            if (keyId == exitCode) return (false, -1, null);
-            return (true, keyId, KeyInfo[keyId].bitmapData);
+            if (keyId == exitCode) return new DequeueElement(false, -1, null);
+            return new DequeueElement(true, keyId, KeyInfo[keyId].bitmapData);
         }
 
         private int WaitForKeyOrExit()
