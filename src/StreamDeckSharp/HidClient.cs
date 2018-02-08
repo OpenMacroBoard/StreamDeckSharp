@@ -90,11 +90,15 @@ namespace StreamDeckSharp
                 {
                     byte[] p1Buffer = new byte[HidCommunicationHelper.PagePacketSize];
                     byte[] p2Buffer = new byte[HidCommunicationHelper.PagePacketSize];
+                    byte[] emptyImage = new byte[HidClient.rawBitmapDataLength];
 
                     while (true)
                     {
                         var res = imageQueue.Dequeue();
                         if (!res.success) break;
+
+                        if (res.data == null)
+                            res.data = emptyImage;
 
                         HidCommunicationHelper.GeneratePage1(p1Buffer, res.keyId, res.data);
                         HidCommunicationHelper.GeneratePage2(p2Buffer, res.keyId, res.data);

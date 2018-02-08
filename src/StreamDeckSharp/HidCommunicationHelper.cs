@@ -37,26 +37,14 @@ namespace StreamDeckSharp
         public static void GeneratePage1(byte[] buffer, int keyId, byte[] imgData)
         {
             Array.Copy(headerTemplatePage1, buffer, headerTemplatePage1.Length);
-
-            if (imgData != null)
-                Array.Copy(imgData, 0, buffer, headerTemplatePage1.Length, numFirstPagePixels * 3);
-            else
-                for (int i = headerTemplatePage1.Length; i < numFirstPagePixels * 3; i++)
-                    buffer[i] = 0;
-
+            Array.Copy(imgData, 0, buffer, headerTemplatePage1.Length, numFirstPagePixels * 3);
             buffer[5] = (byte)(keyId + 1);
         }
 
         public static void GeneratePage2(byte[] buffer, int keyId, byte[] imgData)
         {
             Array.Copy(headerTemplatePage2, buffer, headerTemplatePage2.Length);
-
-            if (imgData != null)
-                Array.Copy(imgData, numFirstPagePixels * 3, buffer, headerTemplatePage2.Length, numSecondPagePixels * 3);
-            else
-                for (int i = headerTemplatePage2.Length; i < numSecondPagePixels * 3; i++)
-                    buffer[i] = 0;
-
+            Array.Copy(imgData, numFirstPagePixels * 3, buffer, headerTemplatePage2.Length, numSecondPagePixels * 3);
             buffer[5] = (byte)(keyId + 1);
         }
 
