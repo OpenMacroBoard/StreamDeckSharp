@@ -6,9 +6,14 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
 ### Added
   - KeyBitmaps now overrides `Equals`, `GetHashCode`, `==` and `!=` and implements `IEquatable<KeyBitmap>`
 ### Changed
-  - Major refactoring  
-    _(Some stuff in IStreamDeck was renamed)_
-
+  - Renaming many classes  
+    _(remove "StreamDeck"-prefix)_
+  - Moved examples to seperate repository
+### Fixed
+  - Image glitches  
+    _Use the same buffer for hid reports and added a cooldown of 75ms for each key,
+	this should prevent reuse of memory before async (overlapped) write is finished_
+	
 ## [0.1.8] - 2018-01-29
 ### Added
   - Example _"DrawFullScreen"_  
