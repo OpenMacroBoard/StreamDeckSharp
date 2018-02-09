@@ -3,12 +3,14 @@ All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
 ## [Unreleased]
+
+## [0.1.9] - 2018-02-09
 ### Added
   - KeyBitmaps now overrides `Equals`, `GetHashCode`, `==` and `!=` and implements `IEquatable<KeyBitmap>`
 ### Changed
-  - Renaming many classes  
-    _(remove "StreamDeck"-prefix)_
-  - Moved examples to seperate repository
+  - Renamed many classes  
+    _(remove "StreamDeck"-prefix, thats what namespaces are for)_
+  - Moved examples to separate repository
 ### Fixed
   - Image glitches  
     _Use the same buffer for hid reports and added a cooldown of 75ms for each key,

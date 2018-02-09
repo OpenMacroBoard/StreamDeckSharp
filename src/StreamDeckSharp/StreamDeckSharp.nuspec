@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<package >
+<package>
 	<metadata>
 		<id>streamdecksharp</id>
-		<version>0.1.8</version>
+		<version>0.1.9</version>
 		<title>StreamDeckSharp</title>
 		<authors>Christian Wischenbart</authors>
 		<licenseUrl>https://github.com/OpenStreamDeck/StreamDeckSharp/blob/master/LICENSE.md</licenseUrl>
