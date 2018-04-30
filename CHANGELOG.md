@@ -4,6 +4,10 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
 
 ## [Unreleased]
 
+## [0.1.10] - 2018-04-30
+### Added
+  - StreamDeck.EnumerateDevices to discover all connected StreamDeck devices.
+
 ## [0.1.9] - 2018-02-09
 ### Added
   - KeyBitmaps now overrides `Equals`, `GetHashCode`, `==` and `!=` and implements `IEquatable<KeyBitmap>`

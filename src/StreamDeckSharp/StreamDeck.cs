@@ -1,5 +1,6 @@
 ﻿using HidLibrary;
 using StreamDeckSharp.Exceptions;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StreamDeckSharp
@@ -13,18 +14,11 @@ namespace StreamDeckSharp
         /// Enumerates connected Stream Decks and returns the first one.
         /// </summary>
         /// <returns>The default <see cref="IStreamDeck"/> HID</returns>
-        /// <exception cref="StreamDeckNotFoundException">Thrown when no Stream Deck is found</exception>
+        /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
         public static IStreamDeck OpenDevice()
         {
-            var dev = HidDevices.Enumerate(
-                HidCommunicationHelper.VendorId,
-                HidCommunicationHelper.ProductId
-            ).FirstOrDefault();
-
-            if (dev == null)
-                throw new StreamDeckNotFoundException();
-
-            return new HidClient(dev);
+            var dev = EnumerateDevices().FirstOrDefault();
+            return dev?.Open() ?? throw new StreamDeckNotFoundException();
         }
 
         /// <summary>
@@ -32,14 +26,31 @@ namespace StreamDeckSharp
         /// </summary>
         /// <param name="devicePath"></param>
         /// <returns><see cref="IStreamDeck"/> specified by <paramref name="devicePath"/></returns>
+        /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
         public static IStreamDeck OpenDevice(string devicePath)
         {
             var dev = HidDevices.GetDevice(devicePath);
+            return new HidClient(dev ?? throw new StreamDeckNotFoundException());
+        }
 
-            if (dev == null)
-                throw new StreamDeckNotFoundException();
+        /// <summary>
+        /// Enumerates all available StreamDeck devices
+        /// </summary>
+        /// <returns>Returns <see cref="DeviceInfo"/> for every StreamDeck device found</returns>
+        public static IEnumerable<DeviceInfo> EnumerateDevices()
+        {
+            var hidDevices = HidDevices.Enumerate(
+                HidCommunicationHelper.VendorId,
+                HidCommunicationHelper.ProductId
+            );
 
-            return new HidClient(dev);
+            foreach (var d in hidDevices)
+            {
+                using (d)
+                {
+                    yield return new DeviceInfo(d.DevicePath);
+                }
+            }
         }
     }
 }
