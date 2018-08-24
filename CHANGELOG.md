@@ -4,6 +4,25 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
 
 ## [Unreleased]
 
+## [0.2.0] - 2018-08-25 - *OpenMacroBoard* :tada:
+Elgato Systems released the *"Steam Deck Mini"* a few weeks ago so I decided to refactor
+`StreamDeckSharp` and use a more generic approach that makes it possible to implement
+many different macro boards (with LCD buttons) - even ones with buttons that are not placed in a grid layout (like keyboards).
+
+Because of this changes I decided to split `StreamDeckSharp` into a generic part called `OpenMacroBoard.SDK`
+and the StreamDeck specific part still called `StreamDeckSharp` and to change the organization name from `OpenStreamDeck` to `OpenMacroBoard` to reflect the generic nature.
+
+### Added
+  - `OpenMacroBoard.VirtualBoard` to allow developing software for macro boards (eg. Stream Deck) without real hardware.
+  - A bunch of unit tests
+  - `IKeyBitmapDataAccess` to retrieve raw RGB data from KeyBitmaps
+  - `IKeyPositionCollection` to allow for complex key layouts.
+  - `DrawFullScreenExtension` is now part of the library (instead of just an example project)
+  - More unit tests
+  - Support for different LCD key resolutions
+### Changed
+  - Interface name `IStreamDeck` to `IMacroBoard`
+
 ## [0.1.10] - 2018-04-30
 ### Added
   - StreamDeck.EnumerateDevices to discover all connected StreamDeck devices.
