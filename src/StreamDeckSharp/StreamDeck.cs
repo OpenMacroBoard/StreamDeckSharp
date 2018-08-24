@@ -1,7 +1,9 @@
-﻿using HidLibrary;
-using StreamDeckSharp.Exceptions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using HidLibrary;
+using OpenMacroBoard.SDK;
+using StreamDeckSharp.Exceptions;
+using StreamDeckSharp.Internals;
 
 namespace StreamDeckSharp
 {
@@ -13,44 +15,53 @@ namespace StreamDeckSharp
         /// <summary>
         /// Enumerates connected Stream Decks and returns the first one.
         /// </summary>
-        /// <returns>The default <see cref="IStreamDeck"/> HID</returns>
+        /// <returns>The default <see cref="IMacroBoard"/> HID</returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IStreamDeck OpenDevice()
+        public static IMacroBoard OpenDevice()
         {
             var dev = EnumerateDevices().FirstOrDefault();
             return dev?.Open() ?? throw new StreamDeckNotFoundException();
         }
 
         /// <summary>
-        /// Get <see cref="IStreamDeck"/> with given <paramref name="devicePath"/>
+        /// Get <see cref="IMacroBoard"/> with given <paramref name="devicePath"/>
         /// </summary>
         /// <param name="devicePath"></param>
-        /// <returns><see cref="IStreamDeck"/> specified by <paramref name="devicePath"/></returns>
+        /// <returns><see cref="IMacroBoard"/> specified by <paramref name="devicePath"/></returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IStreamDeck OpenDevice(string devicePath)
+        public static IMacroBoard OpenDevice(string devicePath)
         {
             var dev = HidDevices.GetDevice(devicePath);
-            return new HidClient(dev ?? throw new StreamDeckNotFoundException());
+            return CachedHidClient.FromHid(dev ?? throw new StreamDeckNotFoundException());
         }
 
         /// <summary>
-        /// Enumerates all available StreamDeck devices
+        /// Enumerate Elgato Stream Deck Devices that match a given type.
         /// </summary>
-        /// <returns>Returns <see cref="DeviceInfo"/> for every StreamDeck device found</returns>
-        public static IEnumerable<DeviceInfo> EnumerateDevices()
+        /// <param name="hardware">If no types or null is passed passed as argument, all known types are found</param>
+        /// <returns></returns>
+        public static IEnumerable<IDeviceReferenceHandle> EnumerateDevices(params IUsbHidHardware[] hardware)
         {
-            var hidDevices = HidDevices.Enumerate(
-                HidCommunicationHelper.VendorId,
-                HidCommunicationHelper.ProductId
-            );
+            var matchAllKnowDevices = hardware is null || hardware.Length < 1;
 
-            foreach (var d in hidDevices)
+            bool DoesMatchHardware(HidDevice d)
             {
-                using (d)
+                if (!Hardware.IsKnownDevice(d.Attributes.VendorId, d.Attributes.ProductId))
+                    return false;
+
+                if (matchAllKnowDevices)
+                    return true;
+
+                foreach (var h in hardware)
                 {
-                    yield return new DeviceInfo(d.DevicePath);
+                    if (d.Attributes.VendorId == h.UsbVendorId &&
+                        d.Attributes.ProductId == h.UsbProductId)
+                        return true;
                 }
+                return false;
             }
+
+            return HidDevices.Enumerate().Where(DoesMatchHardware).Select(d => new DeviceRefereceHandle(d.DevicePath));
         }
     }
 }

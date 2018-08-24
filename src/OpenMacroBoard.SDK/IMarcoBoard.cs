@@ -1,21 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace StreamDeckSharp
+namespace OpenMacroBoard.SDK
 {
     /// <summary>
-    /// Bare minimum StreamDeck Interface.
+    /// An interface that allows you to interact with (LCD) macro boards
     /// </summary>
-    public interface IStreamDeck : IDisposable
+    public interface IMacroBoard : IDisposable
     {
         /// <summary>
-        /// The number of keys present on the Stream Deck
+        /// Informations about the keys and their position
         /// </summary>
-        /// <remarks>
-        /// At the moment there is only a Stream Deck device with 5x3 keys.
-        /// But this may change in the future so please use this property in your
-        /// code / for-loops.
-        /// </remarks>
-        int KeyCount { get; }
+        IKeyPositionCollection Keys { get; }
 
         /// <summary>
         /// Is raised when a key is pressed
@@ -23,7 +21,17 @@ namespace StreamDeckSharp
         event EventHandler<KeyEventArgs> KeyStateChanged;
 
         /// <summary>
-        /// Sets the brightness for this <see cref="IStreamDeck"/>
+        /// Gets a value indicating whether the MarcoBoard is connected.
+        /// </summary>
+        bool IsConnected { get; }
+
+        /// <summary>
+        /// Is raised when the MarcoBoard is beeing disconnected or connected
+        /// </summary>
+        event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
+
+        /// <summary>
+        /// Sets the brightness for this <see cref="IMacroBoard"/>
         /// </summary>
         /// <param name="percent">Brightness in percent (0 - 100)</param>
         /// <remarks>
@@ -43,23 +51,8 @@ namespace StreamDeckSharp
         void SetKeyBitmap(int keyId, KeyBitmap bitmapData);
 
         /// <summary>
-        /// Shows the Stream Deck logo (Fullscreen)
+        /// Shows the standby logo (Fullscreen)
         /// </summary>
         void ShowLogo();
-
-        /// <summary>
-        /// Size of the icon in pixels
-        /// </summary>
-        int IconSize { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the StreamDeck is connected.
-        /// </summary>
-        bool IsConnected { get; }
-
-        /// <summary>
-        /// Is raised when the StreamDeck is beeing disconnected or connected
-        /// </summary>
-        event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
     }
 }

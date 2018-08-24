@@ -1,13 +1,14 @@
 ﻿using HidLibrary;
+using OpenMacroBoard.SDK;
 
 namespace StreamDeckSharp
 {
     /// <summary>
     /// Device information about Stream Deck
     /// </summary>
-    public class DeviceInfo
+    public class DeviceRefereceHandle : IDeviceReferenceHandle
     {
-        internal DeviceInfo(string devicePath)
+        internal DeviceRefereceHandle(string devicePath)
         {
             DevicePath = devicePath;
         }
@@ -20,7 +21,7 @@ namespace StreamDeckSharp
         /// <summary>
         /// Opens the StreamDeck handle
         /// </summary>
-        /// <returns>Returns an <see cref="IStreamDeck"/> reference</returns>
-        public IStreamDeck Open() => StreamDeck.OpenDevice(DevicePath);
+        /// <returns>Returns an <see cref="IMacroBoard"/> reference</returns>
+        public IMacroBoard Open() => StreamDeck.OpenDevice(DevicePath);
     }
 }

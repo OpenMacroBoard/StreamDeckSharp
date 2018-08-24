@@ -26,6 +26,9 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DocumentationFile>bin\Debug\StreamDeckSharp.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,6 +41,8 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Release\StreamDeckSharp.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -53,25 +58,36 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hardware.cs" />
+    <Compile Include="IHardware.cs" />
+    <Compile Include="Internals\ConcurrentBufferedQueue.cs" />
+    <Compile Include="Internals\HidDeviceExtensions.cs" />
+    <Compile Include="Internals\IHardwareInternalInfos.cs" />
+    <Compile Include="Internals\ITimeService.cs" />
+    <Compile Include="Internals\KeyBitmapExtensions.cs" />
+    <Compile Include="Internals\RelativeTimeSource.cs" />
+    <Compile Include="Internals\StreamDeckHardwareInfo.cs" />
+    <Compile Include="Internals\StreamDeckMiniHardwareInfo.cs" />
+    <Compile Include="Internals\BasicHidClient.cs" />
     <Compile Include="DeviceInfo.cs" />
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="IStreamDeck.cs" />
+    <Compile Include="Exceptions\StreamDeckNotFoundException.cs" />
+    <Compile Include="Internals\IStreamDeckHid.cs" />
+    <Compile Include="Internals\OutputReportGenerator.cs" />
+    <Compile Include="Internals\CachedHidClient.cs" />
+    <Compile Include="IUsbHidHardware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="KeyRepaintQueue.cs" />
     <Compile Include="StreamDeck.cs" />
-    <Compile Include="HidCommunicationHelper.cs" />
-    <Compile Include="ConnectionEventArgs.cs" />
-    <Compile Include="HidClient.cs" />
-    <Compile Include="InterfaceExtensions.cs" />
-    <Compile Include="KeyBitmap.cs" />
-    <Compile Include="KeyBitmap_Drawing.cs" />
-    <Compile Include="KeyBitmap_Wpf.cs" />
-    <Compile Include="KeyEventArgs.cs" />
+    <Compile Include="Exceptions\StreamDeckException.cs" />
+    <Compile Include="Internals\StreamDeckHidWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HidLibrary\src\HidLibrary\HidLibrary.csproj">
       <Project>{9e8f1d50-74ea-4c60-bd5c-ab2c5b53bc66}</Project>
       <Name>HidLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
+      <Project>{4bdfc513-16b4-47ed-b230-ed06e7028455}</Project>
+      <Name>OpenMacroBoard.SDK</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
