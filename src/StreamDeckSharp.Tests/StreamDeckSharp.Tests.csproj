@@ -93,10 +93,6 @@
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
-      <Project>{4BDFC513-16B4-47ED-B230-ED06E7028455}</Project>
-      <Name>OpenMacroBoard.SDK</Name>
-    </ProjectReference>
     <ProjectReference Include="..\StreamDeckSharp\StreamDeckSharp.csproj">
       <Project>{d06ab787-766e-4b28-89c4-8d948070eb1c}</Project>
       <Name>StreamDeckSharp</Name>
