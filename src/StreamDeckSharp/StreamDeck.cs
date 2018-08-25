@@ -17,9 +17,9 @@ namespace StreamDeckSharp
         /// </summary>
         /// <returns>The default <see cref="IMacroBoard"/> HID</returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IMacroBoard OpenDevice()
+        public static IMacroBoard OpenDevice(params IUsbHidHardware[] hardware)
         {
-            var dev = EnumerateDevices().FirstOrDefault();
+            var dev = EnumerateDevices(hardware).FirstOrDefault();
             return dev?.Open() ?? throw new StreamDeckNotFoundException();
         }
 

@@ -1,6 +1,3 @@
 [submodule "src/HidLibrary"]
 	path = src/HidLibrary
 	url = https://github.com/OpenStreamDeck/HidLibrary
-[submodule "src/OpenMacroBoard"]
-	path = src/OpenMacroBoard
-	url = https://github.com/OpenMacroBoard/OpenMacroBoard-Core
