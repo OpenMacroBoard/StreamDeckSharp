@@ -22,6 +22,8 @@ and the StreamDeck specific part still called `StreamDeckSharp` and to change th
   - Support for different LCD key resolutions
 ### Changed
   - Interface name `IStreamDeck` to `IMacroBoard`
+  - KeyId order for the stream deck changed to be more intuitive
+    _(left-to-right and top-to-bottom)_
 
 ## [0.1.10] - 2018-04-30
 ### Added
