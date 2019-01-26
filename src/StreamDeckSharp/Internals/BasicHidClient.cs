@@ -1,9 +1,9 @@
-﻿using System;
-using OpenMacroBoard.SDK;
+﻿using OpenMacroBoard.SDK;
+using System;
 
 namespace StreamDeckSharp.Internals
 {
-    internal class BasicHidClient : IMacroBoard
+    internal class BasicHidClient : IStreamDeckBoard
     {
         private readonly byte[] keyStates;
         private readonly object disposeLock = new object();
@@ -30,9 +30,10 @@ namespace StreamDeckSharp.Internals
             );
         }
 
-        public IKeyPositionCollection Keys { get; }
-        public bool IsConnected => deckHid.IsConnected;
+        public GridKeyPositionCollection Keys { get; }
+        IKeyPositionCollection IMacroBoard.Keys => Keys;
 
+        public bool IsConnected => deckHid.IsConnected;
         public event EventHandler<KeyEventArgs> KeyStateChanged;
         public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
 

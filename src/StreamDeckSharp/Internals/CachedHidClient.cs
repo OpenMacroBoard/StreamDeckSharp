@@ -69,7 +69,7 @@ namespace StreamDeckSharp.Internals
             imageQueue.Add(keyId, payload);
         }
 
-        public static IMacroBoard FromHid(HidDevice device)
+        public static IStreamDeckBoard FromHid(HidDevice device)
         {
             var hidWrapper = new StreamDeckHidWrapper(device);
             return new CachedHidClient(hidWrapper, device.GetHardwareInformation());

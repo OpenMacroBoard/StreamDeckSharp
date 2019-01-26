@@ -10,6 +10,6 @@ namespace StreamDeckSharp
         /// <summary>
         /// Key layout information
         /// </summary>
-        IKeyPositionCollection Keys { get; }
+        GridKeyPositionCollection Keys { get; }
     }
 }

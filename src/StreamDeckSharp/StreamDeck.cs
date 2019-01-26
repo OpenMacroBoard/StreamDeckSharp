@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HidLibrary;
-using OpenMacroBoard.SDK;
+﻿using HidLibrary;
 using StreamDeckSharp.Exceptions;
 using StreamDeckSharp.Internals;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace StreamDeckSharp
 {
@@ -15,21 +14,21 @@ namespace StreamDeckSharp
         /// <summary>
         /// Enumerates connected Stream Decks and returns the first one.
         /// </summary>
-        /// <returns>The default <see cref="IMacroBoard"/> HID</returns>
+        /// <returns>The default <see cref="IStreamDeckBoard"/> HID</returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IMacroBoard OpenDevice(params IUsbHidHardware[] hardware)
+        public static IStreamDeckBoard OpenDevice(params IUsbHidHardware[] hardware)
         {
             var dev = EnumerateDevices(hardware).FirstOrDefault();
             return dev?.Open() ?? throw new StreamDeckNotFoundException();
         }
 
         /// <summary>
-        /// Get <see cref="IMacroBoard"/> with given <paramref name="devicePath"/>
+        /// Get <see cref="IStreamDeckBoard"/> with given <paramref name="devicePath"/>
         /// </summary>
         /// <param name="devicePath"></param>
-        /// <returns><see cref="IMacroBoard"/> specified by <paramref name="devicePath"/></returns>
+        /// <returns><see cref="IStreamDeckBoard"/> specified by <paramref name="devicePath"/></returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IMacroBoard OpenDevice(string devicePath)
+        public static IStreamDeckBoard OpenDevice(string devicePath)
         {
             var dev = HidDevices.GetDevice(devicePath);
             return CachedHidClient.FromHid(dev ?? throw new StreamDeckNotFoundException());
@@ -40,7 +39,7 @@ namespace StreamDeckSharp
         /// </summary>
         /// <param name="hardware">If no types or null is passed passed as argument, all known types are found</param>
         /// <returns></returns>
-        public static IEnumerable<IDeviceReferenceHandle> EnumerateDevices(params IUsbHidHardware[] hardware)
+        public static IEnumerable<IStreamDeckRefHandle> EnumerateDevices(params IUsbHidHardware[] hardware)
         {
             var matchAllKnowDevices = hardware is null || hardware.Length < 1;
 

@@ -2,17 +2,17 @@
 <package>
 	<metadata>
 		<id>StreamDeckSharp</id>
-		<version>0.2.0</version>
+		<version>0.3.0</version>
 		<title>StreamDeckSharp</title>
 		<authors>Christian Wischenbart</authors>
-		<licenseUrl>https://github.com/OpenMacroBoard/StreamDeckSharp/blob/master/LICENSE.md</licenseUrl>
+		<license type="expression">MIT</license>
 		<projectUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</projectUrl>
 		<iconUrl>https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/master/doc/icon64.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>A simple .NET interface for the Stream Deck HID</description>
 		<tags>streamdeck elgato stream deck open macro board openmacroboard streamdeckmini</tags>
 		<dependencies>
-			<dependency id="OpenMacroBoard.SDK" version="[0.2,0.3)" />
+			<dependency id="OpenMacroBoard.SDK" version="[0.3,0.4)" />
 		</dependencies>
 	</metadata>
 	<files>

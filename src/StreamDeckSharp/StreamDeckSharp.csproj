@@ -46,7 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenMacroBoard.SDK, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenMacroBoard.SDK.0.2.0\lib\net40\OpenMacroBoard.SDK.dll</HintPath>
+      <HintPath>..\packages\OpenMacroBoard.SDK.0.3.0\lib\net40\OpenMacroBoard.SDK.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -77,6 +77,8 @@
     <Compile Include="Internals\IStreamDeckHid.cs" />
     <Compile Include="Internals\OutputReportGenerator.cs" />
     <Compile Include="Internals\CachedHidClient.cs" />
+    <Compile Include="IStreamDeckBoard.cs" />
+    <Compile Include="IStreamDeckRefHandle.cs" />
     <Compile Include="IUsbHidHardware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StreamDeck.cs" />

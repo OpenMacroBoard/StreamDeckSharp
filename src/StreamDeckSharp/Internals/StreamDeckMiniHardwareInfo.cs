@@ -17,16 +17,16 @@ namespace StreamDeckSharp.Internals
         public int UsbVendorId => Hardware.VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => Hardware.ProductIds.StreamDeckMini;
 
-        public IKeyPositionCollection Keys
+        public GridKeyPositionCollection Keys
             => keyPositions;
 
         static StreamDeckMiniHardwareInfo()
         {
             //3x2 keys with 80x80px icons and 25px in between
-            keyPositions = new KeyPositionCollection(3, 2, imgWidth, 25);
+            keyPositions = new GridKeyPositionCollection(3, 2, imgWidth, 25);
         }
 
-        private static readonly KeyPositionCollection keyPositions;
+        private static readonly GridKeyPositionCollection keyPositions;
         private static readonly byte[] bmpHeader = new byte[] {
             0x42, 0x4d, 0x36, 0x4b, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
