@@ -1,5 +1,6 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
+using System.Text;
 
 namespace StreamDeckSharp.Internals
 {
@@ -56,6 +57,18 @@ namespace StreamDeckSharp.Internals
 
         protected virtual void Shutdown() { }
         protected virtual void Dispose(bool managed) { }
+
+        public string GetFirmwareVersion()
+        {
+            var featureData = deckHid.ReadFeatureData(4);
+            return Encoding.UTF8.GetString(featureData, 5, featureData.Length - 5).Trim('\0');
+        }
+
+        public string GetSerialNumber()
+        {
+            var featureData = deckHid.ReadFeatureData(3);
+            return Encoding.UTF8.GetString(featureData, 5, featureData.Length - 5).Trim('\0');
+        }
 
         public void SetBrightness(byte percent)
         {

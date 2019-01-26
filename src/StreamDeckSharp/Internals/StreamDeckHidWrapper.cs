@@ -53,5 +53,11 @@ namespace StreamDeckSharp.Internals
 
         public bool WriteReport(byte[] reportData)
             => device?.Write(reportData) ?? false;
+
+        public byte[] ReadFeatureData(byte id)
+        {
+            device.ReadFeatureData(out var data, id);
+            return data;
+        }
     }
 }
