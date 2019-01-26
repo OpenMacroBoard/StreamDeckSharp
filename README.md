@@ -17,20 +17,22 @@
 
 I want to...              | Code (C#)
 ------------------------- | ---------------------------------------------------------
-create a device reference | `var deck = StreamDeck.FromHID();`  
+create a device reference | `var deck = StreamDeck.OpenDevice();`  
 set the brightness        | `deck.SetBrightness(50);`
-create bitmap for key     | `var bitmap = StreamDeckKeyBitmap.FromFile("icon.png")`
-set key image             | `deck.SetKeyBitmap(keyId,bitmap)`
+create bitmap for key     | `var bitmap = KeyBitmap.Create.FromFile("icon.png")`
+set key image             | `deck.SetKeyBitmap(keyId, bitmap)`
 clear key image           | `deck.ClearKey(keyId)`
-process key events        | `deck.KeyPressed += KeyHandler;`
+process key events        | `deck.KeyStateChanged += KeyHandler;`
 
 **Make sure to dispose the device reference correctly** _(use `using` whenever possible)_
 
 ## Examples
-If you want to see some examples take a look at the example projects in the repo.  
-Here is a short example called "Austria". Copy the code and start hacking ;-)
+If you want to see some examples take a look at the [example projects](https://github.com/OpenMacroBoard/StreamDeckSharp.ExampleCollection).  
+Here is a short example called "Austria". Copy the code and start hacking :wink:
 
 ```C#
+using System;
+using OpenMacroBoard.SDK;
 using StreamDeckSharp;
 
 namespace StreamDeckSharp.Examples.Austria
@@ -39,19 +41,23 @@ namespace StreamDeckSharp.Examples.Austria
     {
         static void Main(string[] args)
         {
+            //This example is designed for the 5x3 (original) Stream Deck.
+
             //Create some color we use later to draw the flag of austria
-            var red = StreamDeckKeyBitmap.FromRGBColor(237, 41, 57);
-            var white = StreamDeckKeyBitmap.FromRGBColor(255, 255, 255);
-            var rowColors = new StreamDeckKeyBitmap[] { red, white, red };
+            var red = KeyBitmap.Create.FromRgb(237, 41, 57);
+            var white = KeyBitmap.Create.FromRgb(255, 255, 255);
+            var rowColors = new KeyBitmap[] { red, white, red };
 
             //Open the Stream Deck device
-            using (var deck = StreamDeck.FromHID())
+            using (var deck = StreamDeck.OpenDevice())
             {
                 deck.SetBrightness(100);
 
                 //Send the bitmap informaton to the device
-                for (int i = 0; i < deck.NumberOfKeys; i++)
+                for (int i = 0; i < deck.Keys.Count; i++)
                     deck.SetKeyBitmap(i, rowColors[i / 5]);
+
+                Console.ReadKey();
             }
         }
     }
@@ -65,7 +71,8 @@ Here is what the "Rainbow" example looks like after pressing some keys
 ### Play video on StreamDeck
 Here is a short demo of playing a video on the stream deck device.
 
-[![Demo video of the example](https://i.imgur.com/8tlkaIg.png)](http://www.youtube.com/watch?v=tNwUG0sPmKw)
+[![Demo video of the example](https://i.imgur.com/8tlkaIg.png)](http://www.youtube.com/watch?v=tNwUG0sPmKw)  
+_*The glitches you can see are already fixed._
 
 More about that in the Wiki: [Play video on StreamDeck](https://github.com/OpenStreamDeck/StreamDeckSharp/wiki/Play-video-on-StreamDeck)
 
