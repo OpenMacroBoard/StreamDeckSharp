@@ -11,8 +11,9 @@ namespace StreamDeckSharp.Internals
 
         public int KeyCount => keyPositions.Count;
         public int IconSize => ImgWidth;
-        public int ReportSize => 7803;
-        public int StartReportNumber => 1;
+        public int HeaderSize => 16;
+        public int ReportSize => 7819;
+        public int KeyReportOffset => 0;
         public int UsbVendorId => Hardware.VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => Hardware.ProductIds.StreamDeck;
 
@@ -68,6 +69,15 @@ namespace StreamDeckSharp.Internals
         {
             var diff = ((keyId % 5) - 2) * -2;
             return keyId + diff;
+        }
+
+        public void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast)
+        {
+            data[0] = 2; // Report ID ?
+            data[1] = 1; // ? 
+            data[2] = (byte)(pageNumber + 1);
+            data[4] = (byte)(isLast ? 1 : 0);
+            data[5] = (byte)(keyId + 1);
         }
     }
 }

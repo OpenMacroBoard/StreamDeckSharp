@@ -77,6 +77,7 @@
     <Compile Include="Internals\IStreamDeckHid.cs" />
     <Compile Include="Internals\OutputReportGenerator.cs" />
     <Compile Include="Internals\CachedHidClient.cs" />
+    <Compile Include="Internals\StreamDeckXlHardwareInfo.cs" />
     <Compile Include="IStreamDeckBoard.cs" />
     <Compile Include="IStreamDeckRefHandle.cs" />
     <Compile Include="IUsbHidHardware.cs" />

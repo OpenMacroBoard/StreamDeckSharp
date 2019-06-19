@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,18 +33,19 @@ namespace StreamDeckSharp.Internals
             {
                 while (true)
                 {
+                    KeyValuePair<int, byte[]> res;
+
                     try
                     {
-                        var res = imageQueue.Take();
-                        reportGenerator.Initialize(res.Value, res.Key);
+                        res = imageQueue.Take();
                     }
                     catch (InvalidOperationException)
                     {
                         break;
                     }
 
-                    while (reportGenerator.HasNextReport)
-                        deckHid.WriteReport(reportGenerator.GetNextReport());
+                    foreach (var report in OutputReportSplitter.Split(res.Value, buffer, hardwareInformation.ReportSize, hardwareInformation.HeaderSize, res.Key, hardwareInformation.PrepareDataForTransmittion))
+                        deckHid.WriteReport(report);
                 }
             }, TaskCreationOptions.LongRunning);
         }

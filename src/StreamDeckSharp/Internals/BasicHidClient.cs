@@ -6,9 +6,9 @@ namespace StreamDeckSharp.Internals
 {
     internal class BasicHidClient : IStreamDeckBoard
     {
+        protected readonly byte[] buffer;
         private readonly byte[] keyStates;
         private readonly object disposeLock = new object();
-        protected readonly OutputReportGenerator reportGenerator;
         protected readonly IHardwareInternalInfos hardwareInformation;
 
         private bool disposed;
@@ -22,13 +22,9 @@ namespace StreamDeckSharp.Internals
             deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
 
             this.hardwareInformation = hardwareInformation;
-            keyStates = new byte[Keys.Count];
 
-            reportGenerator = new OutputReportGenerator(
-                deckHid.OutputReportLength,
-                hardwareInformation.ReportSize,
-                hardwareInformation.StartReportNumber
-            );
+            buffer = new byte[deckHid.OutputReportLength];
+            keyStates = new byte[Keys.Count];
         }
 
         public GridKeyPositionCollection Keys { get; }
@@ -81,10 +77,9 @@ namespace StreamDeckSharp.Internals
             keyId = hardwareInformation.ExtKeyIdToHardwareKeyId(keyId);
 
             var payload = hardwareInformation.GeneratePayload(bitmapData);
-            reportGenerator.Initialize(payload, keyId);
 
-            while (reportGenerator.HasNextReport)
-                deckHid.WriteReport(reportGenerator.GetNextReport());
+            foreach (var report in OutputReportSplitter.Split(payload, buffer, hardwareInformation.ReportSize, hardwareInformation.HeaderSize, keyId, hardwareInformation.PrepareDataForTransmittion))
+                deckHid.WriteReport(report);
         }
 
         public void ShowLogo()
@@ -102,13 +97,16 @@ namespace StreamDeckSharp.Internals
         public void ProcessKeys()
         {
             var newStates = deckHid.ReadReport();
+
             for (int i = 0; i < keyStates.Length; i++)
             {
-                if (keyStates[i] != newStates[i])
+                var newStatePos = i + hardwareInformation.KeyReportOffset;
+
+                if (keyStates[i] != newStates[newStatePos])
                 {
                     var externalKeyId = hardwareInformation.HardwareKeyIdToExtKeyId(i);
-                    KeyStateChanged?.Invoke(this, new KeyEventArgs(externalKeyId, newStates[i] != 0));
-                    keyStates[i] = newStates[i];
+                    KeyStateChanged?.Invoke(this, new KeyEventArgs(externalKeyId, newStates[newStatePos] != 0));
+                    keyStates[i] = newStates[newStatePos];
                 }
             }
         }
