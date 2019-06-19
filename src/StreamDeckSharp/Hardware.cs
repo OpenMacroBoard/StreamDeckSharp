@@ -17,6 +17,9 @@ namespace StreamDeckSharp
         /// </summary>
         public static IUsbHidHardware StreamDeckMini { get; }
 
+        /// <summary>
+        /// Details about the Stream Deck XL
+        /// </summary>
         public static IUsbHidHardware StreamDeckXL { get; }
 
         internal static IHardwareInternalInfos Internal_StreamDeck { get; }
