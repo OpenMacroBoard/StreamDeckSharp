@@ -1,72 +1,41 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace StreamDeckSharp.Internals
 {
-    internal class OutputReportGenerator
+    internal static class OutputReportSplitter
     {
-        private const int pageHeaderLength = 16;
+        public delegate void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast);
 
-        private readonly byte[] buffer;
-        private readonly int payloadLimit;
-        private readonly int startPageNum;
-        private byte[] payload;
-        private int bytesSent;
-        private int currentPage;
-
-        public bool HasNextReport { get; private set; }
-
-        public OutputReportGenerator(int reportLength, int payloadLimit, int startPageNum)
+        public static IEnumerable<byte[]> Split(
+            byte[] data,
+            byte[] buffer,
+            int bufferLength,
+            int headerSize,
+            int keyId,
+            PrepareDataForTransmittion prepareData
+        )
         {
-            buffer = new byte[reportLength];
-            buffer[0] = 2;
-            buffer[1] = 1;
-            this.payloadLimit = payloadLimit;
-            this.startPageNum = startPageNum;
-        }
+            var maxPayloadLength = bufferLength - headerSize;
 
-        public void Initialize(byte[] payload, int keyId)
-        {
-            this.payload = payload;
-            buffer[5] = (byte)(keyId + 1);
-            bytesSent = 0;
-            currentPage = 0;
-            HasNextReport = true;
-        }
+            var remainingBytes = data.Length;
+            var bytesSent = 0;
+            var splitNumber = 0;
 
-        public byte[] GetNextReport()
-        {
-            var remainingBytes = payload.Length - bytesSent;
-
-            var transferLength = 0;
-            var isLast = false;
-
-            if (remainingBytes <= payloadLimit)
+            while (remainingBytes > 0)
             {
-                transferLength = remainingBytes;
-                isLast = true;
+                var isLast = remainingBytes <= maxPayloadLength;
+                var bytesToSend = Math.Min(remainingBytes, maxPayloadLength);
+
+                Array.Copy(data, bytesSent, buffer, headerSize, bytesToSend);
+                prepareData(buffer, splitNumber, bytesToSend, keyId, isLast);
+                yield return buffer;
+
+                bytesSent += bytesToSend;
+                remainingBytes -= bytesToSend;
+                splitNumber++;
             }
-            else
-            {
-                transferLength = payloadLimit;
-            }
-
-            buffer[2] = (byte)(currentPage + startPageNum);
-            buffer[4] = (byte)(isLast ? 1 : 0);
-
-            //ToDo: set islast to buffer
-            Array.Copy(payload, bytesSent, buffer, pageHeaderLength, transferLength);
-
-            var bufferUsed = pageHeaderLength + transferLength;
-            var remainingBufferLen = buffer.Length - bufferUsed;
-
-            Array.Clear(buffer, bufferUsed, remainingBufferLen);
-
-            if (isLast)
-                HasNextReport = false;
-
-            bytesSent += transferLength;
-            currentPage++;
-            return buffer;
         }
     }
 }

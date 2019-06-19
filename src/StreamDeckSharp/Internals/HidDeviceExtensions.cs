@@ -15,6 +15,7 @@ namespace StreamDeckSharp.Internals
             {
                 case Hardware.ProductIds.StreamDeck: return Hardware.Internal_StreamDeck;
                 case Hardware.ProductIds.StreamDeckMini: return Hardware.Internal_StreamDeckMini;
+                case Hardware.ProductIds.StreamDeckXL: return Hardware.Internal_StreamDeckXL;
 
                 default:
                     throw new NotSupportedException($"ProductId {pid} is not supported.");

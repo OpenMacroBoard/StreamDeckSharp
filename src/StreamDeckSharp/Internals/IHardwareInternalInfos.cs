@@ -9,8 +9,9 @@ namespace StreamDeckSharp.Internals
 {
     internal interface IHardwareInternalInfos : IUsbHidHardware
     {
+        int HeaderSize { get; }
         int ReportSize { get; }
-        int StartReportNumber { get; }
+        int KeyReportOffset { get; }
         byte[] GeneratePayload(KeyBitmap keyBitmap);
 
         /// <summary>
@@ -32,5 +33,7 @@ namespace StreamDeckSharp.Internals
         /// <param name="hardwareKeyId"></param>
         /// <returns></returns>
         int HardwareKeyIdToExtKeyId(int hardwareKeyId);
+
+        void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast);
     }
 }
