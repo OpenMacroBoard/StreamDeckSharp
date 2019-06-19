@@ -12,6 +12,9 @@ namespace StreamDeckSharp.Internals
         {
             var keyDataAccess = (IKeyBitmapDataAccess)keyBitmap;
 
+            if (keyDataAccess.IsNull)
+                return null;
+
             var rawData = new byte[keyDataAccess.DataLength];
             keyDataAccess.CopyData(rawData, 0);
 
