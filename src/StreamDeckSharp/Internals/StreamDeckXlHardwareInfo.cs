@@ -9,7 +9,7 @@ namespace StreamDeckSharp.Internals
     internal sealed class StreamDeckXlHardwareInfo
         : IHardwareInternalInfos
     {
-        private const int imgWidth = 96;
+        private const int imgSize = 96;
 
         public int HeaderSize => 8;
 
@@ -29,7 +29,7 @@ namespace StreamDeckSharp.Internals
 
         static StreamDeckXlHardwareInfo()
         {
-            keyPositions = new GridKeyPositionCollection(8, 4, imgWidth, 25);
+            keyPositions = new GridKeyPositionCollection(8, 4, imgSize, 25);
         }
 
         public int ExtKeyIdToHardwareKeyId(int extKeyId)
@@ -37,7 +37,7 @@ namespace StreamDeckSharp.Internals
 
         public byte[] GeneratePayload(KeyBitmap keyBitmap)
         {
-            var rawData = keyBitmap.GetScaledVersion(imgWidth, imgWidth);
+            var rawData = keyBitmap.GetScaledVersion(imgSize, imgSize);
 
             if (rawData is null)
                 return GetNullImage();
@@ -63,7 +63,7 @@ namespace StreamDeckSharp.Internals
         {
             if (cachedNullImage is null)
             {
-                var rawNullImg = new KeyBitmap(1, 1, new byte[] { 0, 0, 0 }).GetScaledVersion(imgWidth, imgWidth);
+                var rawNullImg = new KeyBitmap(1, 1, new byte[] { 0, 0, 0 }).GetScaledVersion(imgSize, imgSize);
                 cachedNullImage = EncodeImageToJpg(rawNullImg);
             }
 
@@ -72,17 +72,17 @@ namespace StreamDeckSharp.Internals
 
         private static byte[] EncodeImageToJpg(byte[] rgb24)
         {
-            int stride = imgWidth * 4;
-            var data = new byte[imgWidth * stride];
+            int stride = imgSize * 4;
+            var data = new byte[imgSize * stride];
 
-            for (int y = 0; y < imgWidth; y++)
-                for (int x = 0; x < imgWidth; x++)
+            for (int y = 0; y < imgSize; y++)
+                for (int x = 0; x < imgSize; x++)
                 {
-                    var x1 = imgWidth - 1 - x;
-                    var y1 = imgWidth - 1 - y;
+                    var x1 = imgSize - 1 - x;
+                    var y1 = imgSize - 1 - y;
 
-                    var pTarget = (y * imgWidth + x) * 4;
-                    var pSource = (y1 * imgWidth + x1) * 3;
+                    var pTarget = (y * imgSize + x) * 4;
+                    var pSource = (y1 * imgSize + x1) * 3;
 
                     data[pTarget + 0] = rgb24[pSource + 0];
                     data[pTarget + 1] = rgb24[pSource + 1];
@@ -90,7 +90,7 @@ namespace StreamDeckSharp.Internals
                 }
 
             var enc = new JpegBitmapEncoder() { QualityLevel = 100 };
-            var f = BitmapSource.Create(imgWidth, imgWidth, 96, 96, PixelFormats.Bgr32, null, data, stride);
+            var f = BitmapSource.Create(imgSize, imgSize, 96, 96, PixelFormats.Bgr32, null, data, stride);
             enc.Frames.Add(BitmapFrame.Create(f));
 
             using (var ms = new MemoryStream())
