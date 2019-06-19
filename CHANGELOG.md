@@ -2,7 +2,19 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
-## [Unreleased]
+## [0.3.2] - 2019-06-19
+### Added
+  - Support for Stream Deck XL :tada:
+
+## [0.3.1] - 2019-01-26
+### Added
+  - Implement `GridKeyPositionCollection` to make dealing with keyboard layouts simpler
+  - New `IStreamDeckBoard` for easier access to `GridKeyPositionCollection` Keys
+    (Use pattern matching on `IMacroBoard` to get `GridKeyPositionCollection`)
+  - Methods to get serialnumber and firmware version from `IStreamDeckBoard`
+
+### Changed
+  - Change nuget package to license expression
 
 ## [0.2.0] - 2018-08-25 - *OpenMacroBoard* :tada:
 Elgato Systems released the *"Steam Deck Mini"* a few weeks ago so I decided to refactor
