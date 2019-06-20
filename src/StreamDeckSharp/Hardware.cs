@@ -13,32 +13,32 @@ namespace StreamDeckSharp
         public static IUsbHidHardware StreamDeck { get; }
 
         /// <summary>
-        /// Details about the Stream Deck Mini
-        /// </summary>
-        public static IUsbHidHardware StreamDeckMini { get; }
-
-        /// <summary>
         /// Details about the Stream Deck XL
         /// </summary>
         public static IUsbHidHardware StreamDeckXL { get; }
 
+        /// <summary>
+        /// Details about the Stream Deck Mini
+        /// </summary>
+        public static IUsbHidHardware StreamDeckMini { get; }
+
         internal static IHardwareInternalInfos Internal_StreamDeck { get; }
-        internal static IHardwareInternalInfos Internal_StreamDeckMini { get; }
         internal static IHardwareInternalInfos Internal_StreamDeckXL { get; }
+        internal static IHardwareInternalInfos Internal_StreamDeckMini { get; }
 
         static Hardware()
         {
             var hwStreamDeck = new StreamDeckHardwareInfo();
-            var hwStreamDeckMini = new StreamDeckMiniHardwareInfo();
             var hwStreamDeckXL = new StreamDeckXlHardwareInfo();
+            var hwStreamDeckMini = new StreamDeckMiniHardwareInfo();
 
             StreamDeck = hwStreamDeck;
-            StreamDeckMini = hwStreamDeckMini;
             StreamDeckXL = hwStreamDeckXL;
+            StreamDeckMini = hwStreamDeckMini;
 
             Internal_StreamDeck = hwStreamDeck;
-            Internal_StreamDeckMini = hwStreamDeckMini;
             Internal_StreamDeckXL = hwStreamDeckXL;
+            Internal_StreamDeckMini = hwStreamDeckMini;
         }
 
         internal static class VendorIds
@@ -49,24 +49,23 @@ namespace StreamDeckSharp
         internal static class ProductIds
         {
             public const int StreamDeck = 0x0060;
-            public const int StreamDeckMini = 0x0063;
             public const int StreamDeckXL = 0x006c;
+            public const int StreamDeckMini = 0x0063;
         }
 
-        internal static bool IsKnownDevice(int vendorId, int productId)
+        internal static IHardwareInternalInfos GetDeviceDetails(int vendorId, int productId)
         {
             if (vendorId != VendorIds.ElgatoSystemsGmbH)
-                return false;
+                return null;
 
             switch (productId)
             {
-                case ProductIds.StreamDeck:
-                case ProductIds.StreamDeckMini:
-                case ProductIds.StreamDeckXL:
-                    return true;
-                default:
-                    return false;
+                case ProductIds.StreamDeck: return Internal_StreamDeck;
+                case ProductIds.StreamDeckXL: return Internal_StreamDeckXL;
+                case ProductIds.StreamDeckMini: return Internal_StreamDeckMini;
             }
+
+            return null;
         }
     }
 }

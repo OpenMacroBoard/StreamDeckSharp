@@ -8,7 +8,6 @@ namespace StreamDeckSharp.Internals
     {
         private const int imgWidth = 80;
         private const int colorChannels = 3;
-        private const int pxBorder = (imgWidth - imgWidth) / 2;
 
         public int KeyCount => keyPositions.Count;
         public int IconSize => imgWidth;
@@ -17,7 +16,7 @@ namespace StreamDeckSharp.Internals
         public int KeyReportOffset => 0;
         public int UsbVendorId => Hardware.VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => Hardware.ProductIds.StreamDeckMini;
-
+        public string DeviceName => "Stream Deck Mini";
         public GridKeyPositionCollection Keys
             => keyPositions;
 

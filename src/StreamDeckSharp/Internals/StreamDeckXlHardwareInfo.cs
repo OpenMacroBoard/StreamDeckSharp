@@ -10,16 +10,12 @@ namespace StreamDeckSharp.Internals
         : IHardwareInternalInfos
     {
         private const int imgSize = 96;
-
         public int HeaderSize => 8;
-
         public int ReportSize => 1024;
-
         public int KeyReportOffset => 3;
-
         public int UsbVendorId => Hardware.VendorIds.ElgatoSystemsGmbH;
-
         public int UsbProductId => Hardware.ProductIds.StreamDeckXL;
+        public string DeviceName => "Stream Deck XL";
 
         public GridKeyPositionCollection Keys
             => keyPositions;

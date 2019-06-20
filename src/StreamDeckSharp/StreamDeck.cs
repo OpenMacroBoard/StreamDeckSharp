@@ -43,24 +43,31 @@ namespace StreamDeckSharp
         {
             var matchAllKnowDevices = hardware is null || hardware.Length < 1;
 
-            bool DoesMatchHardware(HidDevice d)
+            IHardwareInternalInfos MatchingHardware(HidDevice d)
             {
-                if (!Hardware.IsKnownDevice(d.Attributes.VendorId, d.Attributes.ProductId))
-                    return false;
+                var hwDetails = Hardware.GetDeviceDetails(d.Attributes.VendorId, d.Attributes.ProductId);
+
+                if (hwDetails is null)
+                    return null;
 
                 if (matchAllKnowDevices)
-                    return true;
+                    return hwDetails;
 
                 foreach (var h in hardware)
                 {
                     if (d.Attributes.VendorId == h.UsbVendorId &&
                         d.Attributes.ProductId == h.UsbProductId)
-                        return true;
+                        return hwDetails;
                 }
-                return false;
+
+                return null;
             }
 
-            return HidDevices.Enumerate().Where(DoesMatchHardware).Select(d => new DeviceRefereceHandle(d.DevicePath));
+            return HidDevices
+                    .Enumerate()
+                    .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
+                    .Where(i => i.HardwareInfo != null)
+                    .Select(i => new DeviceRefereceHandle(i.Device.DevicePath, i.HardwareInfo.DeviceName));
         }
     }
 }

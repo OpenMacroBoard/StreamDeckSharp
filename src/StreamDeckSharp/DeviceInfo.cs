@@ -9,14 +9,24 @@ namespace StreamDeckSharp
     public class DeviceRefereceHandle : IStreamDeckRefHandle
     {
         internal DeviceRefereceHandle(string devicePath)
+            : this(devicePath, null)
+        {
+        }
+
+        internal DeviceRefereceHandle(string devicePath, string deviceName)
         {
             DevicePath = devicePath;
+            DeviceName = deviceName;
         }
 
         /// <summary>
         /// Unique identifier for human interface device
         /// </summary>
         public string DevicePath { get; }
+        public string DeviceName { get; }
+
+        public override string ToString()
+            => DeviceName;
 
         /// <summary>
         /// Opens the StreamDeck handle
