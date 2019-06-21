@@ -8,6 +8,11 @@ namespace StreamDeckSharp.Internals
         int HeaderSize { get; }
         int ReportSize { get; }
         int KeyReportOffset { get; }
+        byte FirmwareVersionFeatureId { get; }
+        int FirmwareReportSkip { get; }
+        byte SerialNumberFeatureId { get; }
+        int SerialNumberReportSkip { get; }
+
         byte[] GeneratePayload(KeyBitmap keyBitmap);
 
         /// <summary>

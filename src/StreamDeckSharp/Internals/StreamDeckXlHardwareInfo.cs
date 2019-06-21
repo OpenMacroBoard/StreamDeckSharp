@@ -18,6 +18,10 @@ namespace StreamDeckSharp.Internals
         public int UsbProductId => ProductIds.StreamDeckXL;
         public string DeviceName => "Stream Deck XL";
         public int KeyCooldown => 25;
+        public byte FirmwareVersionFeatureId => 5;
+        public byte SerialNumberFeatureId => 6;
+        public int FirmwareReportSkip => 6;
+        public int SerialNumberReportSkip => 2;
 
         public GridKeyPositionCollection Keys
             => keyPositions;
