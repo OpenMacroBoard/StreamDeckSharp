@@ -1,4 +1,5 @@
 ﻿using OpenMacroBoard.SDK;
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Media;
@@ -102,5 +103,18 @@ namespace StreamDeckSharp.Internals
                 return jpgBytes;
             }
         }
+
+        public byte[] GetBrightnessMessage(byte percent)
+        {
+            if (percent > 100)
+                throw new ArgumentOutOfRangeException(nameof(percent));
+
+            var buffer = new byte[] { 0x03, 0x08, 0x64, 0x23, 0xB8, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xA5, 0x49, 0xCD, 0x02, 0xFE, 0x7F, 0x00, 0x00 };
+            buffer[2] = percent;
+            buffer[3] = 0x23;  //0x23, sometimes 0x27
+
+            return buffer;
+        }
+
     }
 }

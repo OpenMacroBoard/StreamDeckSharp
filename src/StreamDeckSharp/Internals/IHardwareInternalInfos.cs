@@ -36,5 +36,7 @@ namespace StreamDeckSharp.Internals
         int HardwareKeyIdToExtKeyId(int hardwareKeyId);
 
         void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast);
+
+        byte[] GetBrightnessMessage(byte percent);
     }
 }
