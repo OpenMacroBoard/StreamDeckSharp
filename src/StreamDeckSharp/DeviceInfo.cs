@@ -6,14 +6,9 @@ namespace StreamDeckSharp
     /// <summary>
     /// Device information about Stream Deck
     /// </summary>
-    public class DeviceRefereceHandle : IStreamDeckRefHandle
+    internal class DeviceReferenceHandle : IStreamDeckRefHandle
     {
-        internal DeviceRefereceHandle(string devicePath)
-            : this(devicePath, null)
-        {
-        }
-
-        internal DeviceRefereceHandle(string devicePath, string deviceName)
+        internal DeviceReferenceHandle(string devicePath, string deviceName)
         {
             DevicePath = devicePath;
             DeviceName = deviceName;
@@ -24,6 +19,7 @@ namespace StreamDeckSharp
         /// </summary>
         public string DevicePath { get; }
         public string DeviceName { get; }
+        public bool UseWriteCache { get; set; } = true;
 
         public override string ToString()
             => DeviceName;
@@ -33,7 +29,7 @@ namespace StreamDeckSharp
         /// </summary>
         /// <returns>Returns an <see cref="IMacroBoard"/> reference</returns>
         public IStreamDeckBoard Open()
-            => StreamDeck.OpenDevice(DevicePath);
+            => StreamDeck.OpenDevice(DevicePath, UseWriteCache);
 
         IMacroBoard IDeviceReferenceHandle.Open()
             => Open();

@@ -10,7 +10,7 @@ namespace StreamDeckSharp.Internals
         protected readonly byte[] buffer;
         private readonly byte[] keyStates;
         private readonly object disposeLock = new object();
-        protected readonly IHardwareInternalInfos hardwareInformation;
+        protected readonly IHardwareInternalInfos hwInfo;
 
         private readonly Task keyPollingTask;
         protected IStreamDeckHid deckHid;
@@ -20,7 +20,7 @@ namespace StreamDeckSharp.Internals
             this.deckHid = deckHid;
             Keys = hardwareInformation.Keys;
             deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
-            this.hardwareInformation = hardwareInformation;
+            this.hwInfo = hardwareInformation;
             buffer = new byte[deckHid.OutputReportLength];
             keyStates = new byte[Keys.Count];
 
@@ -58,29 +58,29 @@ namespace StreamDeckSharp.Internals
 
         public string GetFirmwareVersion()
         {
-            var featureData = deckHid.ReadFeatureData(4);
-            return Encoding.UTF8.GetString(featureData, 5, featureData.Length - 5).Trim('\0');
+            var featureData = deckHid.ReadFeatureData(hwInfo.FirmwareVersionFeatureId);
+            return Encoding.UTF8.GetString(featureData, hwInfo.FirmwareReportSkip, featureData.Length - hwInfo.FirmwareReportSkip).Trim('\0');
         }
 
         public string GetSerialNumber()
         {
-            var featureData = deckHid.ReadFeatureData(3);
-            return Encoding.UTF8.GetString(featureData, 5, featureData.Length - 5).Trim('\0');
+            var featureData = deckHid.ReadFeatureData(hwInfo.SerialNumberFeatureId);
+            return Encoding.UTF8.GetString(featureData, hwInfo.SerialNumberReportSkip, featureData.Length - hwInfo.SerialNumberReportSkip).Trim('\0');
         }
 
         public void SetBrightness(byte percent)
         {
             VerifyNotDisposed();
-            deckHid.WriteFeature(GetBrightnessMsg(percent));
+            deckHid.WriteFeature(hwInfo.GetBrightnessMessage(percent));
         }
 
         public virtual void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
-            keyId = hardwareInformation.ExtKeyIdToHardwareKeyId(keyId);
+            keyId = hwInfo.ExtKeyIdToHardwareKeyId(keyId);
 
-            var payload = hardwareInformation.GeneratePayload(bitmapData);
+            var payload = hwInfo.GeneratePayload(bitmapData);
 
-            foreach (var report in OutputReportSplitter.Split(payload, buffer, hardwareInformation.ReportSize, hardwareInformation.HeaderSize, keyId, hardwareInformation.PrepareDataForTransmittion))
+            foreach (var report in OutputReportSplitter.Split(payload, buffer, hwInfo.ReportSize, hwInfo.HeaderSize, keyId, hwInfo.PrepareDataForTransmittion))
                 deckHid.WriteReport(report);
         }
 
@@ -102,11 +102,11 @@ namespace StreamDeckSharp.Internals
 
             for (int i = 0; i < keyStates.Length; i++)
             {
-                var newStatePos = i + hardwareInformation.KeyReportOffset;
+                var newStatePos = i + hwInfo.KeyReportOffset;
 
                 if (keyStates[i] != newStates[newStatePos])
                 {
-                    var externalKeyId = hardwareInformation.HardwareKeyIdToExtKeyId(i);
+                    var externalKeyId = hwInfo.HardwareKeyIdToExtKeyId(i);
                     KeyStateChanged?.Invoke(this, new KeyEventArgs(externalKeyId, newStates[newStatePos] != 0));
                     keyStates[i] = newStates[newStatePos];
                 }
@@ -124,17 +124,7 @@ namespace StreamDeckSharp.Internals
 
         private void ShowLogoWithoutDisposeVerification()
         {
-            deckHid.WriteFeature(showLogoMsg);
+            deckHid.WriteFeature(hwInfo.GetLogoMessage());
         }
-
-        private static byte[] GetBrightnessMsg(byte percent)
-        {
-            if (percent > 100) throw new ArgumentOutOfRangeException(nameof(percent));
-            var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-            buffer[5] = percent;
-            return buffer;
-        }
-
-        private static readonly byte[] showLogoMsg = new byte[] { 0x0B, 0x63 };
     }
 }

@@ -16,22 +16,28 @@ namespace StreamDeckSharp
         /// </summary>
         /// <returns>The default <see cref="IStreamDeckBoard"/> HID</returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IStreamDeckBoard OpenDevice(params IUsbHidHardware[] hardware)
+        public static IStreamDeckBoard OpenDevice(bool useWriteCache = true, params IUsbHidHardware[] hardware)
         {
             var dev = EnumerateDevices(hardware).FirstOrDefault();
-            return dev?.Open() ?? throw new StreamDeckNotFoundException();
+
+            if (dev is null)
+                throw new StreamDeckNotFoundException();
+
+            dev.UseWriteCache = useWriteCache;
+            return dev.Open();
         }
 
         /// <summary>
         /// Get <see cref="IStreamDeckBoard"/> with given <paramref name="devicePath"/>
         /// </summary>
         /// <param name="devicePath"></param>
+        /// <param name="useWriteCache"></param>
         /// <returns><see cref="IStreamDeckBoard"/> specified by <paramref name="devicePath"/></returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IStreamDeckBoard OpenDevice(string devicePath)
+        public static IStreamDeckBoard OpenDevice(string devicePath, bool useWriteCache = true)
         {
             var dev = HidDevices.GetDevice(devicePath);
-            return FromHid(dev ?? throw new StreamDeckNotFoundException(), true);
+            return FromHid(dev ?? throw new StreamDeckNotFoundException(), useWriteCache);
         }
 
         /// <summary>
@@ -67,7 +73,7 @@ namespace StreamDeckSharp
                     .Enumerate()
                     .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
                     .Where(i => i.HardwareInfo != null)
-                    .Select(i => new DeviceRefereceHandle(i.Device.DevicePath, i.HardwareInfo.DeviceName));
+                    .Select(i => new DeviceReferenceHandle(i.Device.DevicePath, i.HardwareInfo.DeviceName));
         }
 
         internal static IStreamDeckBoard FromHid(HidDevice device, bool cached)

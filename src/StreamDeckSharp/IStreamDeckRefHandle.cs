@@ -7,5 +7,8 @@ namespace StreamDeckSharp
     {
         /// <inheritdoc />
         new IStreamDeckBoard Open();
+        string DevicePath { get; }
+        string DeviceName { get; }
+        bool UseWriteCache { get; set; }
     }
 }

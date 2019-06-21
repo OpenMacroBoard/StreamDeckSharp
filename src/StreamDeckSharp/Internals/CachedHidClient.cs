@@ -43,7 +43,7 @@ namespace StreamDeckSharp.Internals
                         break;
                     }
 
-                    foreach (var report in OutputReportSplitter.Split(res.Value, buffer, hardwareInformation.ReportSize, hardwareInformation.HeaderSize, res.Key, hardwareInformation.PrepareDataForTransmittion))
+                    foreach (var report in OutputReportSplitter.Split(res.Value, buffer, hwInfo.ReportSize, hwInfo.HeaderSize, res.Key, hwInfo.PrepareDataForTransmittion))
                         deckHid.WriteReport(report);
                 }
             }, TaskCreationOptions.LongRunning);
@@ -52,9 +52,9 @@ namespace StreamDeckSharp.Internals
         public override void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
             VerifyNotDisposed();
-            keyId = hardwareInformation.ExtKeyIdToHardwareKeyId(keyId);
+            keyId = hwInfo.ExtKeyIdToHardwareKeyId(keyId);
 
-            var payload = cacheKeyBitmaps.GetValue(bitmapData, hardwareInformation.GeneratePayload);
+            var payload = cacheKeyBitmaps.GetValue(bitmapData, hwInfo.GeneratePayload);
             imageQueue.Add(keyId, payload);
         }
 
