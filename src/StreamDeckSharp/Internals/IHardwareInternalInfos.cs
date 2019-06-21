@@ -38,5 +38,6 @@ namespace StreamDeckSharp.Internals
         void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast);
 
         byte[] GetBrightnessMessage(byte percent);
+        byte[] GetLogoMessage();
     }
 }

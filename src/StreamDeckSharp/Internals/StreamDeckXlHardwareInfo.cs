@@ -116,5 +116,9 @@ namespace StreamDeckSharp.Internals
             return buffer;
         }
 
+        public byte[] GetLogoMessage()
+        {
+            return new byte[] { 0x03, 0x02 };
+        }
     }
 }
