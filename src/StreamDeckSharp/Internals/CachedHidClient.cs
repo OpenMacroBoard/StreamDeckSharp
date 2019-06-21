@@ -18,7 +18,7 @@ namespace StreamDeckSharp.Internals
 
         private readonly ConditionalWeakTable<KeyBitmap, byte[]> cacheKeyBitmaps = new ConditionalWeakTable<KeyBitmap, byte[]>();
 
-        private CachedHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
+        public CachedHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
             : base(deckHid, hardwareInformation)
         {
             imageQueue = new ConcurrentBufferedQueue<int, byte[]>(RelativeTimeSource.Default, 75);
@@ -69,12 +69,6 @@ namespace StreamDeckSharp.Internals
 
             var payload = cacheKeyBitmaps.GetValue(bitmapData, hardwareInformation.GeneratePayload);
             imageQueue.Add(keyId, payload);
-        }
-
-        public static IStreamDeckBoard FromHid(HidDevice device)
-        {
-            var hidWrapper = new StreamDeckHidWrapper(device);
-            return new CachedHidClient(hidWrapper, device.GetHardwareInformation());
         }
 
         protected override void Shutdown()

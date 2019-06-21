@@ -31,7 +31,7 @@ namespace StreamDeckSharp
         public static IStreamDeckBoard OpenDevice(string devicePath)
         {
             var dev = HidDevices.GetDevice(devicePath);
-            return CachedHidClient.FromHid(dev ?? throw new StreamDeckNotFoundException());
+            return FromHid(dev ?? throw new StreamDeckNotFoundException(), true);
         }
 
         /// <summary>
@@ -68,6 +68,17 @@ namespace StreamDeckSharp
                     .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
                     .Where(i => i.HardwareInfo != null)
                     .Select(i => new DeviceRefereceHandle(i.Device.DevicePath, i.HardwareInfo.DeviceName));
+        }
+
+        internal static IStreamDeckBoard FromHid(HidDevice device, bool cached)
+        {
+            var hidWrapper = new StreamDeckHidWrapper(device);
+            var hwInfo = device.GetHardwareInformation();
+
+            if (cached)
+                return new CachedHidClient(hidWrapper, hwInfo);
+            else
+                return new BasicHidClient(hidWrapper, hwInfo);
         }
     }
 }
