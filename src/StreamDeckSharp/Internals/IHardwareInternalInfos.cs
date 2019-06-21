@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using HidLibrary;
-using OpenMacroBoard.SDK;
+﻿using OpenMacroBoard.SDK;
 
 namespace StreamDeckSharp.Internals
 {

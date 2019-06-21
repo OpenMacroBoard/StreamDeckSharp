@@ -1,5 +1,6 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
+using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
 {
@@ -14,8 +15,8 @@ namespace StreamDeckSharp.Internals
         public int HeaderSize => 16;
         public int ReportSize => 7819;
         public int KeyReportOffset => 0;
-        public int UsbVendorId => Hardware.VendorIds.ElgatoSystemsGmbH;
-        public int UsbProductId => Hardware.ProductIds.StreamDeck;
+        public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
+        public int UsbProductId => ProductIds.StreamDeck;
         public string DeviceName => "Stream Deck";
 
         public GridKeyPositionCollection Keys

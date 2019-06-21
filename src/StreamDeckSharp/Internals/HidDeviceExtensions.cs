@@ -1,25 +1,27 @@
 ﻿using System;
 using HidLibrary;
+using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
 {
     internal static class HidDeviceExtensions
     {
         public static IHardwareInternalInfos GetHardwareInformation(this HidDevice hid)
+            => GetDeviceDetails(hid.Attributes.VendorId, hid.Attributes.ProductId);
+
+        public static IHardwareInternalInfos GetDeviceDetails(int vendorId, int productId)
         {
-            if (hid.Attributes.VendorId != Hardware.VendorIds.ElgatoSystemsGmbH)
-                throw new NotSupportedException();
+            if (vendorId != VendorIds.ElgatoSystemsGmbH)
+                return null;
 
-            var pid = hid.Attributes.ProductId;
-            switch (pid)
+            switch (productId)
             {
-                case Hardware.ProductIds.StreamDeck: return Hardware.Internal_StreamDeck;
-                case Hardware.ProductIds.StreamDeckMini: return Hardware.Internal_StreamDeckMini;
-                case Hardware.ProductIds.StreamDeckXL: return Hardware.Internal_StreamDeckXL;
-
-                default:
-                    throw new NotSupportedException($"ProductId {pid} is not supported.");
+                case ProductIds.StreamDeck: return Hardware.Internal_StreamDeck;
+                case ProductIds.StreamDeckXL: return Hardware.Internal_StreamDeckXL;
+                case ProductIds.StreamDeckMini: return Hardware.Internal_StreamDeckMini;
             }
+
+            return null;
         }
     }
 }

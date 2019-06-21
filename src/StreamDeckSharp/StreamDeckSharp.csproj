@@ -97,6 +97,7 @@
     <Compile Include="StreamDeck.cs" />
     <Compile Include="Exceptions\StreamDeckException.cs" />
     <Compile Include="Internals\StreamDeckHidWrapper.cs" />
+    <Compile Include="UsbConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HidLibrary\src\HidLibrary\HidLibrary.csproj">

@@ -1,4 +1,5 @@
 ﻿using StreamDeckSharp.Internals;
+using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp
 {
@@ -39,33 +40,6 @@ namespace StreamDeckSharp
             Internal_StreamDeck = hwStreamDeck;
             Internal_StreamDeckXL = hwStreamDeckXL;
             Internal_StreamDeckMini = hwStreamDeckMini;
-        }
-
-        internal static class VendorIds
-        {
-            public const int ElgatoSystemsGmbH = 0x0fd9;
-        }
-
-        internal static class ProductIds
-        {
-            public const int StreamDeck = 0x0060;
-            public const int StreamDeckXL = 0x006c;
-            public const int StreamDeckMini = 0x0063;
-        }
-
-        internal static IHardwareInternalInfos GetDeviceDetails(int vendorId, int productId)
-        {
-            if (vendorId != VendorIds.ElgatoSystemsGmbH)
-                return null;
-
-            switch (productId)
-            {
-                case ProductIds.StreamDeck: return Internal_StreamDeck;
-                case ProductIds.StreamDeckXL: return Internal_StreamDeckXL;
-                case ProductIds.StreamDeckMini: return Internal_StreamDeckMini;
-            }
-
-            return null;
         }
     }
 }

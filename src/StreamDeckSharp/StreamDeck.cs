@@ -45,7 +45,7 @@ namespace StreamDeckSharp
 
             IHardwareInternalInfos MatchingHardware(HidDevice d)
             {
-                var hwDetails = Hardware.GetDeviceDetails(d.Attributes.VendorId, d.Attributes.ProductId);
+                var hwDetails = d.GetHardwareInformation();
 
                 if (hwDetails is null)
                     return null;

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
 {
@@ -13,8 +14,8 @@ namespace StreamDeckSharp.Internals
         public int HeaderSize => 8;
         public int ReportSize => 1024;
         public int KeyReportOffset => 3;
-        public int UsbVendorId => Hardware.VendorIds.ElgatoSystemsGmbH;
-        public int UsbProductId => Hardware.ProductIds.StreamDeckXL;
+        public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
+        public int UsbProductId => ProductIds.StreamDeckXL;
         public string DeviceName => "Stream Deck XL";
 
         public GridKeyPositionCollection Keys
