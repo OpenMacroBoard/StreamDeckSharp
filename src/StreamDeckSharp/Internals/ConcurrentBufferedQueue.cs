@@ -8,7 +8,6 @@ namespace StreamDeckSharp.Internals
     internal sealed class ConcurrentBufferedQueue<TKey, TValue> : IDisposable
     {
         private readonly object _sync = new object();
-        private readonly object _newObjectPulse = new object();
 
         private readonly Dictionary<TKey, TValue> valueBuffer = new Dictionary<TKey, TValue>();
         private readonly Dictionary<TKey, long> cooldownValues = new Dictionary<TKey, long>();
