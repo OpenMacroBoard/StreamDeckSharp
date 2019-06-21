@@ -32,8 +32,10 @@ namespace StreamDeckSharp
         /// Opens the StreamDeck handle
         /// </summary>
         /// <returns>Returns an <see cref="IMacroBoard"/> reference</returns>
-        public IStreamDeckBoard Open() => StreamDeck.OpenDevice(DevicePath);
+        public IStreamDeckBoard Open()
+            => StreamDeck.OpenDevice(DevicePath);
 
-        IMacroBoard IDeviceReferenceHandle.Open() => Open();
+        IMacroBoard IDeviceReferenceHandle.Open()
+            => Open();
     }
 }
