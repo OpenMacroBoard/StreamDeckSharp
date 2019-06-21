@@ -2,6 +2,22 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
+## [0.3.3] - 2019-06-21
+### Added
+  - Stream Deck XL now correctly
+      - reports firmware version
+      - reports serial number
+      - shows the logo
+      - sets the brightness
+
+### Changed
+  - It's now possible to open devices without caching (not recommended)
+  - Lower key cooldown for Mini and XL variant, because they don't suffer
+    from images glitches like the classic stream deck. This improves the
+    framerate for cached handles (try the video example ^^)
+  - `IHardware` now has a `DeviceName` property
+  - Cleaned up a lot of things
+
 ## [0.3.2] - 2019-06-19
 ### Added
   - Support for Stream Deck XL :tada:
@@ -17,7 +33,7 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
   - Change nuget package to license expression
 
 ## [0.2.0] - 2018-08-25 - *OpenMacroBoard* :tada:
-Elgato Systems released the *"Steam Deck Mini"* a few weeks ago so I decided to refactor
+Elgato Systems released the *"Stream Deck Mini"* a few weeks ago so I decided to refactor
 `StreamDeckSharp` and use a more generic approach that makes it possible to implement
 many different macro boards (with LCD buttons) - even ones with buttons that are not placed in a grid layout (like keyboards).
 
