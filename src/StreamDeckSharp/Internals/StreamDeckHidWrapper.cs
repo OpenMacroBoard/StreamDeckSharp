@@ -23,7 +23,7 @@ namespace StreamDeckSharp.Internals
 
             if (!device.IsOpen)
                 throw new Exception("Device could not be opened");
-
+            
             this.device = device;
             this.device.Inserted += () => ConnectionStateChanged?.Invoke(this, connected);
             this.device.Removed += () => ConnectionStateChanged?.Invoke(this, disconnected);
