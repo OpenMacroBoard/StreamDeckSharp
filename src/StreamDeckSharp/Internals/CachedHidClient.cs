@@ -10,21 +10,20 @@ namespace StreamDeckSharp.Internals
 {
     internal class CachedHidClient : BasicHidClient
     {
-        private readonly CancellationTokenSource threadCancelSource = new CancellationTokenSource();
         private readonly ConcurrentBufferedQueue<int, byte[]> imageQueue;
 
         private readonly Task writerTask;
-        private readonly Task keyPollingTask;
+
 
         private readonly ConditionalWeakTable<KeyBitmap, byte[]> cacheKeyBitmaps = new ConditionalWeakTable<KeyBitmap, byte[]>();
 
         public CachedHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
             : base(deckHid, hardwareInformation)
         {
-            imageQueue = new ConcurrentBufferedQueue<int, byte[]>(RelativeTimeSource.Default, 75);
+            imageQueue = new ConcurrentBufferedQueue<int, byte[]>(RelativeTimeSource.Default, hardwareInformation.KeyCooldown);
 
             writerTask = StartBitmapWriterTask();
-            keyPollingTask = StartKeyPollingTask();
+
         }
 
         private Task StartBitmapWriterTask()
@@ -50,18 +49,6 @@ namespace StreamDeckSharp.Internals
             }, TaskCreationOptions.LongRunning);
         }
 
-        private Task StartKeyPollingTask()
-        {
-            return Task.Factory.StartNew(() =>
-            {
-                var cancelToken = threadCancelSource.Token;
-                while (!cancelToken.IsCancellationRequested)
-                {
-                    ProcessKeys();
-                }
-            }, TaskCreationOptions.LongRunning);
-        }
-
         public override void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
             VerifyNotDisposed();
@@ -74,15 +61,12 @@ namespace StreamDeckSharp.Internals
         protected override void Shutdown()
         {
             imageQueue.CompleteAdding();
-            threadCancelSource.Cancel();
             Task.WaitAll(writerTask);
         }
 
         protected override void Dispose(bool managed)
         {
-            Task.WaitAll(keyPollingTask);
             imageQueue.Dispose();
-            threadCancelSource.Dispose();
         }
     }
 }

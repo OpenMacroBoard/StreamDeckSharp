@@ -1,6 +1,7 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace StreamDeckSharp.Internals
 {
@@ -11,25 +12,25 @@ namespace StreamDeckSharp.Internals
         private readonly object disposeLock = new object();
         protected readonly IHardwareInternalInfos hardwareInformation;
 
-        private bool disposed;
+        private readonly Task keyPollingTask;
         protected IStreamDeckHid deckHid;
 
         public BasicHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
         {
             this.deckHid = deckHid;
             Keys = hardwareInformation.Keys;
-
             deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
-
             this.hardwareInformation = hardwareInformation;
-
             buffer = new byte[deckHid.OutputReportLength];
             keyStates = new byte[Keys.Count];
+
+            keyPollingTask = StartKeyPollingTask();
         }
 
         public GridKeyPositionCollection Keys { get; }
         IKeyPositionCollection IMacroBoard.Keys => Keys;
 
+        public bool IsDisposed { get; private set; }
         public bool IsConnected => deckHid.IsConnected;
         public event EventHandler<KeyEventArgs> KeyStateChanged;
         public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
@@ -38,15 +39,16 @@ namespace StreamDeckSharp.Internals
         {
             lock (disposeLock)
             {
-                if (disposed)
+                if (IsDisposed)
                     return;
-                disposed = true;
+                IsDisposed = true;
             }
 
             Shutdown();
-
             ShowLogoWithoutDisposeVerification();
+
             deckHid.Dispose();
+            Task.WaitAll(keyPollingTask);
 
             Dispose(true);
         }
@@ -90,7 +92,7 @@ namespace StreamDeckSharp.Internals
 
         protected void VerifyNotDisposed()
         {
-            if (disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(BasicHidClient));
         }
 
@@ -109,6 +111,15 @@ namespace StreamDeckSharp.Internals
                     keyStates[i] = newStates[newStatePos];
                 }
             }
+        }
+
+        private Task StartKeyPollingTask()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                while (!IsDisposed)
+                    ProcessKeys();
+            }, TaskCreationOptions.LongRunning);
         }
 
         private void ShowLogoWithoutDisposeVerification()
