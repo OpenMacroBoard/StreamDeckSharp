@@ -17,6 +17,7 @@ namespace StreamDeckSharp.Internals
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => ProductIds.StreamDeckXL;
         public string DeviceName => "Stream Deck XL";
+        public int KeyCooldown => 25;
 
         public GridKeyPositionCollection Keys
             => keyPositions;
