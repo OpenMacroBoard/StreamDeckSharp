@@ -16,14 +16,13 @@ namespace StreamDeckSharp
         /// </summary>
         /// <returns>The default <see cref="IStreamDeckBoard"/> HID</returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
-        public static IStreamDeckBoard OpenDevice(bool useWriteCache = true, params IUsbHidHardware[] hardware)
+        public static IStreamDeckBoard OpenDevice(params IUsbHidHardware[] hardware)
         {
             var dev = EnumerateDevices(hardware).FirstOrDefault();
 
             if (dev is null)
                 throw new StreamDeckNotFoundException();
 
-            dev.UseWriteCache = useWriteCache;
             return dev.Open();
         }
 
