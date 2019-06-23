@@ -1,9 +1,10 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Runtime.InteropServices;
 using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
@@ -29,6 +30,16 @@ namespace StreamDeckSharp.Internals
 
         private static readonly GridKeyPositionCollection keyPositions;
         private static byte[] cachedNullImage = null;
+
+        private readonly ImageCodecInfo jpgEncoder;
+        private readonly EncoderParameters jpgParams;
+
+        public StreamDeckXlHardwareInfo()
+        {
+            jpgEncoder = ImageCodecInfo.GetImageDecoders().Where(d => d.FormatID == ImageFormat.Jpeg.Guid).First();
+            jpgParams = new EncoderParameters(1);
+            jpgParams.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
+        }
 
         static StreamDeckXlHardwareInfo()
         {
@@ -62,7 +73,7 @@ namespace StreamDeckSharp.Internals
             data[6] = (byte)pageNumber;
         }
 
-        private static byte[] GetNullImage()
+        private byte[] GetNullImage()
         {
             if (cachedNullImage is null)
             {
@@ -73,7 +84,7 @@ namespace StreamDeckSharp.Internals
             return cachedNullImage;
         }
 
-        private static byte[] EncodeImageToJpg(byte[] rgb24)
+        private byte[] EncodeImageToJpg(byte[] rgb24)
         {
             int stride = imgSize * 4;
             var data = new byte[imgSize * stride];
@@ -92,15 +103,21 @@ namespace StreamDeckSharp.Internals
                     data[pTarget + 2] = rgb24[pSource + 2];
                 }
 
-            var enc = new JpegBitmapEncoder() { QualityLevel = 100 };
-            var f = BitmapSource.Create(imgSize, imgSize, 96, 96, PixelFormats.Bgr32, null, data, stride);
-            enc.Frames.Add(BitmapFrame.Create(f));
-
-            using (var ms = new MemoryStream())
+            GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
+            try
             {
-                enc.Save(ms);
-                var jpgBytes = ms.ToArray();
-                return jpgBytes;
+                var pointer = pinnedArray.AddrOfPinnedObject();
+                Bitmap target = new Bitmap(imgSize, imgSize, stride, System.Drawing.Imaging.PixelFormat.Format32bppRgb, pointer);
+
+                using (var memStream = new MemoryStream())
+                {
+                    target.Save(memStream, jpgEncoder, jpgParams);
+                    return memStream.ToArray();
+                }
+            }
+            finally
+            {
+                pinnedArray.Free();
             }
         }
 
