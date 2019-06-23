@@ -5,10 +5,10 @@
     <Company>OpenMacroBoard</Company>
     <Version>0.3.4</Version>
     <Description>A simple .NET wrapper for Stream Deck (using OpenMacroBoard.SDK)</Description>
-    <Copyright>Copyright ©  2018</Copyright>
+    <Copyright>Copyright © OpenMacroBoard 2018 - 2019</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIconUrl>https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/master/doc/icon64.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</PackageProjectUrl>
+    <PackageProjectUrl>https://openmacroboard.github.io/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>streamdeck elgato stream deck open macro board openmacroboard streamdeckmini streamdeckxl mini xl</PackageTags>
