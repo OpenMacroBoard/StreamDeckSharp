@@ -1,5 +1,4 @@
-﻿using System;
-using HidLibrary;
+﻿using HidSharp;
 using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
@@ -7,7 +6,7 @@ namespace StreamDeckSharp.Internals
     internal static class HidDeviceExtensions
     {
         public static IHardwareInternalInfos GetHardwareInformation(this HidDevice hid)
-            => GetDeviceDetails(hid.Attributes.VendorId, hid.Attributes.ProductId);
+            => GetDeviceDetails(hid.VendorID, hid.ProductID);
 
         public static IHardwareInternalInfos GetDeviceDetails(int vendorId, int productId)
         {

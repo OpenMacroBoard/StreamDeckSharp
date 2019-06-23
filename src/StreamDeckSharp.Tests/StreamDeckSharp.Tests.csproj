@@ -37,14 +37,7 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <Choose>
-    <When Condition="Exists('..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK')">
-      <ItemGroup>
-        <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
-          <Project>{4BDFC513-16B4-47ED-B230-ED06E7028455}</Project>
-          <Name>OpenMacroBoard.SDK</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
+    <When Condition="Exists('..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK')" />
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="OpenMacroBoard.SDK" Version="0.3.0" />

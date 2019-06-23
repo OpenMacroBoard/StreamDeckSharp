@@ -45,14 +45,7 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <Choose>
-    <When Condition="Exists('..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK')">
-      <ItemGroup>
-        <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
-          <Project>{4BDFC513-16B4-47ED-B230-ED06E7028455}</Project>
-          <Name>OpenMacroBoard.SDK</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
+    <When Condition="Exists('..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK')" />
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="OpenMacroBoard.SDK" Version="0.3.0" />
@@ -60,6 +53,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Reference Include="HidSharp, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\HidSharp.2.1.0\lib\net35\HidSharp.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -81,6 +77,7 @@
     <Compile Include="Internals\ITimeService.cs" />
     <Compile Include="Internals\KeyBitmapExtensions.cs" />
     <Compile Include="Internals\RelativeTimeSource.cs" />
+    <Compile Include="Internals\ReportReceivedEventArgs.cs" />
     <Compile Include="Internals\StreamDeckHardwareInfo.cs" />
     <Compile Include="Internals\StreamDeckMiniHardwareInfo.cs" />
     <Compile Include="Internals\BasicHidClient.cs" />
@@ -100,9 +97,9 @@
     <Compile Include="UsbConstants.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HidLibrary\src\HidLibrary\HidLibrary.csproj">
-      <Project>{9e8f1d50-74ea-4c60-bd5c-ab2c5b53bc66}</Project>
-      <Name>HidLibrary</Name>
+    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
+      <Project>{e3f6346a-e7d9-4dcb-9f62-0e781dff2927}</Project>
+      <Name>OpenMacroBoard.SDK</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

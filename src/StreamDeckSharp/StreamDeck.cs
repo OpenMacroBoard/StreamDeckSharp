@@ -1,4 +1,4 @@
-﻿using HidLibrary;
+﻿using HidSharp;
 using StreamDeckSharp.Exceptions;
 using StreamDeckSharp.Internals;
 using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace StreamDeckSharp
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
         public static IStreamDeckBoard OpenDevice(string devicePath, bool useWriteCache = true)
         {
-            var dev = HidDevices.GetDevice(devicePath);
+            var dev = DeviceList.Local.GetHidDevices().Where(d => d.DevicePath == devicePath).First();
             return FromHid(dev ?? throw new StreamDeckNotFoundException(), useWriteCache);
         }
 
@@ -60,16 +60,18 @@ namespace StreamDeckSharp
 
                 foreach (var h in hardware)
                 {
-                    if (d.Attributes.VendorId == h.UsbVendorId &&
-                        d.Attributes.ProductId == h.UsbProductId)
+                    if (d.VendorID == h.UsbVendorId &&
+                        d.ProductID == h.UsbProductId)
                         return hwDetails;
                 }
 
                 return null;
             }
 
-            return HidDevices
-                    .Enumerate()
+            
+
+            return DeviceList.Local
+                    .GetHidDevices()
                     .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
                     .Where(i => i.HardwareInfo != null)
                     .Select(i => new DeviceReferenceHandle(i.Device.DevicePath, i.HardwareInfo.DeviceName));

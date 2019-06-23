@@ -14,7 +14,7 @@ namespace StreamDeckSharp.Internals
         public int IconSize => imgWidth;
         public int HeaderSize => 16;
         public int ReportSize => 1024;
-        public int KeyReportOffset => 0;
+        public int KeyReportOffset => 1;
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => ProductIds.StreamDeckMini;
         public string DeviceName => "Stream Deck Mini";

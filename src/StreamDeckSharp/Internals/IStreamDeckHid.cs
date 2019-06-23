@@ -8,10 +8,10 @@ namespace StreamDeckSharp.Internals
         int OutputReportLength { get; }
         bool WriteFeature(byte[] featureData);
         bool WriteReport(byte[] reportData);
-        byte[] ReadReport();
-        byte[] ReadFeatureData(byte id);
+        bool ReadFeatureData(byte id, out byte[] data);
         bool IsConnected { get; }
 
+        event EventHandler<ReportReceivedEventArgs> ReportReceived;
         event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
     }
 }
