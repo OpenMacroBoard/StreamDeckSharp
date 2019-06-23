@@ -74,6 +74,16 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
+      <Project>{e3f6346a-e7d9-4dcb-9f62-0e781dff2927}</Project>
+      <Name>OpenMacroBoard.SDK</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StreamDeckSharp\StreamDeckSharp.csproj">
+      <Project>{c42a8415-5084-4842-ac1a-004927d96eab}</Project>
+      <Name>StreamDeckSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

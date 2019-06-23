@@ -3,6 +3,9 @@ using StreamDeckSharp.Exceptions;
 using StreamDeckSharp.Internals;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("StreamDeckSharp.Tests")]
 
 namespace StreamDeckSharp
 {
