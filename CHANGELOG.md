@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
+## [0.4.0] - 2019-06-28
+### Changed
+  - Prepare for netstandard2 release
+  - Switch to HidSharp (because of netstandard support)
+  - Change the stream deck Xl jpg encoder (the old one was from WPF, which is not supported on netstandard)
+  - Switch to new csproj format and embedded nuspec
+  - Remove old build stuff (switched to nuke.build)
+
 ## [0.3.3] - 2019-06-21
 ### Added
   - Stream Deck XL now correctly
