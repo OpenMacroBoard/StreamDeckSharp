@@ -1,5 +1,4 @@
-﻿using HidLibrary;
-using OpenMacroBoard.SDK;
+﻿using OpenMacroBoard.SDK;
 
 namespace StreamDeckSharp
 {

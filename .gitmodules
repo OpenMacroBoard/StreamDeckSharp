@@ -1,3 +1,0 @@
-[submodule "src/HidLibrary"]
-	path = src/HidLibrary
-	url = https://github.com/OpenStreamDeck/HidLibrary

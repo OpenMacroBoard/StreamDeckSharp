@@ -1,1 +1,0 @@
-Just some quick and dirty build scripts (for windows)

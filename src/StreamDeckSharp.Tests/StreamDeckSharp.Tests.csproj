@@ -37,14 +37,7 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <Choose>
-    <When Condition="Exists('..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK')">
-      <ItemGroup>
-        <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
-          <Project>{4BDFC513-16B4-47ED-B230-ED06E7028455}</Project>
-          <Name>OpenMacroBoard.SDK</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
+    <When Condition="Exists('..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK')" />
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="OpenMacroBoard.SDK" Version="0.3.0" />
@@ -82,8 +75,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
+      <Project>{e3f6346a-e7d9-4dcb-9f62-0e781dff2927}</Project>
+      <Name>OpenMacroBoard.SDK</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StreamDeckSharp\StreamDeckSharp.csproj">
-      <Project>{D06AB787-766E-4B28-89C4-8D948070EB1C}</Project>
+      <Project>{c42a8415-5084-4842-ac1a-004927d96eab}</Project>
       <Name>StreamDeckSharp</Name>
     </ProjectReference>
   </ItemGroup>

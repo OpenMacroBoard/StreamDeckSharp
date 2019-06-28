@@ -12,19 +12,24 @@ namespace StreamDeckSharp.Internals
         private readonly object disposeLock = new object();
         protected readonly IHardwareInternalInfos hwInfo;
 
-        private readonly Task keyPollingTask;
         protected IStreamDeckHid deckHid;
 
         public BasicHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
         {
             this.deckHid = deckHid;
             Keys = hardwareInformation.Keys;
+
             deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
+            deckHid.ReportReceived += DeckHid_ReportReceived;
+
             this.hwInfo = hardwareInformation;
             buffer = new byte[deckHid.OutputReportLength];
             keyStates = new byte[Keys.Count];
+        }
 
-            keyPollingTask = StartKeyPollingTask();
+        private void DeckHid_ReportReceived(object sender, ReportReceivedEventArgs e)
+        {
+            ProcessKeys(e.ReportData);
         }
 
         public GridKeyPositionCollection Keys { get; }
@@ -48,7 +53,6 @@ namespace StreamDeckSharp.Internals
             ShowLogoWithoutDisposeVerification();
 
             deckHid.Dispose();
-            Task.WaitAll(keyPollingTask);
 
             Dispose(true);
         }
@@ -58,13 +62,17 @@ namespace StreamDeckSharp.Internals
 
         public string GetFirmwareVersion()
         {
-            var featureData = deckHid.ReadFeatureData(hwInfo.FirmwareVersionFeatureId);
+            if (!deckHid.ReadFeatureData(hwInfo.FirmwareVersionFeatureId, out var featureData))
+                return null;
+
             return Encoding.UTF8.GetString(featureData, hwInfo.FirmwareReportSkip, featureData.Length - hwInfo.FirmwareReportSkip).Trim('\0');
         }
 
         public string GetSerialNumber()
         {
-            var featureData = deckHid.ReadFeatureData(hwInfo.SerialNumberFeatureId);
+            if (!deckHid.ReadFeatureData(hwInfo.SerialNumberFeatureId, out var featureData))
+                return null;
+
             return Encoding.UTF8.GetString(featureData, hwInfo.SerialNumberReportSkip, featureData.Length - hwInfo.SerialNumberReportSkip).Trim('\0');
         }
 
@@ -96,10 +104,8 @@ namespace StreamDeckSharp.Internals
                 throw new ObjectDisposedException(nameof(BasicHidClient));
         }
 
-        public void ProcessKeys()
+        private void ProcessKeys(byte[] newStates)
         {
-            var newStates = deckHid.ReadReport();
-
             for (int i = 0; i < keyStates.Length; i++)
             {
                 var newStatePos = i + hwInfo.KeyReportOffset;
@@ -111,15 +117,6 @@ namespace StreamDeckSharp.Internals
                     keyStates[i] = newStates[newStatePos];
                 }
             }
-        }
-
-        private Task StartKeyPollingTask()
-        {
-            return Task.Factory.StartNew(() =>
-            {
-                while (!IsDisposed)
-                    ProcessKeys();
-            }, TaskCreationOptions.LongRunning);
         }
 
         private void ShowLogoWithoutDisposeVerification()

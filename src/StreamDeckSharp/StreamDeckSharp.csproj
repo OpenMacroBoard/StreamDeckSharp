@@ -1,121 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\ILRepack.2.0.13\build\ILRepack.props" Condition="Exists('..\packages\ILRepack.2.0.13\build\ILRepack.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D06AB787-766E-4B28-89C4-8D948070EB1C}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StreamDeckSharp</RootNamespace>
-    <AssemblyName>StreamDeckSharp</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
+    <Company>OpenMacroBoard</Company>
+    <Version>0.3.4</Version>
+    <Description>A simple .NET wrapper for Stream Deck (using OpenMacroBoard.SDK)</Description>
+    <Copyright>Copyright © OpenMacroBoard 2018 - 2019</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIconUrl>https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/master/doc/icon64.png</PackageIconUrl>
+    <PackageProjectUrl>https://openmacroboard.github.io/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>streamdeck elgato stream deck open macro board openmacroboard streamdeckmini streamdeckxl mini xl</PackageTags>
+    <Authors>Christian Wischenbart</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <DocumentationFile>bin\Debug\StreamDeckSharp.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Release\StreamDeckSharp.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-    <CodeAnalysisRuleSet>
-    </CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <Choose>
-    <When Condition="Exists('..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK')">
-      <ItemGroup>
-        <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj">
-          <Project>{4BDFC513-16B4-47ED-B230-ED06E7028455}</Project>
-          <Name>OpenMacroBoard.SDK</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="OpenMacroBoard.SDK" Version="0.3.0" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
+
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
+    <PackageReference Include="HidSharp" Version="2.1.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Hardware.cs" />
-    <Compile Include="IHardware.cs" />
-    <Compile Include="Internals\ConcurrentBufferedQueue.cs" />
-    <Compile Include="Internals\HidDeviceExtensions.cs" />
-    <Compile Include="Internals\IHardwareInternalInfos.cs" />
-    <Compile Include="Internals\ITimeService.cs" />
-    <Compile Include="Internals\KeyBitmapExtensions.cs" />
-    <Compile Include="Internals\RelativeTimeSource.cs" />
-    <Compile Include="Internals\StreamDeckHardwareInfo.cs" />
-    <Compile Include="Internals\StreamDeckMiniHardwareInfo.cs" />
-    <Compile Include="Internals\BasicHidClient.cs" />
-    <Compile Include="DeviceInfo.cs" />
-    <Compile Include="Exceptions\StreamDeckNotFoundException.cs" />
-    <Compile Include="Internals\IStreamDeckHid.cs" />
-    <Compile Include="Internals\OutputReportGenerator.cs" />
-    <Compile Include="Internals\CachedHidClient.cs" />
-    <Compile Include="Internals\StreamDeckXlHardwareInfo.cs" />
-    <Compile Include="IStreamDeckBoard.cs" />
-    <Compile Include="IStreamDeckRefHandle.cs" />
-    <Compile Include="IUsbHidHardware.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StreamDeck.cs" />
-    <Compile Include="Exceptions\StreamDeckException.cs" />
-    <Compile Include="Internals\StreamDeckHidWrapper.cs" />
-    <Compile Include="UsbConstants.cs" />
+    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HidLibrary\src\HidLibrary\HidLibrary.csproj">
-      <Project>{9e8f1d50-74ea-4c60-bd5c-ab2c5b53bc66}</Project>
-      <Name>HidLibrary</Name>
-    </ProjectReference>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Drawing.Common">
+      <Version>4.5.1</Version>
+    </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
-    </PropertyGroup>
-  </Target>
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+
 </Project>
