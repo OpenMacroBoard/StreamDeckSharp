@@ -207,7 +207,7 @@ namespace StreamDeckSharp.Tests
                 q.Add(1, "Hallo new");
 
                 var r = q.Take();
-                bool clockWasSet = false;
+                var clockWasSet = false;
 
                 r.Key.Should().Be(1);
                 r.Value.Should().Be("Hallo new");

@@ -53,9 +53,9 @@ namespace StreamDeckSharp.Internals
 
             if (rawData != null)
             {
-                for (int y = 0; y < ImgWidth; y++)
+                for (var y = 0; y < ImgWidth; y++)
                 {
-                    for (int x = 0; x < ImgWidth; x++)
+                    for (var x = 0; x < ImgWidth; x++)
                     {
                         var src = (y * ImgWidth + x) * ColorChannels;
                         var tar = (y * ImgWidth + ((ImgWidth - 1) - x)) * ColorChannels + bmpHeader.Length;

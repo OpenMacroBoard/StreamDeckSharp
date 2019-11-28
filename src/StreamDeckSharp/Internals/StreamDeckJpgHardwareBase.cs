@@ -85,12 +85,12 @@ namespace StreamDeckSharp.Internals
 
         private byte[] EncodeImageToJpg(byte[] rgb24)
         {
-            int stride = imgSize * 4;
+            var stride = imgSize * 4;
             var data = new byte[imgSize * stride];
 
-            for (int y = 0; y < imgSize; y++)
+            for (var y = 0; y < imgSize; y++)
             {
-                for (int x = 0; x < imgSize; x++)
+                for (var x = 0; x < imgSize; x++)
                 {
                     var x1 = imgSize - 1 - x;
                     var y1 = imgSize - 1 - y;
@@ -104,12 +104,12 @@ namespace StreamDeckSharp.Internals
                 }
             }
 
-            GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
             try
             {
                 var pointer = pinnedArray.AddrOfPinnedObject();
 
-                using (Bitmap target = new Bitmap(imgSize, imgSize, stride, System.Drawing.Imaging.PixelFormat.Format32bppRgb, pointer))
+                using (var target = new Bitmap(imgSize, imgSize, stride, System.Drawing.Imaging.PixelFormat.Format32bppRgb, pointer))
                 {
                     using (var memStream = new MemoryStream())
                     {

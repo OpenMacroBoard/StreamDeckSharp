@@ -116,7 +116,7 @@ namespace StreamDeckSharp.Internals
 
         private void ProcessKeys(byte[] newStates)
         {
-            for (int i = 0; i < keyStates.Length; i++)
+            for (var i = 0; i < keyStates.Length; i++)
             {
                 var newStatePos = i + hwInfo.KeyReportOffset;
 

@@ -10,7 +10,7 @@ namespace StreamDeckSharp.Internals
     {
         public static byte[] GetScaledVersion(this KeyBitmap keyBitmap, int width, int height)
         {
-            var keyDataAccess = (IKeyBitmapDataAccess)keyBitmap;
+            IKeyBitmapDataAccess keyDataAccess = keyBitmap;
 
             if (keyDataAccess.IsNull)
             {

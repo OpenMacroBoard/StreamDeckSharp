@@ -82,7 +82,7 @@ namespace StreamDeckSharp.Internals
                 return;
             }
 
-            if (device.TryOpen(out HidStream stream))
+            if (device.TryOpen(out var stream))
             {
                 stream.ReadTimeout = Timeout.Infinite;
                 dStream = stream;
