@@ -13,13 +13,17 @@ namespace StreamDeckSharp.Internals
             var keyDataAccess = (IKeyBitmapDataAccess)keyBitmap;
 
             if (keyDataAccess.IsNull)
+            {
                 return null;
+            }
 
             var rawData = new byte[keyDataAccess.DataLength];
             keyDataAccess.CopyData(rawData, 0);
 
             if (keyBitmap.Width == width && keyBitmap.Height == height)
+            {
                 return rawData;
+            }
 
             var destRect = new Rectangle(0, 0, width, height);
 

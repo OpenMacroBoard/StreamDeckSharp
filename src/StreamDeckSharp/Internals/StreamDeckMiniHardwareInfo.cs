@@ -52,7 +52,9 @@ namespace StreamDeckSharp.Internals
             Array.Copy(bmpHeader, 0, bmp, 0, bmpHeader.Length);
 
             if (rawData != null)
+            {
                 for (int y = 0; y < imgWidth; y++)
+                {
                     for (int x = 0; x < imgWidth; x++)
                     {
                         var src = (y * imgWidth + x) * colorChannels;
@@ -62,6 +64,8 @@ namespace StreamDeckSharp.Internals
                         bmp[tar + 1] = rawData[src + 1];
                         bmp[tar + 2] = rawData[src + 2];
                     }
+                }
+            }
 
             return bmp;
         }
@@ -84,7 +88,9 @@ namespace StreamDeckSharp.Internals
         public byte[] GetBrightnessMessage(byte percent)
         {
             if (percent > 100)
+            {
                 throw new ArgumentOutOfRangeException(nameof(percent));
+            }
 
             var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
             buffer[5] = percent;

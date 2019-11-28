@@ -24,7 +24,9 @@ namespace StreamDeckSharp
             var dev = EnumerateDevices(hardware).FirstOrDefault();
 
             if (dev is null)
+            {
                 throw new StreamDeckNotFoundException();
+            }
 
             return dev.Open();
         }
@@ -56,16 +58,22 @@ namespace StreamDeckSharp
                 var hwDetails = d.GetHardwareInformation();
 
                 if (hwDetails is null)
+                {
                     return null;
+                }
 
                 if (matchAllKnowDevices)
+                {
                     return hwDetails;
+                }
 
                 foreach (var h in hardware)
                 {
                     if (d.VendorID == h.UsbVendorId &&
                         d.ProductID == h.UsbProductId)
+                    {
                         return hwDetails;
+                    }
                 }
 
                 return null;
@@ -84,9 +92,13 @@ namespace StreamDeckSharp
             var hwInfo = device.GetHardwareInformation();
 
             if (cached)
+            {
                 return new CachedHidClient(hidWrapper, hwInfo);
+            }
             else
+            {
                 return new BasicHidClient(hidWrapper, hwInfo);
+            }
         }
     }
 }

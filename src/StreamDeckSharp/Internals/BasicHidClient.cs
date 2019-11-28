@@ -44,7 +44,10 @@ namespace StreamDeckSharp.Internals
             lock (disposeLock)
             {
                 if (IsDisposed)
+                {
                     return;
+                }
+
                 IsDisposed = true;
             }
 
@@ -62,7 +65,9 @@ namespace StreamDeckSharp.Internals
         public string GetFirmwareVersion()
         {
             if (!deckHid.ReadFeatureData(hwInfo.FirmwareVersionFeatureId, out var featureData))
+            {
                 return null;
+            }
 
             return Encoding.UTF8.GetString(featureData, hwInfo.FirmwareReportSkip, featureData.Length - hwInfo.FirmwareReportSkip).Trim('\0');
         }
@@ -70,7 +75,9 @@ namespace StreamDeckSharp.Internals
         public string GetSerialNumber()
         {
             if (!deckHid.ReadFeatureData(hwInfo.SerialNumberFeatureId, out var featureData))
+            {
                 return null;
+            }
 
             return Encoding.UTF8.GetString(featureData, hwInfo.SerialNumberReportSkip, featureData.Length - hwInfo.SerialNumberReportSkip).Trim('\0');
         }
@@ -88,7 +95,9 @@ namespace StreamDeckSharp.Internals
             var payload = hwInfo.GeneratePayload(bitmapData);
 
             foreach (var report in OutputReportSplitter.Split(payload, buffer, hwInfo.ReportSize, hwInfo.HeaderSize, keyId, hwInfo.PrepareDataForTransmittion))
+            {
                 deckHid.WriteReport(report);
+            }
         }
 
         public void ShowLogo()
@@ -100,7 +109,9 @@ namespace StreamDeckSharp.Internals
         protected void VerifyNotDisposed()
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(BasicHidClient));
+            }
         }
 
         private void ProcessKeys(byte[] newStates)

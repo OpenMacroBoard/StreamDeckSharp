@@ -11,7 +11,9 @@ namespace StreamDeckSharp.Internals
         public static IHardwareInternalInfos GetDeviceDetails(int vendorId, int productId)
         {
             if (vendorId != VendorIds.ElgatoSystemsGmbH)
+            {
                 return null;
+            }
 
             switch (productId)
             {

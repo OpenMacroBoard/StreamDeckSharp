@@ -57,30 +57,40 @@ namespace StreamDeckSharp.Internals
                 ThrowIfDisposed();
 
                 if (isAddingCompleted)
+                {
                     throw new InvalidOperationException("Adding was already marked as completed.");
+                }
 
                 try
                 {
                     AddOrUpdateBufferDictionary(key, value);
 
                     if (readyQueue.Contains(key))
+                    {
                         return;
+                    }
 
                     if (cooldownValues.ContainsKey(key))
                     {
                         var wasEmpty = waitingQueue.Count < 1;
 
                         if (!waitingQueue.Contains(key))
+                        {
                             waitingQueue.Enqueue(key);
+                        }
 
                         if (wasEmpty)
                         {
                             var timeToNextRelease = cooldownValues[key] - timeSource.GetRelativeTimestamp();
 
                             if (timeToNextRelease <= 0)
+                            {
                                 ProcessCooldownList();
+                            }
                             else
+                            {
                                 ProcessCooldownAgainAfterMs(timeToNextRelease);
+                            }
                         }
 
                         return;
@@ -100,7 +110,9 @@ namespace StreamDeckSharp.Internals
             lock (_sync)
             {
                 if (disposed)
+                {
                     return;
+                }
 
                 var timestamp = timeSource.GetRelativeTimestamp();
 
@@ -144,9 +156,13 @@ namespace StreamDeckSharp.Internals
         private void AddOrUpdateBufferDictionary(TKey key, TValue value)
         {
             if (valueBuffer.ContainsKey(key))
+            {
                 valueBuffer[key] = value;
+            }
             else
+            {
                 valueBuffer.Add(key, value);
+            }
         }
 
         public KeyValuePair<TKey, TValue> Take()
@@ -158,7 +174,9 @@ namespace StreamDeckSharp.Internals
                     ThrowIfDisposed();
 
                     if (isAddingCompleted)
+                    {
                         throw new InvalidOperationException("Adding is completed and buffer is empty.");
+                    }
 
                     Monitor.Wait(_sync);
                 }
@@ -178,7 +196,9 @@ namespace StreamDeckSharp.Internals
         private void ThrowIfDisposed()
         {
             if (disposed)
+            {
                 throw new ObjectDisposedException(nameof(ConcurrentBufferedQueue<TKey, TValue>));
+            }
         }
 
         public void CompleteAdding()
@@ -186,7 +206,9 @@ namespace StreamDeckSharp.Internals
             lock (_sync)
             {
                 if (isAddingCompleted)
+                {
                     return;
+                }
 
                 isAddingCompleted = true;
                 Monitor.PulseAll(_sync);
@@ -198,11 +220,16 @@ namespace StreamDeckSharp.Internals
             lock (_sync)
             {
                 if (disposed)
+                {
                     return;
+                }
+
                 disposed = true;
 
                 if (!isAddingCompleted)
+                {
                     CompleteAdding();
+                }
             }
         }
     }

@@ -18,7 +18,9 @@ namespace StreamDeckSharp.Internals
         public StreamDeckHidWrapper(HidDevice device)
         {
             if (device is null)
+            {
                 throw new ArgumentNullException(nameof(device));
+            }
 
             devicePath = device.DevicePath;
             DeviceList.Local.Changed += Local_Changed;
@@ -54,21 +56,31 @@ namespace StreamDeckSharp.Internals
             var deviceActive = dStream != null;
 
             if (deviceFound == deviceActive)
+            {
                 return;
+            }
 
             if (!deviceFound)
+            {
                 DisposeConnection();
+            }
             else
+            {
                 OpenConnection(device);
+            }
         }
 
         private void OpenConnection(HidDevice device)
         {
             if (device == null)
+            {
                 return;
+            }
 
             if (dStream != null)
+            {
                 return;
+            }
 
             if (device.TryOpen(out HidStream stream))
             {
@@ -82,7 +94,9 @@ namespace StreamDeckSharp.Internals
         private void DisposeConnection()
         {
             if (dStream is null)
+            {
                 return;
+            }
 
             dStream.Dispose();
             dStream = null;
@@ -110,7 +124,9 @@ namespace StreamDeckSharp.Internals
             var targetStream = dStream;
 
             if (targetStream is null)
+            {
                 return false;
+            }
 
             try
             {
@@ -137,7 +153,9 @@ namespace StreamDeckSharp.Internals
             var targetStream = dStream;
 
             if (targetStream is null)
+            {
                 return false;
+            }
 
             try
             {
@@ -156,7 +174,9 @@ namespace StreamDeckSharp.Internals
             var targetStream = dStream;
 
             if (targetStream is null)
+            {
                 return false;
+            }
 
             try
             {
@@ -199,13 +219,19 @@ namespace StreamDeckSharp.Internals
         private static bool IsConnectionError(Exception ex)
         {
             if (ex is TimeoutException)
+            {
                 return true;
+            }
 
             if (ex is IOException)
+            {
                 return true;
+            }
 
             if (ex is ObjectDisposedException)
+            {
                 return true;
+            }
 
             return false;
         }

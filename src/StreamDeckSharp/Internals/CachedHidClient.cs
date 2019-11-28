@@ -42,7 +42,9 @@ namespace StreamDeckSharp.Internals
                     }
 
                     foreach (var report in OutputReportSplitter.Split(res.Value, buffer, hwInfo.ReportSize, hwInfo.HeaderSize, res.Key, hwInfo.PrepareDataForTransmittion))
+                    {
                         deckHid.WriteReport(report);
+                    }
                 }
             }, TaskCreationOptions.LongRunning);
         }

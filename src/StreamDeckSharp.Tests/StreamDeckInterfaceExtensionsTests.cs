@@ -46,7 +46,9 @@ namespace StreamDeckSharp.Tests
             collection.SequenceEqual(keys).Should().BeTrue();
 
             for (int i = 0; i < keys.Length; i++)
+            {
                 collection[i].Should().BeEquivalentTo(keys[i]);
+            }
 
             int cnt = 0;
             foreach (var element in (IEnumerable)collection)
@@ -126,7 +128,9 @@ namespace StreamDeckSharp.Tests
             deck.SetKeyBitmap(key);
 
             for (int i = 0; i < keyCnt; i++)
+            {
                 keySetCalled[i].Should().Be(1, "because all keys should be called exactly once");
+            }
         }
 
         [Fact]
@@ -159,9 +163,13 @@ namespace StreamDeckSharp.Tests
             for (int i = 0; i < keyCnt; i++)
             {
                 if (i == keyToClear)
+                {
                     keySetCalled[i].Should().Be(1, $"because the cleared key {i} should be called once.");
+                }
                 else
+                {
                     keySetCalled[i].Should().Be(0, $"because key {i} was not cleared.");
+                }
             }
 
 
@@ -169,7 +177,9 @@ namespace StreamDeckSharp.Tests
             deck.ClearKeys();
 
             for (int i = 0; i < keyCnt; i++)
+            {
                 keySetCalled[i].Should().Be(1, $"because the cleared key {i} should be called once.");
+            }
         }
     }
 }

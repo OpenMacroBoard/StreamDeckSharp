@@ -51,7 +51,9 @@ namespace StreamDeckSharp.Internals
             var rawData = keyBitmap.GetScaledVersion(imgSize, imgSize);
 
             if (rawData is null)
+            {
                 return GetNullImage();
+            }
 
             return EncodeImageToJpg(rawData);
         }
@@ -87,6 +89,7 @@ namespace StreamDeckSharp.Internals
             var data = new byte[imgSize * stride];
 
             for (int y = 0; y < imgSize; y++)
+            {
                 for (int x = 0; x < imgSize; x++)
                 {
                     var x1 = imgSize - 1 - x;
@@ -99,6 +102,7 @@ namespace StreamDeckSharp.Internals
                     data[pTarget + 1] = rgb24[pSource + 1];
                     data[pTarget + 2] = rgb24[pSource + 2];
                 }
+            }
 
             GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
             try
@@ -123,7 +127,9 @@ namespace StreamDeckSharp.Internals
         public byte[] GetBrightnessMessage(byte percent)
         {
             if (percent > 100)
+            {
                 throw new ArgumentOutOfRangeException(nameof(percent));
+            }
 
             var buffer = new byte[] { 0x03, 0x08, 0x64, 0x23, 0xB8, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xA5, 0x49, 0xCD, 0x02, 0xFE, 0x7F, 0x00, 0x00 };
             buffer[2] = percent;
