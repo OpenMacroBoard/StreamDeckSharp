@@ -6,23 +6,19 @@ namespace StreamDeckSharp.Internals
 {
     internal class BasicHidClient : IStreamDeckBoard
     {
-        protected readonly byte[] buffer;
-        protected readonly IHardwareInternalInfos hwInfo;
-        protected IStreamDeckHid deckHid;
-
         private readonly byte[] keyStates;
         private readonly object disposeLock = new object();
 
         public BasicHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
         {
-            this.deckHid = deckHid;
+            DeckHid = deckHid;
             Keys = hardwareInformation.Keys;
 
             deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
             deckHid.ReportReceived += DeckHid_ReportReceived;
 
-            hwInfo = hardwareInformation;
-            buffer = new byte[deckHid.OutputReportLength];
+            HardwareInfo = hardwareInformation;
+            Buffer = new byte[deckHid.OutputReportLength];
             keyStates = new byte[Keys.Count];
         }
 
@@ -32,7 +28,11 @@ namespace StreamDeckSharp.Internals
         public GridKeyPositionCollection Keys { get; }
         IKeyPositionCollection IMacroBoard.Keys => Keys;
         public bool IsDisposed { get; private set; }
-        public bool IsConnected => deckHid.IsConnected;
+        public bool IsConnected => DeckHid.IsConnected;
+
+        protected IStreamDeckHid DeckHid { get; }
+        protected IHardwareInternalInfos HardwareInfo { get; }
+        protected byte[] Buffer { get; private set; }
 
         public void Dispose()
         {
@@ -49,46 +49,46 @@ namespace StreamDeckSharp.Internals
             Shutdown();
             ShowLogoWithoutDisposeVerification();
 
-            deckHid.Dispose();
+            DeckHid.Dispose();
 
             Dispose(true);
         }
 
         public string GetFirmwareVersion()
         {
-            if (!deckHid.ReadFeatureData(hwInfo.FirmwareVersionFeatureId, out var featureData))
+            if (!DeckHid.ReadFeatureData(HardwareInfo.FirmwareVersionFeatureId, out var featureData))
             {
                 return null;
             }
 
-            return Encoding.UTF8.GetString(featureData, hwInfo.FirmwareReportSkip, featureData.Length - hwInfo.FirmwareReportSkip).Trim('\0');
+            return Encoding.UTF8.GetString(featureData, HardwareInfo.FirmwareReportSkip, featureData.Length - HardwareInfo.FirmwareReportSkip).Trim('\0');
         }
 
         public string GetSerialNumber()
         {
-            if (!deckHid.ReadFeatureData(hwInfo.SerialNumberFeatureId, out var featureData))
+            if (!DeckHid.ReadFeatureData(HardwareInfo.SerialNumberFeatureId, out var featureData))
             {
                 return null;
             }
 
-            return Encoding.UTF8.GetString(featureData, hwInfo.SerialNumberReportSkip, featureData.Length - hwInfo.SerialNumberReportSkip).Trim('\0');
+            return Encoding.UTF8.GetString(featureData, HardwareInfo.SerialNumberReportSkip, featureData.Length - HardwareInfo.SerialNumberReportSkip).Trim('\0');
         }
 
         public void SetBrightness(byte percent)
         {
             VerifyNotDisposed();
-            deckHid.WriteFeature(hwInfo.GetBrightnessMessage(percent));
+            DeckHid.WriteFeature(HardwareInfo.GetBrightnessMessage(percent));
         }
 
         public virtual void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
-            keyId = hwInfo.ExtKeyIdToHardwareKeyId(keyId);
+            keyId = HardwareInfo.ExtKeyIdToHardwareKeyId(keyId);
 
-            var payload = hwInfo.GeneratePayload(bitmapData);
+            var payload = HardwareInfo.GeneratePayload(bitmapData);
 
-            foreach (var report in OutputReportSplitter.Split(payload, buffer, hwInfo.ReportSize, hwInfo.HeaderSize, keyId, hwInfo.PrepareDataForTransmittion))
+            foreach (var report in OutputReportSplitter.Split(payload, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, keyId, HardwareInfo.PrepareDataForTransmittion))
             {
-                deckHid.WriteReport(report);
+                DeckHid.WriteReport(report);
             }
         }
 
@@ -123,11 +123,11 @@ namespace StreamDeckSharp.Internals
         {
             for (var i = 0; i < keyStates.Length; i++)
             {
-                var newStatePos = i + hwInfo.KeyReportOffset;
+                var newStatePos = i + HardwareInfo.KeyReportOffset;
 
                 if (keyStates[i] != newStates[newStatePos])
                 {
-                    var externalKeyId = hwInfo.HardwareKeyIdToExtKeyId(i);
+                    var externalKeyId = HardwareInfo.HardwareKeyIdToExtKeyId(i);
                     KeyStateChanged?.Invoke(this, new KeyEventArgs(externalKeyId, newStates[newStatePos] != 0));
                     keyStates[i] = newStates[newStatePos];
                 }
@@ -136,7 +136,7 @@ namespace StreamDeckSharp.Internals
 
         private void ShowLogoWithoutDisposeVerification()
         {
-            deckHid.WriteFeature(hwInfo.GetLogoMessage());
+            DeckHid.WriteFeature(HardwareInfo.GetLogoMessage());
         }
     }
 }

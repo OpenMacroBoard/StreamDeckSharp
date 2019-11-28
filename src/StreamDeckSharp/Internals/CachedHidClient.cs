@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StreamDeckSharp.Internals
@@ -22,9 +23,9 @@ namespace StreamDeckSharp.Internals
         public override void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
             VerifyNotDisposed();
-            keyId = hwInfo.ExtKeyIdToHardwareKeyId(keyId);
+            keyId = HardwareInfo.ExtKeyIdToHardwareKeyId(keyId);
 
-            var payload = cacheKeyBitmaps.GetValue(bitmapData, hwInfo.GeneratePayload);
+            var payload = cacheKeyBitmaps.GetValue(bitmapData, HardwareInfo.GeneratePayload);
             imageQueue.Add(keyId, payload);
         }
 
@@ -42,26 +43,30 @@ namespace StreamDeckSharp.Internals
         private Task StartBitmapWriterTask()
         {
             return Task.Factory.StartNew(() =>
-            {
-                while (true)
                 {
-                    KeyValuePair<int, byte[]> res;
+                    while (true)
+                    {
+                        KeyValuePair<int, byte[]> res;
 
-                    try
-                    {
-                        res = imageQueue.Take();
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        break;
-                    }
+                        try
+                        {
+                            res = imageQueue.Take();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            break;
+                        }
 
-                    foreach (var report in OutputReportSplitter.Split(res.Value, buffer, hwInfo.ReportSize, hwInfo.HeaderSize, res.Key, hwInfo.PrepareDataForTransmittion))
-                    {
-                        deckHid.WriteReport(report);
+                        foreach (var report in OutputReportSplitter.Split(res.Value, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, res.Key, HardwareInfo.PrepareDataForTransmittion))
+                        {
+                            DeckHid.WriteReport(report);
+                        }
                     }
-                }
-            }, TaskCreationOptions.LongRunning);
+                },
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default
+            );
         }
     }
 }

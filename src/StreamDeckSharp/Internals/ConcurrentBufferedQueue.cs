@@ -165,11 +165,13 @@ namespace StreamDeckSharp.Internals
             }
         }
 
-        private static Task Delay(int milliseconds)
+        private static Task Delay(long milliseconds)
         {
-            var tcs = new TaskCompletionSource<object>();
-            new Timer(_ => tcs.SetResult(null)).Change(milliseconds, -1);
-            return tcs.Task;
+#if NETSTANDARD2_0
+            return Task.Delay((int)milliseconds);
+#else
+            return TaskEx.Delay((int)milliseconds);
+#endif
         }
 
         private void ProcessCooldownList()
@@ -207,10 +209,7 @@ namespace StreamDeckSharp.Internals
 
         private void ProcessCooldownAgainAfterMs(long milliseconds)
         {
-            Delay((int)milliseconds).ContinueWith((t) =>
-            {
-                ProcessCooldownList();
-            });
+            Delay(milliseconds).ContinueWith(_ => ProcessCooldownList(), TaskScheduler.Default);
         }
 
         private void AddOrUpdateBufferDictionary(TKey key, TValue value)
