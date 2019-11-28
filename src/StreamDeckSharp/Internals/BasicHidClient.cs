@@ -21,7 +21,7 @@ namespace StreamDeckSharp.Internals
             deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
             deckHid.ReportReceived += DeckHid_ReportReceived;
 
-            this.hwInfo = hardwareInformation;
+            hwInfo = hardwareInformation;
             buffer = new byte[deckHid.OutputReportLength];
             keyStates = new byte[Keys.Count];
         }
