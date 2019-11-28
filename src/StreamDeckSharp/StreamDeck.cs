@@ -17,6 +17,7 @@ namespace StreamDeckSharp
         /// <summary>
         /// Enumerates connected Stream Decks and returns the first one.
         /// </summary>
+        /// <param name="hardware"></param>
         /// <returns>The default <see cref="IStreamDeckBoard"/> HID</returns>
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
         public static IStreamDeckBoard OpenDevice(params IUsbHidHardware[] hardware)

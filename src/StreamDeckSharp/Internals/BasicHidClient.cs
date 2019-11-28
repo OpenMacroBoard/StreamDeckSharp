@@ -7,11 +7,11 @@ namespace StreamDeckSharp.Internals
     internal class BasicHidClient : IStreamDeckBoard
     {
         protected readonly byte[] buffer;
+        protected readonly IHardwareInternalInfos hwInfo;
+        protected IStreamDeckHid deckHid;
+
         private readonly byte[] keyStates;
         private readonly object disposeLock = new object();
-        protected readonly IHardwareInternalInfos hwInfo;
-
-        protected IStreamDeckHid deckHid;
 
         public BasicHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
         {
@@ -26,18 +26,13 @@ namespace StreamDeckSharp.Internals
             keyStates = new byte[Keys.Count];
         }
 
-        private void DeckHid_ReportReceived(object sender, ReportReceivedEventArgs e)
-        {
-            ProcessKeys(e.ReportData);
-        }
+        public event EventHandler<KeyEventArgs> KeyStateChanged;
+        public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
 
         public GridKeyPositionCollection Keys { get; }
         IKeyPositionCollection IMacroBoard.Keys => Keys;
-
         public bool IsDisposed { get; private set; }
         public bool IsConnected => deckHid.IsConnected;
-        public event EventHandler<KeyEventArgs> KeyStateChanged;
-        public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
 
         public void Dispose()
         {
@@ -58,9 +53,6 @@ namespace StreamDeckSharp.Internals
 
             Dispose(true);
         }
-
-        protected virtual void Shutdown() { }
-        protected virtual void Dispose(bool managed) { }
 
         public string GetFirmwareVersion()
         {
@@ -106,12 +98,25 @@ namespace StreamDeckSharp.Internals
             ShowLogoWithoutDisposeVerification();
         }
 
+        protected virtual void Shutdown()
+        {
+        }
+
+        protected virtual void Dispose(bool managed)
+        {
+        }
+
         protected void VerifyNotDisposed()
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(BasicHidClient));
             }
+        }
+
+        private void DeckHid_ReportReceived(object sender, ReportReceivedEventArgs e)
+        {
+            ProcessKeys(e.ReportData);
         }
 
         private void ProcessKeys(byte[] newStates)

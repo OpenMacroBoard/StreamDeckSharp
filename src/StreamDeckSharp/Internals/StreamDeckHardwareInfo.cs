@@ -10,7 +10,21 @@ namespace StreamDeckSharp.Internals
         private const int ImgWidth = 72;
         private const int ColorChannels = 3;
 
-        public int KeyCount => keyPositions.Count;
+        private static readonly GridKeyPositionCollection KeyPositions
+            = new GridKeyPositionCollection(5, 3, ImgWidth, 25);
+
+        private static readonly byte[] BmpHeader = new byte[]
+        {
+            0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
+            0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00,
+            0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e,
+            0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        };
+
+        public int KeyCount => KeyPositions.Count;
         public int IconSize => ImgWidth;
         public int HeaderSize => 16;
         public int ReportSize => 7819;
@@ -23,33 +37,15 @@ namespace StreamDeckSharp.Internals
         public byte SerialNumberFeatureId => 3;
         public int FirmwareReportSkip => 5;
         public int SerialNumberReportSkip => 5;
-
         public GridKeyPositionCollection Keys
-           => keyPositions;
-
-        static StreamDeckHardwareInfo()
-        {
-            //3x2 keys with 72x72px icons and 25px in between
-            keyPositions = new GridKeyPositionCollection(5, 3, ImgWidth, 25);
-        }
-
-        private static readonly GridKeyPositionCollection keyPositions;
-        private static readonly byte[] bmpHeader = new byte[] {
-            0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
-            0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00,
-            0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e,
-            0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        };
+            => KeyPositions;
 
         public byte[] GeneratePayload(KeyBitmap keyBitmap)
         {
             var rawData = keyBitmap.GetScaledVersion(ImgWidth, ImgWidth);
 
-            var bmp = new byte[ImgWidth * ImgWidth * 3 + bmpHeader.Length];
-            Array.Copy(bmpHeader, 0, bmp, 0, bmpHeader.Length);
+            var bmp = new byte[ImgWidth * ImgWidth * 3 + BmpHeader.Length];
+            Array.Copy(BmpHeader, 0, bmp, 0, BmpHeader.Length);
 
             if (rawData != null)
             {
@@ -58,7 +54,7 @@ namespace StreamDeckSharp.Internals
                     for (var x = 0; x < ImgWidth; x++)
                     {
                         var src = (y * ImgWidth + x) * ColorChannels;
-                        var tar = (y * ImgWidth + ((ImgWidth - 1) - x)) * ColorChannels + bmpHeader.Length;
+                        var tar = (y * ImgWidth + ((ImgWidth - 1) - x)) * ColorChannels + BmpHeader.Length;
 
                         bmp[tar + 0] = rawData[src + 0];
                         bmp[tar + 1] = rawData[src + 1];
@@ -76,16 +72,10 @@ namespace StreamDeckSharp.Internals
         public int HardwareKeyIdToExtKeyId(int hardwareKeyId)
             => FlipIdsHorizontal(hardwareKeyId);
 
-        private static int FlipIdsHorizontal(int keyId)
-        {
-            var diff = ((keyId % 5) - 2) * -2;
-            return keyId + diff;
-        }
-
         public void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast)
         {
             data[0] = 2; // Report ID ?
-            data[1] = 1; // ? 
+            data[1] = 1; // ?
             data[2] = (byte)(pageNumber + 1);
             data[4] = (byte)(isLast ? 1 : 0);
             data[5] = (byte)(keyId + 1);
@@ -106,6 +96,12 @@ namespace StreamDeckSharp.Internals
         public byte[] GetLogoMessage()
         {
             return new byte[] { 0x0B, 0x63 };
+        }
+
+        private static int FlipIdsHorizontal(int keyId)
+        {
+            var diff = ((keyId % 5) - 2) * -2;
+            return keyId + diff;
         }
     }
 }

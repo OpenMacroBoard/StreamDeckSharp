@@ -3,11 +3,9 @@
 namespace StreamDeckSharp
 {
     /// <inheritdoc />
-    public interface IStreamDeckRefHandle : IDeviceReferenceHandle
+    public interface IStreamDeckRefHandle
+        : IDeviceReferenceHandle
     {
-        /// <inheritdoc />
-        new IStreamDeckBoard Open();
-
         /// <summary>
         /// The device path of the HID
         /// </summary>
@@ -23,5 +21,8 @@ namespace StreamDeckSharp
         /// (true is default and recommended)
         /// </summary>
         bool UseWriteCache { get; set; }
+
+        /// <inheritdoc />
+        new IStreamDeckBoard Open();
     }
 }

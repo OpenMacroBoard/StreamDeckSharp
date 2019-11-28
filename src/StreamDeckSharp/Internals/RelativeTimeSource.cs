@@ -4,6 +4,13 @@ namespace StreamDeckSharp.Internals
 {
     internal static class RelativeTimeSource
     {
+        static RelativeTimeSource()
+        {
+            Default = new StopwatchTimesource();
+        }
+
+        public static ITimeService Default { get; }
+
         private class StopwatchTimesource : ITimeService
         {
             private readonly Stopwatch sw;
@@ -15,13 +22,6 @@ namespace StreamDeckSharp.Internals
 
             public long GetRelativeTimestamp()
                 => sw.ElapsedMilliseconds;
-        }
-
-        public static ITimeService Default { get; }
-
-        static RelativeTimeSource()
-        {
-            Default = new StopwatchTimesource();
         }
     }
 }

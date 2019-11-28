@@ -19,10 +19,21 @@
 
   <ItemGroup>
     <PackageReference Include="HidSharp" Version="[2.1, 3)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
+      <Version>3.3.1</Version>
+    </PackageReference>
     <PackageReference Include="System.Drawing.Common" Version="4.6.1" />
   </ItemGroup>
 

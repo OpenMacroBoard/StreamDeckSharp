@@ -3,7 +3,8 @@
 namespace StreamDeckSharp
 {
     /// <inheritdoc />
-    public interface IStreamDeckBoard : IMacroBoard
+    public interface IStreamDeckBoard
+        : IMacroBoard
     {
         /// <inheritdoc />
         new GridKeyPositionCollection Keys { get; }

@@ -12,9 +12,24 @@ namespace StreamDeckSharp.Internals
     internal abstract class StreamDeckJpgHardwareBase
         : IHardwareInternalInfos
     {
+        private static byte[] cachedNullImage = null;
+
         private readonly int imgSize;
-        public abstract string DeviceName { get; }
+        private readonly ImageCodecInfo jpgEncoder;
+        private readonly EncoderParameters jpgParams;
+
+        public StreamDeckJpgHardwareBase(GridKeyPositionCollection keyPositions)
+        {
+            jpgEncoder = ImageCodecInfo.GetImageDecoders().Where(d => d.FormatID == ImageFormat.Jpeg.Guid).First();
+            jpgParams = new EncoderParameters(1);
+            jpgParams.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
+
+            Keys = keyPositions;
+            imgSize = keyPositions.KeyWidth;
+        }
+
         public abstract int UsbProductId { get; }
+        public abstract string DeviceName { get; }
 
         public int HeaderSize => 8;
         public int ReportSize => 1024;
@@ -28,20 +43,6 @@ namespace StreamDeckSharp.Internals
         public int SerialNumberReportSkip => 2;
 
         public GridKeyPositionCollection Keys { get; }
-        private static byte[] cachedNullImage = null;
-
-        private readonly ImageCodecInfo jpgEncoder;
-        private readonly EncoderParameters jpgParams;
-
-        public StreamDeckJpgHardwareBase(GridKeyPositionCollection keyPositions)
-        {
-            jpgEncoder = ImageCodecInfo.GetImageDecoders().Where(d => d.FormatID == ImageFormat.Jpeg.Guid).First();
-            jpgParams = new EncoderParameters(1);
-            jpgParams.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
-
-            Keys = keyPositions;
-            imgSize = keyPositions.KeyWidth;
-        }
 
         public int ExtKeyIdToHardwareKeyId(int extKeyId)
             => extKeyId;
@@ -70,6 +71,25 @@ namespace StreamDeckSharp.Internals
             data[4] = (byte)(payloadLength & 255);
             data[5] = (byte)(payloadLength >> 8);
             data[6] = (byte)pageNumber;
+        }
+
+        public byte[] GetBrightnessMessage(byte percent)
+        {
+            if (percent > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(percent));
+            }
+
+            var buffer = new byte[] { 0x03, 0x08, 0x64, 0x23, 0xB8, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xA5, 0x49, 0xCD, 0x02, 0xFE, 0x7F, 0x00, 0x00 };
+            buffer[2] = percent;
+            buffer[3] = 0x23;  // 0x23, sometimes 0x27
+
+            return buffer;
+        }
+
+        public byte[] GetLogoMessage()
+        {
+            return new byte[] { 0x03, 0x02 };
         }
 
         private byte[] GetNullImage()
@@ -122,25 +142,6 @@ namespace StreamDeckSharp.Internals
             {
                 pinnedArray.Free();
             }
-        }
-
-        public byte[] GetBrightnessMessage(byte percent)
-        {
-            if (percent > 100)
-            {
-                throw new ArgumentOutOfRangeException(nameof(percent));
-            }
-
-            var buffer = new byte[] { 0x03, 0x08, 0x64, 0x23, 0xB8, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xA5, 0x49, 0xCD, 0x02, 0xFE, 0x7F, 0x00, 0x00 };
-            buffer[2] = percent;
-            buffer[3] = 0x23;  //0x23, sometimes 0x27
-
-            return buffer;
-        }
-
-        public byte[] GetLogoMessage()
-        {
-            return new byte[] { 0x03, 0x02 };
         }
     }
 }

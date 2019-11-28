@@ -13,8 +13,7 @@ namespace StreamDeckSharp.Internals
             int bufferLength,
             int headerSize,
             int keyId,
-            PrepareDataForTransmittion prepareData
-        )
+            PrepareDataForTransmittion prepareData)
         {
             var maxPayloadLength = bufferLength - headerSize;
 

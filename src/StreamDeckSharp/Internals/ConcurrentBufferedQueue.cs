@@ -7,7 +7,7 @@ namespace StreamDeckSharp.Internals
 {
     internal sealed class ConcurrentBufferedQueue<TKey, TValue> : IDisposable
     {
-        private readonly object _sync = new object();
+        private readonly object sync = new object();
 
         private readonly Dictionary<TKey, TValue> valueBuffer = new Dictionary<TKey, TValue>();
         private readonly Dictionary<TKey, long> cooldownValues = new Dictionary<TKey, long>();
@@ -19,6 +19,15 @@ namespace StreamDeckSharp.Internals
         private readonly long cooldownTime;
         private volatile bool isAddingCompleted;
         private volatile bool disposed;
+
+        public ConcurrentBufferedQueue(ITimeService timeSource, long cooldown = 100)
+        {
+            this.timeSource = timeSource ?? throw new ArgumentNullException(nameof(timeSource));
+            cooldownTime = cooldown;
+        }
+
+        public int Count
+            => readyQueue.Count;
 
         public bool IsAddingCompleted
         {
@@ -33,7 +42,7 @@ namespace StreamDeckSharp.Internals
         {
             get
             {
-                lock (_sync)
+                lock (sync)
                 {
                     ThrowIfDisposed();
                     return isAddingCompleted && Count == 0;
@@ -41,18 +50,9 @@ namespace StreamDeckSharp.Internals
             }
         }
 
-        public int Count
-            => readyQueue.Count;
-
-        public ConcurrentBufferedQueue(ITimeService timeSource, long cooldown = 100)
-        {
-            this.timeSource = timeSource ?? throw new ArgumentNullException(nameof(timeSource));
-            cooldownTime = cooldown;
-        }
-
         public void Add(TKey key, TValue value)
         {
-            lock (_sync)
+            lock (sync)
             {
                 ThrowIfDisposed();
 
@@ -100,74 +100,14 @@ namespace StreamDeckSharp.Internals
                 }
                 finally
                 {
-                    Monitor.PulseAll(_sync);
+                    Monitor.PulseAll(sync);
                 }
-            }
-        }
-
-        private void ProcessCooldownList()
-        {
-            lock (_sync)
-            {
-                if (disposed)
-                {
-                    return;
-                }
-
-                var timestamp = timeSource.GetRelativeTimestamp();
-
-                while (waitingQueue.Count > 0)
-                {
-                    var top = waitingQueue.Peek();
-                    var targetTime = cooldownValues[top];
-
-                    //not yet ready
-                    if (targetTime > timestamp)
-                    {
-                        var timeToNextRelease = targetTime - timestamp;
-                        ProcessCooldownAgainAfterMs(timeToNextRelease);
-                        return;
-                    }
-
-                    waitingQueue.Dequeue();
-                    cooldownValues.Remove(top);
-
-                    readyQueue.Enqueue(top);
-                    Monitor.PulseAll(_sync);
-                }
-            }
-        }
-
-        private void ProcessCooldownAgainAfterMs(long milliseconds)
-        {
-            Delay((int)milliseconds).ContinueWith((t) =>
-            {
-                ProcessCooldownList();
-            });
-        }
-
-        private static Task Delay(int milliseconds)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            new Timer(_ => tcs.SetResult(null)).Change(milliseconds, -1);
-            return tcs.Task;
-        }
-
-        private void AddOrUpdateBufferDictionary(TKey key, TValue value)
-        {
-            if (valueBuffer.ContainsKey(key))
-            {
-                valueBuffer[key] = value;
-            }
-            else
-            {
-                valueBuffer.Add(key, value);
             }
         }
 
         public KeyValuePair<TKey, TValue> Take()
         {
-            lock (_sync)
+            lock (sync)
             {
                 while (readyQueue.Count < 1)
                 {
@@ -178,7 +118,7 @@ namespace StreamDeckSharp.Internals
                         throw new InvalidOperationException("Adding is completed and buffer is empty.");
                     }
 
-                    Monitor.Wait(_sync);
+                    Monitor.Wait(sync);
                 }
 
                 ThrowIfDisposed();
@@ -193,17 +133,9 @@ namespace StreamDeckSharp.Internals
             }
         }
 
-        private void ThrowIfDisposed()
-        {
-            if (disposed)
-            {
-                throw new ObjectDisposedException(nameof(ConcurrentBufferedQueue<TKey, TValue>));
-            }
-        }
-
         public void CompleteAdding()
         {
-            lock (_sync)
+            lock (sync)
             {
                 if (isAddingCompleted)
                 {
@@ -211,13 +143,13 @@ namespace StreamDeckSharp.Internals
                 }
 
                 isAddingCompleted = true;
-                Monitor.PulseAll(_sync);
+                Monitor.PulseAll(sync);
             }
         }
 
         public void Dispose()
         {
-            lock (_sync)
+            lock (sync)
             {
                 if (disposed)
                 {
@@ -230,6 +162,74 @@ namespace StreamDeckSharp.Internals
                 {
                     CompleteAdding();
                 }
+            }
+        }
+
+        private static Task Delay(int milliseconds)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            new Timer(_ => tcs.SetResult(null)).Change(milliseconds, -1);
+            return tcs.Task;
+        }
+
+        private void ProcessCooldownList()
+        {
+            lock (sync)
+            {
+                if (disposed)
+                {
+                    return;
+                }
+
+                var timestamp = timeSource.GetRelativeTimestamp();
+
+                while (waitingQueue.Count > 0)
+                {
+                    var top = waitingQueue.Peek();
+                    var targetTime = cooldownValues[top];
+
+                    // not yet ready
+                    if (targetTime > timestamp)
+                    {
+                        var timeToNextRelease = targetTime - timestamp;
+                        ProcessCooldownAgainAfterMs(timeToNextRelease);
+                        return;
+                    }
+
+                    waitingQueue.Dequeue();
+                    cooldownValues.Remove(top);
+
+                    readyQueue.Enqueue(top);
+                    Monitor.PulseAll(sync);
+                }
+            }
+        }
+
+        private void ProcessCooldownAgainAfterMs(long milliseconds)
+        {
+            Delay((int)milliseconds).ContinueWith((t) =>
+            {
+                ProcessCooldownList();
+            });
+        }
+
+        private void AddOrUpdateBufferDictionary(TKey key, TValue value)
+        {
+            if (valueBuffer.ContainsKey(key))
+            {
+                valueBuffer[key] = value;
+            }
+            else
+            {
+                valueBuffer.Add(key, value);
+            }
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(nameof(ConcurrentBufferedQueue<TKey, TValue>));
             }
         }
     }

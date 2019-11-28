@@ -8,8 +8,17 @@ namespace StreamDeckSharp.Exceptions
     [Serializable]
     public abstract class StreamDeckException : Exception
     {
-        internal StreamDeckException(string Message)
-            : base(Message)
+        public StreamDeckException()
+        {
+        }
+
+        public StreamDeckException(string message)
+            : base(message)
+        {
+        }
+
+        public StreamDeckException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

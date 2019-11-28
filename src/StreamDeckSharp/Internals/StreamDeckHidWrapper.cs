@@ -29,87 +29,13 @@ namespace StreamDeckSharp.Internals
             OpenConnection(device);
         }
 
-        private void Local_Changed(object sender, DeviceListChangedEventArgs e)
-        {
-            RefreshConnection();
-        }
-
-        private void InitializeDeviceSettings(HidDevice device)
-        {
-            if (readReportBuffer is null)
-            {
-                OutputReportLength = device.GetMaxOutputReportLength();
-                FeatureReportLength = device.GetMaxFeatureReportLength();
-                readReportBuffer = new byte[OutputReportLength];
-            }
-        }
-
-        private void RefreshConnection()
-        {
-            var device = DeviceList
-                            .Local
-                            .GetHidDevices()
-                            .Where(d => d.DevicePath == devicePath)
-                            .FirstOrDefault();
-
-            var deviceFound = device != null;
-            var deviceActive = dStream != null;
-
-            if (deviceFound == deviceActive)
-            {
-                return;
-            }
-
-            if (!deviceFound)
-            {
-                DisposeConnection();
-            }
-            else
-            {
-                OpenConnection(device);
-            }
-        }
-
-        private void OpenConnection(HidDevice device)
-        {
-            if (device == null)
-            {
-                return;
-            }
-
-            if (dStream != null)
-            {
-                return;
-            }
-
-            if (device.TryOpen(out var stream))
-            {
-                stream.ReadTimeout = Timeout.Infinite;
-                dStream = stream;
-                BeginWaitRead(stream);
-                ConnectionStateChanged?.Invoke(this, new ConnectionEventArgs(true));
-            }
-        }
-
-        private void DisposeConnection()
-        {
-            if (dStream is null)
-            {
-                return;
-            }
-
-            dStream.Dispose();
-            dStream = null;
-            ConnectionStateChanged?.Invoke(this, new ConnectionEventArgs(false));
-        }
+        public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
+        public event EventHandler<ReportReceivedEventArgs> ReportReceived;
 
         public int OutputReportLength { get; private set; }
         public int FeatureReportLength { get; private set; }
 
         public bool IsConnected => dStream != null;
-
-        public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
-        public event EventHandler<ReportReceivedEventArgs> ReportReceived;
 
         public void Dispose()
         {
@@ -190,6 +116,100 @@ namespace StreamDeckSharp.Internals
             }
         }
 
+        private static bool IsConnectionError(Exception ex)
+        {
+            if (ex is TimeoutException)
+            {
+                return true;
+            }
+
+            if (ex is IOException)
+            {
+                return true;
+            }
+
+            if (ex is ObjectDisposedException)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void OpenConnection(HidDevice device)
+        {
+            if (device == null)
+            {
+                return;
+            }
+
+            if (dStream != null)
+            {
+                return;
+            }
+
+            if (device.TryOpen(out var stream))
+            {
+                stream.ReadTimeout = Timeout.Infinite;
+                dStream = stream;
+                BeginWaitRead(stream);
+                ConnectionStateChanged?.Invoke(this, new ConnectionEventArgs(true));
+            }
+        }
+
+        private void Local_Changed(object sender, DeviceListChangedEventArgs e)
+        {
+            RefreshConnection();
+        }
+
+        private void InitializeDeviceSettings(HidDevice device)
+        {
+            if (readReportBuffer is null)
+            {
+                OutputReportLength = device.GetMaxOutputReportLength();
+                FeatureReportLength = device.GetMaxFeatureReportLength();
+                readReportBuffer = new byte[OutputReportLength];
+            }
+        }
+
+        private void RefreshConnection()
+        {
+            var device = DeviceList
+                            .Local
+                            .GetHidDevices()
+                            .Where(d => d.DevicePath == devicePath)
+                            .FirstOrDefault();
+
+            var deviceFound = device != null;
+            var deviceActive = dStream != null;
+
+            if (deviceFound == deviceActive)
+            {
+                return;
+            }
+
+            if (!deviceFound)
+            {
+                DisposeConnection();
+            }
+            else
+            {
+                OpenConnection(device);
+            }
+        }
+
+        private void DisposeConnection()
+        {
+            if (dStream is null)
+            {
+                return;
+            }
+
+            dStream.Dispose();
+            dStream = null;
+            ConnectionStateChanged?.Invoke(this, new ConnectionEventArgs(false));
+        }
+
         private void BeginWaitRead(HidStream stream)
         {
             stream.BeginRead(readReportBuffer, 0, readReportBuffer.Length, new AsyncCallback(ReadReportCallback), stream);
@@ -214,26 +234,6 @@ namespace StreamDeckSharp.Internals
             }
 
             BeginWaitRead(stream);
-        }
-
-        private static bool IsConnectionError(Exception ex)
-        {
-            if (ex is TimeoutException)
-            {
-                return true;
-            }
-
-            if (ex is IOException)
-            {
-                return true;
-            }
-
-            if (ex is ObjectDisposedException)
-            {
-                return true;
-            }
-
-            return false;
         }
     }
 }
