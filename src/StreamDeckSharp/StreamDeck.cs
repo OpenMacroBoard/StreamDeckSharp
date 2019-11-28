@@ -71,8 +71,6 @@ namespace StreamDeckSharp
                 return null;
             }
 
-            
-
             return DeviceList.Local
                     .GetHidDevices()
                     .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })

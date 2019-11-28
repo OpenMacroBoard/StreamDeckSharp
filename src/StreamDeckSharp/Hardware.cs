@@ -11,35 +11,37 @@ namespace StreamDeckSharp
         /// <summary>
         /// Details about the classic Stream Deck
         /// </summary>
-        public static IUsbHidHardware StreamDeck { get; }
+        public static IUsbHidHardware StreamDeck
+            => Internal_StreamDeck;
+
+        /// <summary>
+        /// Details about the classic Stream Deck Rev 2
+        /// </summary>
+        public static IUsbHidHardware StreamDeckRev2
+            => Internal_StreamDeckRev2;
 
         /// <summary>
         /// Details about the Stream Deck XL
         /// </summary>
-        public static IUsbHidHardware StreamDeckXL { get; }
+        public static IUsbHidHardware StreamDeckXL
+            => Internal_StreamDeckXL;
 
         /// <summary>
         /// Details about the Stream Deck Mini
         /// </summary>
-        public static IUsbHidHardware StreamDeckMini { get; }
+        public static IUsbHidHardware StreamDeckMini
+            => Internal_StreamDeckMini;
 
         internal static IHardwareInternalInfos Internal_StreamDeck { get; }
+            = new StreamDeckHardwareInfo();
+
+        internal static IHardwareInternalInfos Internal_StreamDeckRev2 { get; }
+            = new StreamDeckRev2HardwareInfo();
+
         internal static IHardwareInternalInfos Internal_StreamDeckXL { get; }
+            = new StreamDeckXlHardwareInfo();
+
         internal static IHardwareInternalInfos Internal_StreamDeckMini { get; }
-
-        static Hardware()
-        {
-            var hwStreamDeck = new StreamDeckHardwareInfo();
-            var hwStreamDeckXL = new StreamDeckXlHardwareInfo();
-            var hwStreamDeckMini = new StreamDeckMiniHardwareInfo();
-
-            StreamDeck = hwStreamDeck;
-            StreamDeckXL = hwStreamDeckXL;
-            StreamDeckMini = hwStreamDeckMini;
-
-            Internal_StreamDeck = hwStreamDeck;
-            Internal_StreamDeckXL = hwStreamDeckXL;
-            Internal_StreamDeckMini = hwStreamDeckMini;
-        }
+            = new StreamDeckMiniHardwareInfo();
     }
 }
