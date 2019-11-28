@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FluentAssertions;
+using Moq;
+using OpenMacroBoard.SDK;
+using System;
 using System.Collections;
 using System.Drawing;
 using System.Linq;
-using FluentAssertions;
-using Moq;
-using OpenMacroBoard.SDK;
 using Xunit;
 
 namespace StreamDeckSharp.Tests

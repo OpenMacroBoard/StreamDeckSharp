@@ -1,5 +1,4 @@
 ﻿using StreamDeckSharp.Internals;
-using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp
 {

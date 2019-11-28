@@ -1,7 +1,6 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StreamDeckSharp.Internals
 {

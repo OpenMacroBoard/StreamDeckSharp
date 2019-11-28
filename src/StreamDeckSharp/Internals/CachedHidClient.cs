@@ -1,9 +1,8 @@
-﻿using System;
+﻿using OpenMacroBoard.SDK;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
-using OpenMacroBoard.SDK;
 
 namespace StreamDeckSharp.Internals
 {
