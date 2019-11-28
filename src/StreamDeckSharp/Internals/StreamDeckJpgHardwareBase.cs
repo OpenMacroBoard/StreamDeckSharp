@@ -1,5 +1,6 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,6 +10,7 @@ using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
 {
+    [SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "EncoderParameters are disposed in the finalizer")]
     internal abstract class StreamDeckJpgHardwareBase
         : IHardwareInternalInfos
     {
