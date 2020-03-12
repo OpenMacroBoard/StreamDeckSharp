@@ -164,12 +164,9 @@ namespace StreamDeckSharp.Internals
 
         private void InitializeDeviceSettings(HidDevice device)
         {
-            if (readReportBuffer is null)
-            {
-                OutputReportLength = device.GetMaxOutputReportLength();
-                FeatureReportLength = device.GetMaxFeatureReportLength();
-                readReportBuffer = new byte[OutputReportLength];
-            }
+            OutputReportLength = device.GetMaxOutputReportLength();
+            FeatureReportLength = device.GetMaxFeatureReportLength();
+            readReportBuffer = new byte[OutputReportLength];
         }
 
         private void RefreshConnection()
