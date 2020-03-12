@@ -10,6 +10,7 @@ namespace StreamDeckSharp.Internals
 {
     internal sealed class StreamDeckHidWrapper : IStreamDeckHid
     {
+        private readonly object hidStreamLock = new object();
         private readonly string devicePath;
 
         private HidStream dStream;
@@ -56,8 +57,11 @@ namespace StreamDeckSharp.Internals
 
             try
             {
-                dStream.GetFeature(data);
-                return true;
+                lock (hidStreamLock)
+                {
+                    targetStream.GetFeature(data);
+                    return true;
+                }
             }
             catch (Exception ex) when (ex is TimeoutException || ex is IOException)
             {
@@ -85,7 +89,11 @@ namespace StreamDeckSharp.Internals
 
             try
             {
-                dStream.SetFeature(featureData);
+                lock (hidStreamLock)
+                {
+                    targetStream.SetFeature(featureData);
+                }
+
                 return true;
             }
             catch (Exception ex) when (IsConnectionError(ex))
@@ -106,7 +114,11 @@ namespace StreamDeckSharp.Internals
 
             try
             {
-                targetStream.Write(reportData);
+                lock (hidStreamLock)
+                {
+                    targetStream.Write(reportData);
+                }
+
                 return true;
             }
             catch (Exception ex) when (IsConnectionError(ex))
