@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
     <Company>OpenMacroBoard</Company>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Description>A simple .NET wrapper for Stream Deck (using OpenMacroBoard.SDK)</Description>
     <Copyright>Copyright © OpenMacroBoard 2018 - 2019</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -29,7 +29,7 @@
     </PackageReference>
     <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.4.0" />
     <PackageReference Include="System.Drawing.Common" Version="4.6.1" />

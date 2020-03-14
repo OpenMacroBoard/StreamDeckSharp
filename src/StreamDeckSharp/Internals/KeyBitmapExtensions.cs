@@ -1,4 +1,5 @@
-﻿using OpenMacroBoard.SDK;
+using OpenMacroBoard.SDK;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -33,14 +34,31 @@ namespace StreamDeckSharp.Internals
                 var bmpData = sourceBmp.LockBits(new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
                 try
                 {
-                    Marshal.Copy(rawData, 0, bmpData.Scan0, rawData.Length);
+                    var h = sourceBmp.Height;
+                    var w = sourceBmp.Width;
+
+                    var alignedData = new byte[bmpData.Stride * h];
+
+                    for (var y = 0; y < h; y++)
+                    {
+                        for (var x = 0; x < w; x++)
+                        {
+                            var ps = bmpData.Stride * y + x * 3;
+                            var pt = (w * y + x) * 3;
+                            alignedData[ps + 0] = rawData[pt + 0];
+                            alignedData[ps + 1] = rawData[pt + 1];
+                            alignedData[ps + 2] = rawData[pt + 2];
+                        }
+                    }
+
+                    Marshal.Copy(alignedData, 0, bmpData.Scan0, rawData.Length);
                 }
                 finally
                 {
                     sourceBmp.UnlockBits(bmpData);
                 }
 
-                using (var g = System.Drawing.Graphics.FromImage(scaledBmp))
+                using (var g = Graphics.FromImage(scaledBmp))
                 {
                     g.CompositingMode = CompositingMode.SourceCopy;
                     g.CompositingQuality = CompositingQuality.HighQuality;
