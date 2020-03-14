@@ -70,8 +70,13 @@ Here is what the "Rainbow" example looks like after pressing some keys
 
 ![Rainbow example photo](doc/images/rainbow_example.png?raw=true "Rainbow demo after pressing some keys")
 
-### Play video on StreamDeck
-Here is a short demo of playing a video on the stream deck device.
+### Play games on a StreamDeck
+For example minesweeper (take a look at the [example projects](https://github.com/OpenMacroBoard/StreamDeckSharp.ExampleCollection) if you are interested in that)
+
+<img src="doc/images/minesweeper.jpg?raw=true" width="500" />
+
+### You can even play videos on a StreamDeck
+Here is a short demo, playing a video on a stream deck device.
 
 [![Demo video of the example](https://i.imgur.com/8tlkaIg.png)](http://www.youtube.com/watch?v=tNwUG0sPmKw)  
 _*The glitches you can see are already fixed._
