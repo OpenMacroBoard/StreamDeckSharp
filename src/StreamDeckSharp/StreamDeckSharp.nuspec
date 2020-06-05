@@ -14,13 +14,8 @@
 		<description>A simple .NET interface for the Stream Deck HID</description>
 		<tags>streamdeck elgato stream deck open macro board openmacroboard streamdeckmini</tags>
 		<dependencies>
-			<group targetFramework="net40">
-				<dependency id="OpenMacroBoard.SDK" version="[1.0, 2.0)" exclude="Build,Analyzers" />
-				<dependency id="HidSharp" version="[2.1, 3)" exclude="Build,Analyzers" />
-				<dependency id="Microsoft.Bcl.Async" version="1.0.168" />
-			</group>
 			<group targetFramework="netstandard2.0">
-				<dependency id="OpenMacroBoard.SDK" version="[1.0, 2.0)" exclude="Build,Analyzers" />
+				<dependency id="OpenMacroBoard.SDK" version="[2.0, 3.0)" exclude="Build,Analyzers" />
 				<dependency id="HidSharp" version="[2.1, 3)" exclude="Build,Analyzers" />
 				<dependency id="System.Drawing.Common" version="[4.5.1, 5.0)" exclude="Build,Analyzers" />
 			</group>
@@ -28,9 +23,6 @@
 	</metadata>
 	<files>
 		<file src="icon.png" target="" />
-		<file src="bin\$configuration$\net40\StreamDeckSharp.xml" target="lib\net40\" />
-		<file src="bin\$configuration$\net40\StreamDeckSharp.dll" target="lib\net40\" />
-		<file src="bin\$configuration$\net40\StreamDeckSharp.pdb" target="lib\net40\" />
 		<file src="bin\$configuration$\netstandard2.0\StreamDeckSharp.xml" target="lib\netstandard2.0\" />
 		<file src="bin\$configuration$\netstandard2.0\StreamDeckSharp.dll" target="lib\netstandard2.0\" />
 		<file src="bin\$configuration$\netstandard2.0\StreamDeckSharp.pdb" target="lib\netstandard2.0\" />
