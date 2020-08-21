@@ -1,6 +1,7 @@
-﻿using HidSharp;
+using HidSharp;
 using StreamDeckSharp.Exceptions;
 using StreamDeckSharp.Internals;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,6 +15,19 @@ namespace StreamDeckSharp
     /// </summary>
     public static class StreamDeck
     {
+        /// <summary>
+        /// Creates a listener and cache of devices that updates while devices connect or disconnet.
+        /// </summary>
+        /// <param name="hardwareFilter">A set of devices the listener uses as a whitelist filter.</param>
+        /// <remarks>
+        /// Make sure to properly dispose the listener. Not disposing can lead to memory leaks.
+        /// </remarks>
+        /// <returns>Returns the listener.</returns>
+        public static IStreamDeckListener CreateDeviceListener(params IUsbHidHardware[] hardwareFilter)
+        {
+            return new StreamDeckListener(hardwareFilter);
+        }
+
         /// <summary>
         /// Enumerates connected Stream Decks and returns the first one.
         /// </summary>
@@ -52,39 +66,7 @@ namespace StreamDeckSharp
         /// <returns></returns>
         public static IEnumerable<IStreamDeckRefHandle> EnumerateDevices(params IUsbHidHardware[] hardware)
         {
-            var matchAllKnowDevices = hardware is null || hardware.Length < 1;
-
-            IHardwareInternalInfos MatchingHardware(HidDevice d)
-            {
-                var hwDetails = d.GetHardwareInformation();
-
-                if (hwDetails is null)
-                {
-                    return null;
-                }
-
-                if (matchAllKnowDevices)
-                {
-                    return hwDetails;
-                }
-
-                foreach (var h in hardware)
-                {
-                    if (d.VendorID == h.UsbVendorId &&
-                        d.ProductID == h.UsbProductId)
-                    {
-                        return hwDetails;
-                    }
-                }
-
-                return null;
-            }
-
-            return DeviceList.Local
-                    .GetHidDevices()
-                    .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
-                    .Where(i => i.HardwareInfo != null)
-                    .Select(i => new DeviceReferenceHandle(i.Device.DevicePath, i.HardwareInfo.DeviceName));
+            return DeviceList.Local.GetStreamDecks(hardware);
         }
 
         internal static IStreamDeckBoard FromHid(HidDevice device, bool cached)
