@@ -11,7 +11,7 @@
 		<iconUrl>https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/master/doc/icon64.png</iconUrl>
 		<icon>icon.png</icon>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>A simple .NET interface for the Stream Deck HID</description>
+		<description>A simple .NET interface for the StreamDeck HID</description>
 		<tags>streamdeck elgato stream deck open macro board openmacroboard streamdeckmini</tags>
 		<dependencies>
 			<group targetFramework="netstandard2.0">
