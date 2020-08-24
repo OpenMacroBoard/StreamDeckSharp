@@ -1,4 +1,4 @@
-﻿using OpenMacroBoard.SDK;
+using OpenMacroBoard.SDK;
 using System;
 using static StreamDeckSharp.UsbConstants;
 
@@ -11,7 +11,7 @@ namespace StreamDeckSharp.Internals
         private const int ColorChannels = 3;
 
         private static readonly GridKeyPositionCollection KeyPositions
-             = new GridKeyPositionCollection(3, 2, ImgWidth, 25);
+             = new GridKeyPositionCollection(3, 2, ImgWidth, 32);
 
         private static readonly byte[] BmpHeader = new byte[]
         {

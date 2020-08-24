@@ -1,4 +1,4 @@
-﻿using OpenMacroBoard.SDK;
+using OpenMacroBoard.SDK;
 using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
@@ -7,7 +7,7 @@ namespace StreamDeckSharp.Internals
         : StreamDeckJpgHardwareBase
     {
         public StreamDeckXlHardwareInfo()
-            : base(new GridKeyPositionCollection(8, 4, 96, 25))
+            : base(new GridKeyPositionCollection(8, 4, 96, 32))
         {
         }
 
