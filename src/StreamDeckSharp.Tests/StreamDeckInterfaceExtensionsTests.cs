@@ -115,7 +115,7 @@ namespace StreamDeckSharp.Tests
             mock.Setup(d => d.Keys).Returns(keyCollection);
             mock.Setup(d =>
                 d.SetKeyBitmap(
-                    It.IsInRange<int>(0, keyCnt - 1, Range.Inclusive),
+                    It.IsInRange<int>(0, keyCnt - 1, Moq.Range.Inclusive),
                     It.Is<KeyBitmap>(k => ReferenceEquals(key, k))
                 )
             )
@@ -147,7 +147,7 @@ namespace StreamDeckSharp.Tests
             mock.Setup(d => d.Keys).Returns(keyCollection);
             mock.Setup(d =>
                 d.SetKeyBitmap(
-                    It.IsInRange<int>(0, keyCnt - 1, Range.Inclusive),
+                    It.IsInRange<int>(0, keyCnt - 1, Moq.Range.Inclusive),
                     It.Is<KeyBitmap>(k => KeyBitmap.Black.Equals(k))
                 )
             )
