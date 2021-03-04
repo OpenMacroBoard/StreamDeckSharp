@@ -15,7 +15,7 @@
 		<tags>streamdeck elgato stream deck open macro board openmacroboard streamdeckmini</tags>
 		<dependencies>
 			<group targetFramework="netstandard2.0">
-				<dependency id="OpenMacroBoard.SDK" version="[2.0, 3.0)" exclude="Build,Analyzers" />
+				<dependency id="OpenMacroBoard.SDK" version="[3.0, 4.0)" exclude="Build,Analyzers" />
 				<dependency id="System.Drawing.Common" version="4.5.1" exclude="Build,Analyzers" />
 			</group>
 		</dependencies>
@@ -25,5 +25,8 @@
 		<file src="bin\$configuration$\netstandard2.0\StreamDeckSharp.xml" target="lib\netstandard2.0\" />
 		<file src="bin\$configuration$\netstandard2.0\StreamDeckSharp.dll" target="lib\netstandard2.0\" />
 		<file src="bin\$configuration$\netstandard2.0\StreamDeckSharp.pdb" target="lib\netstandard2.0\" />
+		<file src="bin\$configuration$\netstandard2.0\HidSharp.xml" target="lib\netstandard2.0\" />
+		<file src="bin\$configuration$\netstandard2.0\HidSharp.dll" target="lib\netstandard2.0\" />
+		<file src="bin\$configuration$\netstandard2.0\HidSharp.pdb" target="lib\netstandard2.0\" />
 	</files>
 </package>
