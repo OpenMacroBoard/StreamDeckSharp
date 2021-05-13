@@ -10,21 +10,12 @@ namespace StreamDeckSharp.Internals
         private readonly object sync = new object();
 
         private readonly Dictionary<TKey, TValue> valueBuffer = new Dictionary<TKey, TValue>();
-        private readonly Dictionary<TKey, long> cooldownValues = new Dictionary<TKey, long>();
 
         private readonly Queue<TKey> readyQueue = new Queue<TKey>();
         private readonly Queue<TKey> waitingQueue = new Queue<TKey>();
 
-        private readonly ITimeService timeSource;
-        private readonly long cooldownTime;
         private volatile bool isAddingCompleted;
         private volatile bool disposed;
-
-        public ConcurrentBufferedQueue(ITimeService timeSource, long cooldown = 100)
-        {
-            this.timeSource = timeSource ?? throw new ArgumentNullException(nameof(timeSource));
-            cooldownTime = cooldown;
-        }
 
         public int Count
             => readyQueue.Count;
@@ -63,36 +54,10 @@ namespace StreamDeckSharp.Internals
 
                 try
                 {
-                    AddOrUpdateBufferDictionary(key, value);
+                    valueBuffer[key] = value;
 
                     if (readyQueue.Contains(key))
                     {
-                        return;
-                    }
-
-                    if (cooldownValues.ContainsKey(key))
-                    {
-                        var wasEmpty = waitingQueue.Count < 1;
-
-                        if (!waitingQueue.Contains(key))
-                        {
-                            waitingQueue.Enqueue(key);
-                        }
-
-                        if (wasEmpty)
-                        {
-                            var timeToNextRelease = cooldownValues[key] - timeSource.GetRelativeTimestamp();
-
-                            if (timeToNextRelease <= 0)
-                            {
-                                ProcessCooldownList();
-                            }
-                            else
-                            {
-                                ProcessCooldownAgainAfterMs(timeToNextRelease);
-                            }
-                        }
-
                         return;
                     }
 
@@ -126,8 +91,6 @@ namespace StreamDeckSharp.Internals
                 var key = readyQueue.Dequeue();
                 var value = valueBuffer[key];
                 valueBuffer.Remove(key);
-
-                cooldownValues.Add(key, timeSource.GetRelativeTimestamp() + cooldownTime);
 
                 return new KeyValuePair<TKey, TValue>(key, value);
             }
@@ -184,56 +147,6 @@ namespace StreamDeckSharp.Internals
 
             return DelayNet40((int)milliseconds);
 #endif
-        }
-
-        private void ProcessCooldownList()
-        {
-            lock (sync)
-            {
-                if (disposed)
-                {
-                    return;
-                }
-
-                var timestamp = timeSource.GetRelativeTimestamp();
-
-                while (waitingQueue.Count > 0)
-                {
-                    var top = waitingQueue.Peek();
-                    var targetTime = cooldownValues[top];
-
-                    // not yet ready
-                    if (targetTime > timestamp)
-                    {
-                        var timeToNextRelease = targetTime - timestamp;
-                        ProcessCooldownAgainAfterMs(timeToNextRelease);
-                        return;
-                    }
-
-                    waitingQueue.Dequeue();
-                    cooldownValues.Remove(top);
-
-                    readyQueue.Enqueue(top);
-                    Monitor.PulseAll(sync);
-                }
-            }
-        }
-
-        private void ProcessCooldownAgainAfterMs(long milliseconds)
-        {
-            Delay(milliseconds).ContinueWith(_ => ProcessCooldownList(), TaskScheduler.Default);
-        }
-
-        private void AddOrUpdateBufferDictionary(TKey key, TValue value)
-        {
-            if (valueBuffer.ContainsKey(key))
-            {
-                valueBuffer[key] = value;
-            }
-            else
-            {
-                valueBuffer.Add(key, value);
-            }
         }
 
         private void ThrowIfDisposed()
