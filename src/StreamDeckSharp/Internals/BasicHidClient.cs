@@ -1,6 +1,7 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
 using System.Text;
+using System.Threading;
 
 namespace StreamDeckSharp.Internals
 {
@@ -47,6 +48,12 @@ namespace StreamDeckSharp.Internals
             }
 
             Shutdown();
+
+            // Sleep to let the stream deck catch up.
+            // Without this Sleep() the stream deck might set a key image after the logo was shown.
+            // I've no idea why it's sometimes executed out of order even though the write is synchronized.
+            Thread.Sleep(50);
+
             ShowLogoWithoutDisposeVerification();
 
             DeckHid.Dispose();
