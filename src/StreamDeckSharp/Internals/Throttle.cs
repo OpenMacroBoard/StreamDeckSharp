@@ -11,6 +11,7 @@ namespace StreamDeckSharp.Internals
         private int sleepCount = 0;
 
         public double BytesPerSecondLimit { get; set; } = double.PositiveInfinity;
+        public int ByteCountBeforeThrottle { get; set; } = 16_000;
 
         public void MeasureAndBlock(int bytes)
         {
@@ -19,7 +20,7 @@ namespace StreamDeckSharp.Internals
             var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
             var estimatedSeconds = sumBytesInWindow / BytesPerSecondLimit;
 
-            if (elapsedSeconds < estimatedSeconds)
+            if (sumBytesInWindow > ByteCountBeforeThrottle && elapsedSeconds < estimatedSeconds)
             {
                 var delta = Math.Max(1, (int)((estimatedSeconds - elapsedSeconds) * 1000));
                 Thread.Sleep(delta);
