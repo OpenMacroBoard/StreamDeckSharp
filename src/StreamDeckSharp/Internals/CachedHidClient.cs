@@ -41,28 +41,31 @@ namespace StreamDeckSharp.Internals
 
         private Task StartBitmapWriterTask()
         {
-            return Task.Factory.StartNew(() =>
+            void BackgroundAction()
+            {
+                while (true)
                 {
-                    while (true)
+                    int keyId;
+                    byte[] payload;
+
+                    try
                     {
-                        int keyId;
-                        byte[] payload;
-
-                        try
-                        {
-                            (keyId, payload) = imageQueue.Take();
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            break;
-                        }
-
-                        foreach (var report in OutputReportSplitter.Split(payload, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, keyId, HardwareInfo.PrepareDataForTransmittion))
-                        {
-                            DeckHid.WriteReport(report);
-                        }
+                        (keyId, payload) = imageQueue.Take();
                     }
-                },
+                    catch (InvalidOperationException)
+                    {
+                        break;
+                    }
+
+                    foreach (var report in OutputReportSplitter.Split(payload, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, keyId, HardwareInfo.PrepareDataForTransmittion))
+                    {
+                        DeckHid.WriteReport(report);
+                    }
+                }
+            }
+
+            return Task.Factory.StartNew(
+                BackgroundAction,
                 CancellationToken.None,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default
