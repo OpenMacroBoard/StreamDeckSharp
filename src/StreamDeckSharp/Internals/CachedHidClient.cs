@@ -1,6 +1,5 @@
 ﻿using OpenMacroBoard.SDK;
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace StreamDeckSharp.Internals
         public CachedHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
             : base(deckHid, hardwareInformation)
         {
-            imageQueue = new ConcurrentBufferedQueue<int, byte[]>(RelativeTimeSource.Default, hardwareInformation.KeyCooldown);
+            imageQueue = new ConcurrentBufferedQueue<int, byte[]>();
             writerTask = StartBitmapWriterTask();
         }
 
@@ -46,18 +45,19 @@ namespace StreamDeckSharp.Internals
                 {
                     while (true)
                     {
-                        KeyValuePair<int, byte[]> res;
+                        int keyId;
+                        byte[] payload;
 
                         try
                         {
-                            res = imageQueue.Take();
+                            (keyId, payload) = imageQueue.Take();
                         }
                         catch (InvalidOperationException)
                         {
                             break;
                         }
 
-                        foreach (var report in OutputReportSplitter.Split(res.Value, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, res.Key, HardwareInfo.PrepareDataForTransmittion))
+                        foreach (var report in OutputReportSplitter.Split(payload, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, keyId, HardwareInfo.PrepareDataForTransmittion))
                         {
                             DeckHid.WriteReport(report);
                         }

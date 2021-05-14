@@ -13,6 +13,42 @@ namespace StreamDeckSharp.Internals
         private readonly object hidStreamLock = new object();
         private readonly string devicePath;
 
+        private readonly Throttle throttle = new Throttle()
+        {
+            // Based on a hand full of speed measurements, it looks like that (at least)
+            // the classical stream deck (hardware revision 1) can't keep up with full USB 2.0 speed.
+            //
+            // For the other devices this limit is also active but probably not relevant,
+            // because in practice the speed is slower, because all other devices use
+            // JPEG instead of BMP and the Hid.Write probably also blocks as long as the device is busy.
+            //
+            // The limit was determined by the following measurements with a classical stream deck:
+            //
+            // write speed -> time between glitches
+            // 3.90 MiB/s -> 1.7s
+            // 3.68 MiB/s -> 3.7s
+            // 3.60 MiB/s -> 7.6s
+            //
+            // Based on the assumption, that the stream deck has a maximum speed at which data is processed,
+            // the following formular can be used:
+            //
+            // Measured speed ............ s
+            // Time between glitches ..... t
+            // Internal speed ............ x (to be calculated)
+            // Hardware buffer size ...... b (will be eliminated when solving for x)
+            //
+            // (s - x) * t = b
+            //
+            // (s1 - x) * t1 = (s2 - x) * t2
+            //
+            // When solved for x and evaluated with all the measured pairs, the calculated internal speed
+            // of the classical stream deck seems to be (almost exactly?) 3.50 MiB/s - A few tests indeed
+            // showed that limiting the speed below that value seems to prevent glitches.
+            //
+            // So long story short we set a limit of 3'200'000 bytes/s (~3.0 MiB/s)
+            BytesPerSecondLimit = 3_200_000,
+        };
+
         private HidStream dStream;
         private byte[] readReportBuffer;
 
@@ -59,6 +95,7 @@ namespace StreamDeckSharp.Internals
             {
                 lock (hidStreamLock)
                 {
+                    throttle.MeasureAndBlock(data.Length);
                     targetStream.GetFeature(data);
                     return true;
                 }
@@ -91,6 +128,7 @@ namespace StreamDeckSharp.Internals
             {
                 lock (hidStreamLock)
                 {
+                    throttle.MeasureAndBlock(featureData.Length);
                     targetStream.SetFeature(featureData);
                 }
 
@@ -116,6 +154,7 @@ namespace StreamDeckSharp.Internals
             {
                 lock (hidStreamLock)
                 {
+                    throttle.MeasureAndBlock(reportData.Length);
                     targetStream.Write(reportData);
                 }
 

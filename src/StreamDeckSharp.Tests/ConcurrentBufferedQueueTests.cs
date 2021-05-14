@@ -12,222 +12,175 @@ namespace StreamDeckSharp.Tests
         [Fact(DisplayName = "IsCompleted is false after construction.")]
         public void IsCompletedIsFalseAfterConstruction()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.IsCompleted.Should().BeFalse();
-            }
+            using var q = new ConcurrentBufferedQueue<int, string>();
+            q.IsCompleted.Should().BeFalse();
         }
 
         [Fact(DisplayName = "IsAddingCompleted is false after construction.")]
         public void IsAddingCompletedIsFalseAfterConstruction()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.IsAddingCompleted.Should().BeFalse();
-            }
+            using var q = new ConcurrentBufferedQueue<int, string>();
+            q.IsAddingCompleted.Should().BeFalse();
         }
 
         [Fact(DisplayName = "Count is 0 after construction.")]
         public void CountIsZeroAfterConstruction()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.Count.Should().Be(0);
-            }
+            using var q = new ConcurrentBufferedQueue<int, string>();
+            q.Count.Should().Be(0);
         }
 
         [Fact(DisplayName = "IsAddingCompleted and IsCompleted is true after CompleteAdding is called (if queue was empty).")]
         public void CompleteAddingAnEmptyQueue()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.CompleteAdding();
-                q.IsAddingCompleted.Should().BeTrue();
-                q.IsCompleted.Should().BeTrue();
-            }
+            using var q = new ConcurrentBufferedQueue<int, string>();
+
+            q.CompleteAdding();
+            q.IsAddingCompleted.Should().BeTrue();
+            q.IsCompleted.Should().BeTrue();
         }
 
         [Fact(DisplayName = "Adding an element increases Count.")]
         public void AddingAnElementIncreasesCount()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.Add(1, "Hallo");
-                q.Count.Should().Be(1);
-                q.Add(2, "Hallo");
-                q.Count.Should().Be(2);
-            }
+            using var q = new ConcurrentBufferedQueue<int, string>();
+
+            q.Add(1, "Hallo");
+            q.Count.Should().Be(1);
+
+            q.Add(2, "Hallo");
+            q.Count.Should().Be(2);
         }
 
         [Fact(DisplayName = "Adding and elements with same id doesn't increase the Count value.")]
         public void AddingAnElementWithSameIdDoesntIncreasesCount()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.Add(1, "Hallo");
-                q.Add(1, "Hallo");
-                q.Count.Should().Be(1);
-            }
+            using var q = new ConcurrentBufferedQueue<int, string>();
+
+            q.Add(1, "Hallo");
+            q.Add(1, "Hallo");
+
+            q.Count.Should().Be(1);
         }
 
         [Fact(DisplayName = "Taking an element retrives the first added element (FIFO).")]
         public void TakingAnElementRetrievesTheFirstOne()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.Add(3, "Hallo 3");
-                q.Add(7, "Hallo 7");
-                q.Add(1, "Hallo 1");
+            using var q = new ConcurrentBufferedQueue<int, string>();
 
-                var result = q.Take();
-                result.Key.Should().Be(3);
-                result.Value.Should().Be("Hallo 3");
+            q.Add(3, "Hallo 3");
+            q.Add(7, "Hallo 7");
+            q.Add(1, "Hallo 1");
 
-                result = q.Take();
-                result.Key.Should().Be(7);
-                result.Value.Should().Be("Hallo 7");
+            var result = q.Take();
+            result.Key.Should().Be(3);
+            result.Value.Should().Be("Hallo 3");
 
-                result = q.Take();
-                result.Key.Should().Be(1);
-                result.Value.Should().Be("Hallo 1");
-            }
+            result = q.Take();
+            result.Key.Should().Be(7);
+            result.Value.Should().Be("Hallo 7");
+
+            result = q.Take();
+            result.Key.Should().Be(1);
+            result.Value.Should().Be("Hallo 1");
         }
 
         [Fact(DisplayName = "Taking an element blocks until an element is available.")]
         public void TakingAnElementBlocksUnitAnElementIsAvailable()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
+            using var q = new ConcurrentBufferedQueue<int, string>();
+
+            Task.Factory.StartNew(() =>
             {
+                Thread.Sleep(50);  //Make sure Take is called before the next line is executed
+                q.Add(3, "Hallo");
+            });
 
-                Task.Factory.StartNew(() =>
-                {
-                    Thread.Sleep(50);  //Make sure Take is called before the next line is executed
-                    q.Add(3, "Hallo");
-                });
+            var (key, value) = q.Take();
 
-                var result = q.Take();
-                result.Key.Should().Be(3);
-                result.Value.Should().Be("Hallo");
-            }
+            key.Should().Be(3);
+            value.Should().Be("Hallo");
         }
 
         [Fact(DisplayName = "Complete Adding causes waiting Take mathods to throw.")]
         public void CompletingTheBufferWhileTakeIsWaitingThrowsAnException()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
+            using var q = new ConcurrentBufferedQueue<int, string>();
+
+            Task.Factory.StartNew(() =>
             {
-                Task.Factory.StartNew(() =>
-                {
-                    Thread.Sleep(50);  //Make sure Take is called before the next line is executed
-                    q.CompleteAdding();
-                });
+                Thread.Sleep(50);  //Make sure Take is called before the next line is executed
+                q.CompleteAdding();
+            });
 
-                var takeAction = new Action(() =>
-                {
-                    var result = q.Take();
-                });
+            var takeAction = new Action(() =>
+            {
+                _ = q.Take();
+            });
 
-                takeAction.Should().Throw<InvalidOperationException>();
-            }
+            takeAction.Should().Throw<InvalidOperationException>();
         }
 
         [Fact]
         public void CallTakeAfterCompletingThrowsAnException()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                var takeAction = new Action(() =>
-                {
-                    var result = q.Take();
-                });
+            using var q = new ConcurrentBufferedQueue<int, string>();
 
-                q.CompleteAdding();
-                takeAction.Should().Throw<InvalidOperationException>();
-            }
+            var takeAction = new Action(() =>
+            {
+                var result = q.Take();
+            });
+
+            q.CompleteAdding();
+            takeAction.Should().Throw<InvalidOperationException>();
         }
 
         [Fact]
         public void CompleteAddingPropertiesWorkAsExpected()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.Add(1, "Hallo 1");
-                q.Add(2, "Hallo 2");
+            using var q = new ConcurrentBufferedQueue<int, string>();
 
-                q.CompleteAdding();
-                q.IsAddingCompleted.Should().BeTrue();
-                q.IsCompleted.Should().BeFalse();
+            q.Add(1, "Hallo 1");
+            q.Add(2, "Hallo 2");
 
-                var r = q.Take();
-                r = q.Take();
+            q.CompleteAdding();
+            q.IsAddingCompleted.Should().BeTrue();
+            q.IsCompleted.Should().BeFalse();
 
-                q.IsCompleted.Should().BeTrue();
-            }
+            _ = q.Take();
+            _ = q.Take();
+
+            q.IsCompleted.Should().BeTrue();
         }
 
         [Fact]
         public void OverrideQueueElementWithSameKey()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.Add(1, "Hallo 1");
-                q.Add(2, "Hallo 2");
-                q.Add(1, "Hallo NEW");
+            using var q = new ConcurrentBufferedQueue<int, string>();
 
-                var r = q.Take();
+            q.Add(1, "Hallo 1");
+            q.Add(2, "Hallo 2");
+            q.Add(1, "Hallo NEW");
 
-                r.Key.Should().Be(1);
-                r.Value.Should().Be("Hallo NEW");
-            }
+            var (key, value) = q.Take();
+
+            key.Should().Be(1);
+            value.Should().Be("Hallo NEW");
         }
 
         [Fact]
         public void AddAfterCompletionThrowsException()
         {
-            using (var q = new ConcurrentBufferedQueue<int, string>(NullTime.Source))
-            {
-                q.CompleteAdding();
+            using var q = new ConcurrentBufferedQueue<int, string>();
 
-                var addAction = new Action(() =>
-                {
-                    q.Add(1, "Hallo 1");
-                });
+            q.CompleteAdding();
 
-                addAction.Should().Throw<InvalidOperationException>();
-            }
-        }
-
-        [Fact]
-        public void TheSecondTakeIsBlockedUntilTheKeyCooledDown()
-        {
-            var timeSource = new ControllableTime();
-            using (var q = new ConcurrentBufferedQueue<int, string>(timeSource))
+            var addAction = new Action(() =>
             {
                 q.Add(1, "Hallo 1");
-                q.Add(1, "Hallo new");
+            });
 
-                var r = q.Take();
-                var clockWasSet = false;
-
-                r.Key.Should().Be(1);
-                r.Value.Should().Be("Hallo new");
-                q.Count.Should().Be(0);
-
-                q.Add(1, "Hallo after cooldown");
-
-                Task.Factory.StartNew(() =>
-                {
-                    Thread.Sleep(50);
-                    clockWasSet = true;
-                    timeSource.Add(100);
-                });
-
-                r = q.Take();
-
-                clockWasSet.Should().BeTrue();
-                r.Key.Should().Be(1);
-                r.Value.Should().Be("Hallo after cooldown");
-            }
+            addAction.Should().Throw<InvalidOperationException>();
         }
     }
 }

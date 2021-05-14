@@ -4,7 +4,6 @@ namespace StreamDeckSharp.Internals
 {
     internal interface IHardwareInternalInfos : IUsbHidHardware
     {
-        int KeyCooldown { get; }
         int HeaderSize { get; }
         int ReportSize { get; }
         int KeyReportOffset { get; }

@@ -38,7 +38,6 @@ namespace StreamDeckSharp.Internals
         public int KeyReportOffset => 4;
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
 
-        public int KeyCooldown => 25;
         public byte FirmwareVersionFeatureId => 5;
         public byte SerialNumberFeatureId => 6;
         public int FirmwareReportSkip => 6;

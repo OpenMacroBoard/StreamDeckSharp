@@ -32,7 +32,6 @@ namespace StreamDeckSharp.Internals
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => ProductIds.StreamDeckMini;
         public string DeviceName => "Stream Deck Mini";
-        public int KeyCooldown => 25;
         public byte FirmwareVersionFeatureId => 4;
         public byte SerialNumberFeatureId => 3;
         public int FirmwareReportSkip => 5;
