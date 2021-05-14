@@ -11,7 +11,7 @@ namespace StreamDeckSharp.Internals
         private const int ColorChannels = 3;
 
         private static readonly GridKeyPositionCollection KeyPositions
-            = new GridKeyPositionCollection(5, 3, ImgWidth, 28);
+            = new GridKeyPositionCollection(5, 3, ImgWidth, 30);
 
         private static readonly byte[] BmpHeader = new byte[]
         {

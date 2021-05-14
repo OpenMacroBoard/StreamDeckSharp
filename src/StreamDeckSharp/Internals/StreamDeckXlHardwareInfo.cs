@@ -7,7 +7,7 @@ namespace StreamDeckSharp.Internals
         : StreamDeckJpgHardwareBase
     {
         public StreamDeckXlHardwareInfo()
-            : base(new GridKeyPositionCollection(8, 4, 96, 32))
+            : base(new GridKeyPositionCollection(8, 4, 96, 38))
         {
         }
 
