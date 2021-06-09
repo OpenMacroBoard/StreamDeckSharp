@@ -13,8 +13,8 @@
 #### [Recent Changes](CHANGELOG.md)
 
 ## Quickstart _(TL;DR)_
-***At the moment only Windows is supported (tested with 10, should also work with 8, 7, Vista and XP)***
-1. Add StreamDeckSharp reference (via nuget or download latest release)
+***At the moment only Windows and macOS is supported (tested with Windows 10, should also work with 8, 7, Vista and XP. Also tested with macOS 11.3)***
+1. Add StreamDeckSharp reference (via nuget or download latest release). On macOS you have to add [libgdiplus packaging](https://github.com/CoreCompat/libgdiplus-packaging))
 2. Add a using directive for StreamDeckSharp: `using StreamDeckSharp;`
 
 I want to...              | Code (C#)
