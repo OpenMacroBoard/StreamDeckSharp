@@ -14,6 +14,12 @@ namespace StreamDeckSharp
             => Internal_StreamDeck;
 
         /// <summary>
+        /// Details about the updated Stream Deck MK.2
+        /// </summary>
+        public static IUsbHidHardware StreamDeckMK2
+            => Internal_StreamDeckMK2;
+
+        /// <summary>
         /// Details about the classic Stream Deck Rev 2
         /// </summary>
         public static IUsbHidHardware StreamDeckRev2
@@ -36,6 +42,9 @@ namespace StreamDeckSharp
 
         internal static IHardwareInternalInfos Internal_StreamDeckRev2 { get; }
             = new StreamDeckRev2HardwareInfo();
+
+        internal static IHardwareInternalInfos Internal_StreamDeckMK2 { get; }
+            = new StreamDeckMK2HardwareInfo();
 
         internal static IHardwareInternalInfos Internal_StreamDeckXL { get; }
             = new StreamDeckXlHardwareInfo();
