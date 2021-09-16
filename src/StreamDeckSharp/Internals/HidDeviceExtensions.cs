@@ -19,6 +19,7 @@ namespace StreamDeckSharp.Internals
             {
                 case ProductIds.StreamDeck: return Hardware.Internal_StreamDeck;
                 case ProductIds.StreamDeckRev2: return Hardware.Internal_StreamDeckRev2;
+                case ProductIds.StreamDeckMK2: return Hardware.Internal_StreamDeckMK2;
                 case ProductIds.StreamDeckXL: return Hardware.Internal_StreamDeckXL;
                 case ProductIds.StreamDeckMini: return Hardware.Internal_StreamDeckMini;
             }
