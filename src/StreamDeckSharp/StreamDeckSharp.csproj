@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Company>OpenMacroBoard</Company>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
     <Description>A simple .NET wrapper for StreamDeck (using OpenMacroBoard.SDK)</Description>
     <Copyright>OpenMacroBoard 2018 - 2021</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
