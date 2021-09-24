@@ -14,7 +14,7 @@
 
 ## Quickstart _(TL;DR)_
 ***At the moment only Windows is "officially" supported.***  
-*Because it's plain .NET Standard 2.0, it should™ work on Linux and macOS aswell. See the Wiki for details: [Supported Platforms](https://github.com/OpenMacroBoard/StreamDeckSharp/wiki/Supported-Platforms)*
+*Because it's plain .NET Standard 2.0, it should™ work on Linux and macOS aswell. See the Wiki for details: [Supported Platforms](https://github.com/OpenMacroBoard/StreamDeckSharp/wiki/Supported-Platforms-and-Devices)*
 
 1. Add StreamDeckSharp reference (via nuget or download latest release)
 2. Add a using directive for StreamDeckSharp: `using StreamDeckSharp;`
