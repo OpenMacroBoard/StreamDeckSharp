@@ -2,15 +2,42 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
-## [0.4.0] - 2019-06-28
+## [3.2.0] - 2021-09-04
+- Support for Stream Deck MK.2 (by jdahlblom - https://github.com/OpenMacroBoard/StreamDeckSharp/pull/36)
+- Remove old cooldown mechanism and replace with a new throttle mechanism that limits the write speed
+- Fix a few reported gaps between buttons (again)
+
+## [3.0.0] - 2021-03-05
+- Added HidSharp Source to SteamDeckSharp, because the original HidSharp does not have a strong name we sign it here and ship it with StreamDeckSharp. This is required so we can ship new versions of StreamDeckSharp that reference an already existing version of OpenStreamDeck.SDK
+
+## [2.2.0] - 2020-08-24
+- Improve accuracy of the reported gaps between buttons (is used to draw "fullscreen" for example)
+
+## [2.1.0] - 2020-08-22
+- Added `StreamDeck.CreateDeviceListener()` that allows to keep track of stream decks between reconnects and provides events to react to connection changes.
+
+## [2.0.0] - 2020-06-05
+- Drop .NET 4 support. In theory one could still port back the code to .NET 4 but it's not worth it to still maintain that. netstandard20 is the only target from now on.
+
+## [1.1.0] - 2020-03-14
+- A lot of code cleanup (+ static analyzers to enforce rules)
+- Added locks around hidstream access to fix some glitches
+- Switch to semantic(-ish) versioning
+- Fix alignment issue with keys that weren't 72px but 96px
+
+## [0.3.5] - 2019-11-28
 ### Changed
   - Prepare for netstandard2 release
   - Switch to HidSharp (because of netstandard support)
   - Change the stream deck Xl jpg encoder (the old one was from WPF, which is not supported on netstandard)
   - Switch to new csproj format and embedded nuspec
   - Remove old build stuff (switched to nuke.build)
+  - New icon for the nuget package
 
-## [0.3.3] - 2019-06-21
+### Added
+  - Support for Stream Deck Rev2 :tada: (Thanks to patrick-dmxc for reporting that)
+
+## [0.3.4] - 2019-06-22
 ### Added
   - Stream Deck XL now correctly
       - reports firmware version
