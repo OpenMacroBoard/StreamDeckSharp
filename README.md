@@ -8,7 +8,7 @@
 
 [![license](https://img.shields.io/github/license/OpenStreamDeck/StreamDeckSharp.svg)](https://github.com/OpenStreamDeck/StreamDeckSharp/blob/master/LICENSE.md)
 [![GitHub release](https://img.shields.io/github/release/OpenStreamDeck/StreamDeckSharp.svg)](https://github.com/OpenStreamDeck/StreamDeckSharp/releases)
-![Nuget version](https://img.shields.io/nuget/v/streamdecksharp.svg)
+[![Nuget version](https://img.shields.io/nuget/v/streamdecksharp.svg)](https://www.nuget.org/packages/StreamDeckSharp/)
 
 #### [Recent Changes](CHANGELOG.md)
 
