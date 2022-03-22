@@ -96,8 +96,9 @@ namespace StreamDeckSharp.Tests
                 q.Add(3, "Hallo");
             });
 
-            var (key, value) = q.Take();
+            var (success, key, value) = q.Take();
 
+            success.Should().BeTrue();
             key.Should().Be(3);
             value.Should().Be("Hallo");
         }
@@ -113,9 +114,8 @@ namespace StreamDeckSharp.Tests
                 q.CompleteAdding();
             });
 
-            var takeAction = new Action(() => _ = q.Take());
-
-            takeAction.Should().Throw<InvalidOperationException>();
+            var (success, _, _) = q.Take();
+            success.Should().BeFalse();
         }
 
         [Fact]
@@ -123,10 +123,14 @@ namespace StreamDeckSharp.Tests
         {
             using var q = new ConcurrentBufferedQueue<int, string>();
 
-            var takeAction = new Action(() => _ = q.Take());
+            bool? success = null;
+            var takeAction = new Action(() => (success, _, _) = q.Take());
 
             q.CompleteAdding();
-            takeAction.Should().Throw<InvalidOperationException>();
+            takeAction();
+
+            success.HasValue.Should().BeTrue();
+            success.Value.Should().BeFalse();
         }
 
         [Fact]
@@ -156,8 +160,9 @@ namespace StreamDeckSharp.Tests
             q.Add(2, "Hallo 2");
             q.Add(1, "Hallo NEW");
 
-            var (key, value) = q.Take();
+            var (success, key, value) = q.Take();
 
+            success.Should().BeTrue();
             key.Should().Be(1);
             value.Should().Be("Hallo NEW");
         }
