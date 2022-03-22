@@ -282,13 +282,15 @@ namespace StreamDeckSharp.Internals
 
         private void DisposeConnection()
         {
-            if (dStream is null)
+            var dStreamRefCopy = dStream;
+            dStream = null;
+
+            if (dStreamRefCopy is null)
             {
                 return;
             }
 
-            dStream.Dispose();
-            dStream = null;
+            dStreamRefCopy.Dispose();
             ConnectionStateChanged?.Invoke(this, new ConnectionEventArgs(false));
         }
 
@@ -303,6 +305,12 @@ namespace StreamDeckSharp.Internals
 
             try
             {
+                if (dStream == null)
+                {
+                    // connection already disposed
+                    return;
+                }
+
                 var res = stream.EndRead(ar);
                 var data = new byte[res];
                 Array.Copy(readReportBuffer, 0, data, 0, res);
@@ -310,7 +318,6 @@ namespace StreamDeckSharp.Internals
             }
             catch (Exception ex) when (IsConnectionError(ex))
             {
-                Debug.WriteLine($"EXCEPTION: ({ex.GetType()}) {ex.Message}");
                 DisposeConnection();
                 return;
             }

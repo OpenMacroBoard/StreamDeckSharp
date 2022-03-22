@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -64,7 +64,7 @@ namespace StreamDeckSharp.Internals
             }
         }
 
-        public (TKey Key, TValue Value) Take()
+        public (bool Success, TKey Key, TValue Value) Take()
         {
             lock (sync)
             {
@@ -74,7 +74,7 @@ namespace StreamDeckSharp.Internals
 
                     if (isAddingCompleted)
                     {
-                        throw new InvalidOperationException("Adding is completed and buffer is empty.");
+                        return (false, default, default);
                     }
 
                     Monitor.Wait(sync);
@@ -86,7 +86,7 @@ namespace StreamDeckSharp.Internals
                 var value = valueBuffer[key];
                 valueBuffer.Remove(key);
 
-                return (key, value);
+                return (true, key, value);
             }
         }
 

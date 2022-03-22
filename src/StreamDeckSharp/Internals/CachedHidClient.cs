@@ -1,5 +1,4 @@
 using OpenMacroBoard.SDK;
-using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,15 +45,11 @@ namespace StreamDeckSharp.Internals
             {
                 while (true)
                 {
-                    int keyId;
-                    byte[] payload;
+                    var (success, keyId, payload) = imageQueue.Take();
 
-                    try
+                    if (!success)
                     {
-                        (keyId, payload) = imageQueue.Take();
-                    }
-                    catch (InvalidOperationException)
-                    {
+                        // image queue completed
                         break;
                     }
 
