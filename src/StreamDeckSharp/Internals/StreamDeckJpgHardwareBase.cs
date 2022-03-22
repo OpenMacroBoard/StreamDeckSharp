@@ -1,33 +1,31 @@
-﻿using OpenMacroBoard.SDK;
+using OpenMacroBoard.SDK;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
+
 using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
 {
-    [SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "EncoderParameters are disposed in the finalizer")]
     internal abstract class StreamDeckJpgHardwareBase
         : IHardwareInternalInfos
     {
-        private static byte[] cachedNullImage = null;
-
         private readonly int imgSize;
-        private readonly ImageCodecInfo jpgEncoder;
-        private readonly EncoderParameters jpgParams;
+        private readonly JpegEncoder jpgEncoder;
 
-        public StreamDeckJpgHardwareBase(GridKeyPositionCollection keyPositions)
+        private byte[] cachedNullImage = null;
+
+        protected StreamDeckJpgHardwareBase(GridKeyLayout keyPositions)
         {
-            jpgEncoder = ImageCodecInfo.GetImageDecoders().Where(d => d.FormatID == ImageFormat.Jpeg.Guid).First();
-            jpgParams = new EncoderParameters(1);
-            jpgParams.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
+            jpgEncoder = new JpegEncoder()
+            {
+                Quality = 100,
+            };
 
             Keys = keyPositions;
-            imgSize = keyPositions.KeyWidth;
+            imgSize = keyPositions.KeySize;
         }
 
         public abstract int UsbProductId { get; }
@@ -35,24 +33,39 @@ namespace StreamDeckSharp.Internals
 
         public int HeaderSize => 8;
         public int ReportSize => 1024;
+
+        public int ExpectedFeatureReportLength => 32;
+        public int ExpectedOutputReportLength => 1024;
+        public int ExpectedInputReportLength => 512;
+
         public int KeyReportOffset => 4;
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
 
         public byte FirmwareVersionFeatureId => 5;
         public byte SerialNumberFeatureId => 6;
+
         public int FirmwareReportSkip => 6;
         public int SerialNumberReportSkip => 2;
 
-        public GridKeyPositionCollection Keys { get; }
+        public GridKeyLayout Keys { get; }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// Unlimited because during my tests I couldn't see any glitches.
+        /// See <see cref="StreamDeckHidWrapper"/> for details.
+        /// </remarks>
+        public virtual double BytesPerSecondLimit => double.PositiveInfinity;
 
         public int ExtKeyIdToHardwareKeyId(int extKeyId)
-            => extKeyId;
+        {
+            return extKeyId;
+        }
 
         public byte[] GeneratePayload(KeyBitmap keyBitmap)
         {
             var rawData = keyBitmap.GetScaledVersion(imgSize, imgSize);
 
-            if (rawData is null)
+            if (rawData.Length == 0)
             {
                 return GetNullImage();
             }
@@ -61,9 +74,17 @@ namespace StreamDeckSharp.Internals
         }
 
         public int HardwareKeyIdToExtKeyId(int hardwareKeyId)
-            => hardwareKeyId;
+        {
+            return hardwareKeyId;
+        }
 
-        public void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast)
+        public void PrepareDataForTransmittion(
+            byte[] data,
+            int pageNumber,
+            int payloadLength,
+            int keyId,
+            bool isLast
+        )
         {
             data[0] = 2;
             data[1] = 7;
@@ -81,7 +102,14 @@ namespace StreamDeckSharp.Internals
                 throw new ArgumentOutOfRangeException(nameof(percent));
             }
 
-            var buffer = new byte[] { 0x03, 0x08, 0x64, 0x23, 0xB8, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xA5, 0x49, 0xCD, 0x02, 0xFE, 0x7F, 0x00, 0x00 };
+            var buffer = new byte[]
+            {
+                0x03, 0x08, 0x64, 0x23, 0xB8, 0x01, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0xA5, 0x49, 0xCD, 0x02, 0xFE, 0x7F, 0x00, 0x00,
+            };
+
             buffer[2] = percent;
             buffer[3] = 0x23;  // 0x23, sometimes 0x27
 
@@ -97,17 +125,17 @@ namespace StreamDeckSharp.Internals
         {
             if (cachedNullImage is null)
             {
-                var rawNullImg = new KeyBitmap(1, 1, new byte[] { 0, 0, 0 }).GetScaledVersion(imgSize, imgSize);
+                var rawNullImg = KeyBitmap.FromBgr24Array(1, 1, new byte[] { 0, 0, 0 }).GetScaledVersion(imgSize, imgSize);
                 cachedNullImage = EncodeImageToJpg(rawNullImg);
             }
 
             return cachedNullImage;
         }
 
-        private byte[] EncodeImageToJpg(byte[] rgb24)
+        private byte[] EncodeImageToJpg(ReadOnlySpan<byte> bgr24)
         {
-            var stride = imgSize * 4;
-            var data = new byte[imgSize * stride];
+            // Flip XY ... for some reason the JPEG devices have flipped x and y coordinates.
+            var flippedData = new byte[imgSize * imgSize * 3];
 
             for (var y = 0; y < imgSize; y++)
             {
@@ -116,33 +144,21 @@ namespace StreamDeckSharp.Internals
                     var x1 = imgSize - 1 - x;
                     var y1 = imgSize - 1 - y;
 
-                    var pTarget = (y * imgSize + x) * 4;
+                    var pTarget = (y * imgSize + x) * 3;
                     var pSource = (y1 * imgSize + x1) * 3;
 
-                    data[pTarget + 0] = rgb24[pSource + 0];
-                    data[pTarget + 1] = rgb24[pSource + 1];
-                    data[pTarget + 2] = rgb24[pSource + 2];
+                    flippedData[pTarget + 0] = bgr24[pSource + 0];
+                    flippedData[pTarget + 1] = bgr24[pSource + 1];
+                    flippedData[pTarget + 2] = bgr24[pSource + 2];
                 }
             }
 
-            var pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
-            try
-            {
-                var pointer = pinnedArray.AddrOfPinnedObject();
+            using var image = Image.LoadPixelData<Bgr24>(flippedData, imgSize, imgSize);
 
-                using (var target = new Bitmap(imgSize, imgSize, stride, System.Drawing.Imaging.PixelFormat.Format32bppRgb, pointer))
-                {
-                    using (var memStream = new MemoryStream())
-                    {
-                        target.Save(memStream, jpgEncoder, jpgParams);
-                        return memStream.ToArray();
-                    }
-                }
-            }
-            finally
-            {
-                pinnedArray.Free();
-            }
+            using var memStream = new MemoryStream();
+            image.SaveAsJpeg(memStream, jpgEncoder);
+
+            return memStream.ToArray();
         }
     }
 }

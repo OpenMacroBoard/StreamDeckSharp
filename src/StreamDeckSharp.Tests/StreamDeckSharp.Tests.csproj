@@ -1,23 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <LangVersion>9</LangVersion>
     <IsPackable>false</IsPackable>
-
     <AssemblyName>StreamDeckSharp.Tests</AssemblyName>
-
     <RootNamespace>StreamDeckSharp.Tests</RootNamespace>
-
-    <SignAssembly>true</SignAssembly>
-
-    <AssemblyOriginatorKeyFile>StreamDeckSharp.Tests.snk</AssemblyOriginatorKeyFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="Verify.Xunit" Version="14.12.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,7 +25,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <Import Project="..\..\..\analyzers.targets" />
+
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenMacroBoard.Meta.TestUtils\OpenMacroBoard.Meta.TestUtils.csproj" />
     <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
     <ProjectReference Include="..\StreamDeckSharp\StreamDeckSharp.csproj" />
   </ItemGroup>

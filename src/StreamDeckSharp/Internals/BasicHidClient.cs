@@ -1,14 +1,14 @@
-﻿using OpenMacroBoard.SDK;
+using OpenMacroBoard.SDK;
 using System;
 using System.Text;
 using System.Threading;
 
 namespace StreamDeckSharp.Internals
 {
-    internal class BasicHidClient : IStreamDeckBoard
+    internal class BasicHidClient : IMacroBoard
     {
         private readonly byte[] keyStates;
-        private readonly object disposeLock = new object();
+        private readonly object disposeLock = new();
 
         public BasicHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
         {
@@ -26,64 +26,33 @@ namespace StreamDeckSharp.Internals
         public event EventHandler<KeyEventArgs> KeyStateChanged;
         public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
 
-        public GridKeyPositionCollection Keys { get; }
-        IKeyPositionCollection IMacroBoard.Keys => Keys;
+        public IKeyLayout Keys { get; }
         public bool IsDisposed { get; private set; }
         public bool IsConnected => DeckHid.IsConnected;
 
         protected IStreamDeckHid DeckHid { get; }
         protected IHardwareInternalInfos HardwareInfo { get; }
-        protected byte[] Buffer { get; private set; }
+        protected byte[] Buffer { get; }
 
         public void Dispose()
         {
-            lock (disposeLock)
-            {
-                if (IsDisposed)
-                {
-                    return;
-                }
-
-                IsDisposed = true;
-            }
-
-            Shutdown();
-
-            // Sleep to let the stream deck catch up.
-            // Without this Sleep() the stream deck might set a key image after the logo was shown.
-            // I've no idea why it's sometimes executed out of order even though the write is synchronized.
-            Thread.Sleep(50);
-
-            ShowLogoWithoutDisposeVerification();
-
-            DeckHid.Dispose();
-
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public string GetFirmwareVersion()
         {
-            if (!DeckHid.ReadFeatureData(HardwareInfo.FirmwareVersionFeatureId, out var featureData))
-            {
-                return null;
-            }
-
-            return Encoding.UTF8.GetString(featureData, HardwareInfo.FirmwareReportSkip, featureData.Length - HardwareInfo.FirmwareReportSkip).Trim('\0');
+            return ReadFeatureString(HardwareInfo.FirmwareVersionFeatureId, HardwareInfo.FirmwareReportSkip);
         }
 
         public string GetSerialNumber()
         {
-            if (!DeckHid.ReadFeatureData(HardwareInfo.SerialNumberFeatureId, out var featureData))
-            {
-                return null;
-            }
-
-            return Encoding.UTF8.GetString(featureData, HardwareInfo.SerialNumberReportSkip, featureData.Length - HardwareInfo.SerialNumberReportSkip).Trim('\0');
+            return ReadFeatureString(HardwareInfo.SerialNumberFeatureId, HardwareInfo.SerialNumberReportSkip);
         }
 
         public void SetBrightness(byte percent)
         {
-            VerifyNotDisposed();
+            ThrowIfAlreadyDisposed();
             DeckHid.WriteFeature(HardwareInfo.GetBrightnessMessage(percent));
         }
 
@@ -93,7 +62,16 @@ namespace StreamDeckSharp.Internals
 
             var payload = HardwareInfo.GeneratePayload(bitmapData);
 
-            foreach (var report in OutputReportSplitter.Split(payload, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, keyId, HardwareInfo.PrepareDataForTransmittion))
+            var reports = OutputReportSplitter.Split(
+                payload,
+                Buffer,
+                HardwareInfo.ReportSize,
+                HardwareInfo.HeaderSize,
+                keyId,
+                HardwareInfo.PrepareDataForTransmittion
+            );
+
+            foreach (var report in reports)
             {
                 DeckHid.WriteReport(report);
             }
@@ -101,7 +79,7 @@ namespace StreamDeckSharp.Internals
 
         public void ShowLogo()
         {
-            VerifyNotDisposed();
+            ThrowIfAlreadyDisposed();
             ShowLogoWithoutDisposeVerification();
         }
 
@@ -109,16 +87,49 @@ namespace StreamDeckSharp.Internals
         {
         }
 
-        protected virtual void Dispose(bool managed)
+        protected virtual void Dispose(bool disposing)
         {
+            if (disposing)
+            {
+                lock (disposeLock)
+                {
+                    if (IsDisposed)
+                    {
+                        return;
+                    }
+
+                    IsDisposed = true;
+                }
+
+                Shutdown();
+
+                // Sleep to let the stream deck catch up.
+                // Without this Sleep() the stream deck might set a key image after the logo was shown.
+                // I've no idea why it's sometimes executed out of order even though the write is synchronized.
+                Thread.Sleep(50);
+
+                ShowLogoWithoutDisposeVerification();
+
+                DeckHid.Dispose();
+            }
         }
 
-        protected void VerifyNotDisposed()
+        protected void ThrowIfAlreadyDisposed()
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(BasicHidClient));
             }
+        }
+
+        private string ReadFeatureString(byte featureId, int skipBytes)
+        {
+            if (!DeckHid.ReadFeatureData(featureId, out var featureData))
+            {
+                return null;
+            }
+
+            return Encoding.UTF8.GetString(featureData, skipBytes, featureData.Length - skipBytes).Trim('\0');
         }
 
         private void DeckHid_ReportReceived(object sender, ReportReceivedEventArgs e)

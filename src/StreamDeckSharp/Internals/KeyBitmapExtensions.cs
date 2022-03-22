@@ -1,60 +1,38 @@
 using OpenMacroBoard.SDK;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 
 namespace StreamDeckSharp.Internals
 {
     internal static class KeyBitmapExtensions
     {
-        public static byte[] GetScaledVersion(this KeyBitmap keyBitmap, int width, int height)
+        public static ReadOnlySpan<byte> GetScaledVersion(this KeyBitmap keyBitmap, int width, int height)
         {
             IKeyBitmapDataAccess keyDataAccess = keyBitmap;
 
-            if (keyDataAccess.IsNull)
+            if (keyDataAccess.IsEmpty)
             {
-                return null;
+                // default span is of length 0 (the caller has to check this special case)
+                return default;
             }
+
+            var underlyingData = keyDataAccess.GetData();
 
             if (keyBitmap.Width == width && keyBitmap.Height == height)
             {
-                return keyDataAccess.CopyData();
+                // if it is already the size we need just return the underlying data
+                return underlyingData;
             }
 
-            var destRect = new Rectangle(0, 0, width, height);
+            using var image = Image.LoadPixelData<Bgr24>(underlyingData, keyBitmap.Width, keyBitmap.Height);
 
-            using (var scaledBmp = new Bitmap(width, height, PixelFormat.Format24bppRgb))
-            using (var sourceBmp = keyDataAccess.GetBitmap())
-            {
-                using (var g = Graphics.FromImage(scaledBmp))
-                {
-                    g.CompositingMode = CompositingMode.SourceCopy;
-                    g.CompositingQuality = CompositingQuality.HighQuality;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            image.Mutate(x => x.Resize(width, height));
 
-                    using (var wrapMode = new ImageAttributes())
-                    {
-                        wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                        g.DrawImage(sourceBmp, destRect, 0, 0, sourceBmp.Width, sourceBmp.Height, GraphicsUnit.Pixel, wrapMode);
-                    }
-                }
+            var scaledPixelData = image.ToBgr24PixelArray();
 
-                var bmpData = scaledBmp.LockBits(destRect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-                try
-                {
-                    var dataArray = new byte[width * height * 3];
-                    Marshal.Copy(bmpData.Scan0, dataArray, 0, dataArray.Length);
-                    return dataArray;
-                }
-                finally
-                {
-                    scaledBmp.UnlockBits(bmpData);
-                }
-            }
+            return new ReadOnlySpan<byte>(scaledPixelData);
         }
     }
 }

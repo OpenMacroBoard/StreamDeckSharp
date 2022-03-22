@@ -1,11 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace StreamDeckSharp.Internals
 {
     internal static class OutputReportSplitter
     {
-        public delegate void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast);
+        public delegate void PrepareDataForTransmittion(
+            byte[] data,
+            int pageNumber,
+            int payloadLength,
+            int keyId,
+            bool isLast
+        );
 
         public static IEnumerable<byte[]> Split(
             byte[] data,
@@ -13,15 +19,15 @@ namespace StreamDeckSharp.Internals
             int bufferLength,
             int headerSize,
             int keyId,
-            PrepareDataForTransmittion prepareData)
+            PrepareDataForTransmittion prepareData
+        )
         {
             var maxPayloadLength = bufferLength - headerSize;
 
             var remainingBytes = data.Length;
             var bytesSent = 0;
-            var splitNumber = 0;
 
-            while (remainingBytes > 0)
+            for (var splitNumber = 0; remainingBytes > 0; splitNumber++)
             {
                 var isLast = remainingBytes <= maxPayloadLength;
                 var bytesToSend = Math.Min(remainingBytes, maxPayloadLength);
@@ -32,7 +38,6 @@ namespace StreamDeckSharp.Internals
 
                 bytesSent += bytesToSend;
                 remainingBytes -= bytesToSend;
-                splitNumber++;
             }
         }
     }

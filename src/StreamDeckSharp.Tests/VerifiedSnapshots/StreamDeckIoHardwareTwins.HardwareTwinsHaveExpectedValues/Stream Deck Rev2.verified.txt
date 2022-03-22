@@ -1,0 +1,333 @@
+﻿{
+  BytesPerSecondLimit: 3200000.0,
+  DeviceName: Stream Deck Rev2,
+  ExpectedFeatureReportLength: 32,
+  ExpectedInputReportLength: 512,
+  ExpectedOutputReportLength: 1024,
+  FirmwareReportSkip: 6,
+  FirmwareVersionFeatureId: 5,
+  HeaderSize: 8,
+  KeyReportOffset: 4,
+  Keys: [
+    {
+      Bottom: 72,
+      Height: 72,
+      IsEmpty: false,
+      Left: 0,
+      Location: {
+        IsEmpty: true,
+        X: 0,
+        Y: 0
+      },
+      Right: 72,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 0,
+      Width: 72,
+      X: 0,
+      Y: 0
+    },
+    {
+      Bottom: 72,
+      Height: 72,
+      IsEmpty: false,
+      Left: 104,
+      Location: {
+        IsEmpty: false,
+        X: 104,
+        Y: 0
+      },
+      Right: 176,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 0,
+      Width: 72,
+      X: 104,
+      Y: 0
+    },
+    {
+      Bottom: 72,
+      Height: 72,
+      IsEmpty: false,
+      Left: 208,
+      Location: {
+        IsEmpty: false,
+        X: 208,
+        Y: 0
+      },
+      Right: 280,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 0,
+      Width: 72,
+      X: 208,
+      Y: 0
+    },
+    {
+      Bottom: 72,
+      Height: 72,
+      IsEmpty: false,
+      Left: 312,
+      Location: {
+        IsEmpty: false,
+        X: 312,
+        Y: 0
+      },
+      Right: 384,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 0,
+      Width: 72,
+      X: 312,
+      Y: 0
+    },
+    {
+      Bottom: 72,
+      Height: 72,
+      IsEmpty: false,
+      Left: 416,
+      Location: {
+        IsEmpty: false,
+        X: 416,
+        Y: 0
+      },
+      Right: 488,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 0,
+      Width: 72,
+      X: 416,
+      Y: 0
+    },
+    {
+      Bottom: 176,
+      Height: 72,
+      IsEmpty: false,
+      Left: 0,
+      Location: {
+        IsEmpty: false,
+        X: 0,
+        Y: 104
+      },
+      Right: 72,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 104,
+      Width: 72,
+      X: 0,
+      Y: 104
+    },
+    {
+      Bottom: 176,
+      Height: 72,
+      IsEmpty: false,
+      Left: 104,
+      Location: {
+        IsEmpty: false,
+        X: 104,
+        Y: 104
+      },
+      Right: 176,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 104,
+      Width: 72,
+      X: 104,
+      Y: 104
+    },
+    {
+      Bottom: 176,
+      Height: 72,
+      IsEmpty: false,
+      Left: 208,
+      Location: {
+        IsEmpty: false,
+        X: 208,
+        Y: 104
+      },
+      Right: 280,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 104,
+      Width: 72,
+      X: 208,
+      Y: 104
+    },
+    {
+      Bottom: 176,
+      Height: 72,
+      IsEmpty: false,
+      Left: 312,
+      Location: {
+        IsEmpty: false,
+        X: 312,
+        Y: 104
+      },
+      Right: 384,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 104,
+      Width: 72,
+      X: 312,
+      Y: 104
+    },
+    {
+      Bottom: 176,
+      Height: 72,
+      IsEmpty: false,
+      Left: 416,
+      Location: {
+        IsEmpty: false,
+        X: 416,
+        Y: 104
+      },
+      Right: 488,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 104,
+      Width: 72,
+      X: 416,
+      Y: 104
+    },
+    {
+      Bottom: 280,
+      Height: 72,
+      IsEmpty: false,
+      Left: 0,
+      Location: {
+        IsEmpty: false,
+        X: 0,
+        Y: 208
+      },
+      Right: 72,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 208,
+      Width: 72,
+      X: 0,
+      Y: 208
+    },
+    {
+      Bottom: 280,
+      Height: 72,
+      IsEmpty: false,
+      Left: 104,
+      Location: {
+        IsEmpty: false,
+        X: 104,
+        Y: 208
+      },
+      Right: 176,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 208,
+      Width: 72,
+      X: 104,
+      Y: 208
+    },
+    {
+      Bottom: 280,
+      Height: 72,
+      IsEmpty: false,
+      Left: 208,
+      Location: {
+        IsEmpty: false,
+        X: 208,
+        Y: 208
+      },
+      Right: 280,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 208,
+      Width: 72,
+      X: 208,
+      Y: 208
+    },
+    {
+      Bottom: 280,
+      Height: 72,
+      IsEmpty: false,
+      Left: 312,
+      Location: {
+        IsEmpty: false,
+        X: 312,
+        Y: 208
+      },
+      Right: 384,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 208,
+      Width: 72,
+      X: 312,
+      Y: 208
+    },
+    {
+      Bottom: 280,
+      Height: 72,
+      IsEmpty: false,
+      Left: 416,
+      Location: {
+        IsEmpty: false,
+        X: 416,
+        Y: 208
+      },
+      Right: 488,
+      Size: {
+        Height: 72,
+        IsEmpty: false,
+        Width: 72
+      },
+      Top: 208,
+      Width: 72,
+      X: 416,
+      Y: 208
+    }
+  ],
+  ReportSize: 1024,
+  SerialNumberFeatureId: 6,
+  SerialNumberReportSkip: 2,
+  UsbProductId: 109,
+  UsbVendorId: 4057
+}

@@ -1,4 +1,4 @@
-﻿using OpenMacroBoard.SDK;
+using OpenMacroBoard.SDK;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -10,7 +10,7 @@ namespace StreamDeckSharp.Internals
     {
         private readonly Task writerTask;
         private readonly ConcurrentBufferedQueue<int, byte[]> imageQueue;
-        private readonly ConditionalWeakTable<KeyBitmap, byte[]> cacheKeyBitmaps = new ConditionalWeakTable<KeyBitmap, byte[]>();
+        private readonly ConditionalWeakTable<KeyBitmap, byte[]> cacheKeyBitmaps = new();
 
         public CachedHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
             : base(deckHid, hardwareInformation)
@@ -21,7 +21,7 @@ namespace StreamDeckSharp.Internals
 
         public override void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
-            VerifyNotDisposed();
+            ThrowIfAlreadyDisposed();
             keyId = HardwareInfo.ExtKeyIdToHardwareKeyId(keyId);
 
             var payload = cacheKeyBitmaps.GetValue(bitmapData, HardwareInfo.GeneratePayload);
@@ -31,11 +31,12 @@ namespace StreamDeckSharp.Internals
         protected override void Shutdown()
         {
             imageQueue.CompleteAdding();
-            Task.WaitAll(writerTask);
+            writerTask.Wait();
         }
 
-        protected override void Dispose(bool managed)
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
             imageQueue.Dispose();
         }
 
@@ -57,7 +58,16 @@ namespace StreamDeckSharp.Internals
                         break;
                     }
 
-                    foreach (var report in OutputReportSplitter.Split(payload, Buffer, HardwareInfo.ReportSize, HardwareInfo.HeaderSize, keyId, HardwareInfo.PrepareDataForTransmittion))
+                    var reports = OutputReportSplitter.Split(
+                        payload,
+                        Buffer,
+                        HardwareInfo.ReportSize,
+                        HardwareInfo.HeaderSize,
+                        keyId,
+                        HardwareInfo.PrepareDataForTransmittion
+                    );
+
+                    foreach (var report in reports)
                     {
                         DeckHid.WriteReport(report);
                     }

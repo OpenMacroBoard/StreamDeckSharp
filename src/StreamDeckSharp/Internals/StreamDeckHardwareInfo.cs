@@ -1,5 +1,6 @@
 using OpenMacroBoard.SDK;
 using System;
+
 using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
@@ -10,8 +11,7 @@ namespace StreamDeckSharp.Internals
         private const int ImgWidth = 72;
         private const int ColorChannels = 3;
 
-        private static readonly GridKeyPositionCollection KeyPositions
-            = new GridKeyPositionCollection(5, 3, ImgWidth, 30);
+        private static readonly GridKeyLayout KeyPositions = new(5, 3, ImgWidth, 30);
 
         private static readonly byte[] BmpHeader = new byte[]
         {
@@ -28,6 +28,10 @@ namespace StreamDeckSharp.Internals
         public int IconSize => ImgWidth;
         public int HeaderSize => 16;
         public int ReportSize => 7819;
+        public int ExpectedFeatureReportLength => 17;
+        public int ExpectedOutputReportLength => 8191;
+        public int ExpectedInputReportLength => 17;
+
         public int KeyReportOffset => 1;
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => ProductIds.StreamDeck;
@@ -36,8 +40,20 @@ namespace StreamDeckSharp.Internals
         public byte SerialNumberFeatureId => 3;
         public int FirmwareReportSkip => 5;
         public int SerialNumberReportSkip => 5;
-        public GridKeyPositionCollection Keys
+        public GridKeyLayout Keys
             => KeyPositions;
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// <para>
+        /// Limit of 3'200'000 bytes/s (~3.0 MiB/s)
+        /// because without that limit glitches will happen on fast writes.
+        /// </para>
+        /// <para>
+        /// See <see cref="StreamDeckHidWrapper"/> for details.
+        /// </para>
+        /// </remarks>
+        public double BytesPerSecondLimit => 3_200_000;
 
         public byte[] GeneratePayload(KeyBitmap keyBitmap)
         {
@@ -46,14 +62,14 @@ namespace StreamDeckSharp.Internals
             var bmp = new byte[ImgWidth * ImgWidth * 3 + BmpHeader.Length];
             Array.Copy(BmpHeader, 0, bmp, 0, BmpHeader.Length);
 
-            if (rawData != null)
+            if (rawData.Length != 0)
             {
                 for (var y = 0; y < ImgWidth; y++)
                 {
                     for (var x = 0; x < ImgWidth; x++)
                     {
                         var src = (y * ImgWidth + x) * ColorChannels;
-                        var tar = (y * ImgWidth + ((ImgWidth - 1) - x)) * ColorChannels + BmpHeader.Length;
+                        var tar = (y * ImgWidth + (ImgWidth - 1 - x)) * ColorChannels + BmpHeader.Length;
 
                         bmp[tar + 0] = rawData[src + 0];
                         bmp[tar + 1] = rawData[src + 1];
@@ -66,12 +82,22 @@ namespace StreamDeckSharp.Internals
         }
 
         public int ExtKeyIdToHardwareKeyId(int extKeyId)
-            => FlipIdsHorizontal(extKeyId);
+        {
+            return FlipIdsHorizontal(extKeyId);
+        }
 
         public int HardwareKeyIdToExtKeyId(int hardwareKeyId)
-            => FlipIdsHorizontal(hardwareKeyId);
+        {
+            return FlipIdsHorizontal(hardwareKeyId);
+        }
 
-        public void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast)
+        public void PrepareDataForTransmittion(
+            byte[] data,
+            int pageNumber,
+            int payloadLength,
+            int keyId,
+            bool isLast
+        )
         {
             data[0] = 2; // Report ID ?
             data[1] = 1; // ?
@@ -87,7 +113,13 @@ namespace StreamDeckSharp.Internals
                 throw new ArgumentOutOfRangeException(nameof(percent));
             }
 
-            var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+            var buffer = new byte[]
+            {
+                0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00,
+            };
+
             buffer[5] = percent;
             return buffer;
         }

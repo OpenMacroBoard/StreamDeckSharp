@@ -1,4 +1,4 @@
-﻿using OpenMacroBoard.SDK;
+using OpenMacroBoard.SDK;
 
 namespace StreamDeckSharp.Internals
 {
@@ -6,19 +6,26 @@ namespace StreamDeckSharp.Internals
     {
         int HeaderSize { get; }
         int ReportSize { get; }
+
+        int ExpectedFeatureReportLength { get; }
+        int ExpectedOutputReportLength { get; }
+        int ExpectedInputReportLength { get; }
+
         int KeyReportOffset { get; }
+
         byte FirmwareVersionFeatureId { get; }
         int FirmwareReportSkip { get; }
+
         byte SerialNumberFeatureId { get; }
         int SerialNumberReportSkip { get; }
+
+        double BytesPerSecondLimit { get; }
 
         byte[] GeneratePayload(KeyBitmap keyBitmap);
 
         /// <summary>
         /// This is used to convert between keyId conventions
         /// </summary>
-        /// <param name="extKeyId"></param>
-        /// <returns></returns>
         /// <remarks>
         /// The original stream deck has a pretty weird way of enumerating keys.
         /// Index 0 starts right top and they are enumerated right to left,
@@ -31,10 +38,15 @@ namespace StreamDeckSharp.Internals
         /// This is used to convert between keyId conventions
         /// </summary>
         /// <param name="hardwareKeyId"></param>
-        /// <returns></returns>
         int HardwareKeyIdToExtKeyId(int hardwareKeyId);
 
-        void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast);
+        void PrepareDataForTransmittion(
+            byte[] data,
+            int pageNumber,
+            int payloadLength,
+            int keyId,
+            bool isLast
+        );
 
         byte[] GetBrightnessMessage(byte percent);
         byte[] GetLogoMessage();

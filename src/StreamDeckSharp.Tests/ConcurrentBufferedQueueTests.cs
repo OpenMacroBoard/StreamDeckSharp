@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using StreamDeckSharp.Internals;
 using System;
 using System.Threading;
@@ -63,7 +63,7 @@ namespace StreamDeckSharp.Tests
             q.Count.Should().Be(1);
         }
 
-        [Fact(DisplayName = "Taking an element retrives the first added element (FIFO).")]
+        [Fact(DisplayName = "Taking an element retrieves the first added element (FIFO).")]
         public void TakingAnElementRetrievesTheFirstOne()
         {
             using var q = new ConcurrentBufferedQueue<int, string>();
@@ -92,7 +92,7 @@ namespace StreamDeckSharp.Tests
 
             Task.Factory.StartNew(() =>
             {
-                Thread.Sleep(50);  //Make sure Take is called before the next line is executed
+                Thread.Sleep(50);  // Make sure Take is called before the next line is executed
                 q.Add(3, "Hallo");
             });
 
@@ -102,21 +102,18 @@ namespace StreamDeckSharp.Tests
             value.Should().Be("Hallo");
         }
 
-        [Fact(DisplayName = "Complete Adding causes waiting Take mathods to throw.")]
+        [Fact(DisplayName = "Complete Adding causes waiting Take methods to throw.")]
         public void CompletingTheBufferWhileTakeIsWaitingThrowsAnException()
         {
             using var q = new ConcurrentBufferedQueue<int, string>();
 
             Task.Factory.StartNew(() =>
             {
-                Thread.Sleep(50);  //Make sure Take is called before the next line is executed
+                Thread.Sleep(50);  // Make sure Take is called before the next line is executed
                 q.CompleteAdding();
             });
 
-            var takeAction = new Action(() =>
-            {
-                _ = q.Take();
-            });
+            var takeAction = new Action(() => _ = q.Take());
 
             takeAction.Should().Throw<InvalidOperationException>();
         }
@@ -126,10 +123,7 @@ namespace StreamDeckSharp.Tests
         {
             using var q = new ConcurrentBufferedQueue<int, string>();
 
-            var takeAction = new Action(() =>
-            {
-                var result = q.Take();
-            });
+            var takeAction = new Action(() => _ = q.Take());
 
             q.CompleteAdding();
             takeAction.Should().Throw<InvalidOperationException>();
@@ -175,10 +169,7 @@ namespace StreamDeckSharp.Tests
 
             q.CompleteAdding();
 
-            var addAction = new Action(() =>
-            {
-                q.Add(1, "Hallo 1");
-            });
+            var addAction = new Action(() => q.Add(1, "Hallo 1"));
 
             addAction.Should().Throw<InvalidOperationException>();
         }

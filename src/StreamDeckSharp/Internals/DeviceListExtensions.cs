@@ -7,7 +7,10 @@ namespace StreamDeckSharp.Internals
 {
     internal static class DeviceListExtensions
     {
-        public static IEnumerable<DeviceReferenceHandle> GetStreamDecks(this DeviceList deviceList, params IUsbHidHardware[] hardware)
+        public static IEnumerable<StreamDeckDeviceReferenceHandle> GetStreamDecks(
+            this DeviceList deviceList,
+            params IUsbHidHardware[] hardware
+        )
         {
             if (deviceList is null)
             {
@@ -43,10 +46,14 @@ namespace StreamDeckSharp.Internals
             }
 
             return deviceList
-                    .GetHidDevices()
-                    .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
-                    .Where(i => i.HardwareInfo != null)
-                    .Select(i => new DeviceReferenceHandle(i.Device.DevicePath, i.HardwareInfo.DeviceName));
+                .GetHidDevices()
+                .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
+                .Where(i => i.HardwareInfo != null)
+                .Select(i => new StreamDeckDeviceReferenceHandle(
+                    i.Device.DevicePath,
+                    i.HardwareInfo.DeviceName,
+                    i.HardwareInfo.Keys
+                ));
         }
     }
 }

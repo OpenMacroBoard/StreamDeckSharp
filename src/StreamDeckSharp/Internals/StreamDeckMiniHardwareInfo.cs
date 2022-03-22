@@ -10,8 +10,7 @@ namespace StreamDeckSharp.Internals
         private const int ImgWidth = 80;
         private const int ColorChannels = 3;
 
-        private static readonly GridKeyPositionCollection KeyPositions
-             = new GridKeyPositionCollection(3, 2, ImgWidth, 32);
+        private static readonly GridKeyLayout KeyPositions = new(3, 2, ImgWidth, 32);
 
         private static readonly byte[] BmpHeader = new byte[]
         {
@@ -28,6 +27,10 @@ namespace StreamDeckSharp.Internals
         public int IconSize => ImgWidth;
         public int HeaderSize => 16;
         public int ReportSize => 1024;
+        public int ExpectedFeatureReportLength => 17;
+        public int ExpectedOutputReportLength => 1024;
+        public int ExpectedInputReportLength => 17;
+
         public int KeyReportOffset => 1;
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
         public int UsbProductId => ProductIds.StreamDeckMini;
@@ -37,8 +40,15 @@ namespace StreamDeckSharp.Internals
         public int FirmwareReportSkip => 5;
         public int SerialNumberReportSkip => 5;
 
-        public GridKeyPositionCollection Keys
+        public GridKeyLayout Keys
             => KeyPositions;
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// Unlimited because during my tests I couldn't see any glitches.
+        /// See <see cref="StreamDeckHidWrapper"/> for details.
+        /// </remarks>
+        public double BytesPerSecondLimit => double.PositiveInfinity;
 
         public byte[] GeneratePayload(KeyBitmap keyBitmap)
         {
@@ -47,7 +57,7 @@ namespace StreamDeckSharp.Internals
 
             Array.Copy(BmpHeader, 0, bmp, 0, BmpHeader.Length);
 
-            if (rawData != null)
+            if (rawData.Length != 0)
             {
                 for (var y = 0; y < ImgWidth; y++)
                 {
@@ -67,12 +77,22 @@ namespace StreamDeckSharp.Internals
         }
 
         public int ExtKeyIdToHardwareKeyId(int extKeyId)
-            => extKeyId;
+        {
+            return extKeyId;
+        }
 
         public int HardwareKeyIdToExtKeyId(int hardwareKeyId)
-            => hardwareKeyId;
+        {
+            return hardwareKeyId;
+        }
 
-        public void PrepareDataForTransmittion(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast)
+        public void PrepareDataForTransmittion(
+            byte[] data,
+            int pageNumber,
+            int payloadLength,
+            int keyId,
+            bool isLast
+        )
         {
             data[0] = 2; // Report ID ?
             data[1] = 1; // ?
@@ -88,7 +108,13 @@ namespace StreamDeckSharp.Internals
                 throw new ArgumentOutOfRangeException(nameof(percent));
             }
 
-            var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+            var buffer = new byte[]
+            {
+                0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00,
+            };
+
             buffer[5] = percent;
             return buffer;
         }

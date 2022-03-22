@@ -1,4 +1,4 @@
-﻿using HidSharp;
+using HidSharp;
 using OpenMacroBoard.SDK;
 using System;
 using System.Diagnostics;
@@ -10,53 +10,72 @@ namespace StreamDeckSharp.Internals
 {
     internal sealed class StreamDeckHidWrapper : IStreamDeckHid
     {
-        private readonly object hidStreamLock = new object();
+        private readonly object hidStreamLock = new();
         private readonly string devicePath;
 
-        private readonly Throttle throttle = new Throttle()
-        {
-            // Based on a hand full of speed measurements, it looks like that (at least)
-            // the classical stream deck (hardware revision 1) can't keep up with full USB 2.0 speed.
-            //
-            // For the other devices this limit is also active but probably not relevant,
-            // because in practice the speed is slower, because all other devices use
-            // JPEG instead of BMP and the Hid.Write probably also blocks as long as the device is busy.
-            //
-            // The limit was determined by the following measurements with a classical stream deck:
-            //
-            // write speed -> time between glitches
-            // 3.90 MiB/s -> 1.7s
-            // 3.68 MiB/s -> 3.7s
-            // 3.60 MiB/s -> 7.6s
-            //
-            // Based on the assumption, that the stream deck has a maximum speed at which data is processed,
-            // the following formular can be used:
-            //
-            // Measured speed ............ s
-            // Time between glitches ..... t
-            // Internal speed ............ x (to be calculated)
-            // Hardware buffer size ...... b (will be eliminated when solving for x)
-            //
-            // (s - x) * t = b
-            //
-            // (s1 - x) * t1 = (s2 - x) * t2
-            //
-            // When solved for x and evaluated with all the measured pairs, the calculated internal speed
-            // of the classical stream deck seems to be (almost exactly?) 3.50 MiB/s - A few tests indeed
-            // showed that limiting the speed below that value seems to prevent glitches.
-            //
-            // So long story short we set a limit of 3'200'000 bytes/s (~3.0 MiB/s)
-            BytesPerSecondLimit = 3_200_000,
-        };
+        /// <summary>
+        /// Used to throttle write speed.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Based on a hand full of speed measurements, it looks like that (at least)
+        /// the classical stream deck (hardware revision 1) can't keep up with full USB 2.0 speed.
+        /// </para>
+        /// <para>
+        /// For the other devices this limit is also active but probably not relevant,
+        /// because in practice the speed is slower, because all other devices use
+        /// JPEG instead of BMP and the Hid.Write probably also blocks as long as the device is busy.
+        /// </para>
+        /// <para>
+        /// The limit was determined by the following measurements with a classical stream deck:</para>
+        /// <para>
+        /// write speed -> time between glitches<br/>
+        /// 3.90 MiB/s -> 1.7s<br/>
+        /// 3.68 MiB/s -> 3.7s<br/>
+        /// 3.60 MiB/s -> 7.6s<br/>
+        /// </para>
+        /// <para>
+        /// Based on the assumption, that the stream deck has a maximum speed at which data is processed,
+        /// the following formular can be used:
+        /// </para>
+        /// <para>
+        /// Measured speed ............ s<br/>
+        /// Time between glitches ..... t<br/>
+        /// Internal speed ............ x (to be calculated)<br/>
+        /// Hardware buffer size ...... b (will be eliminated when solving for x)<br/>
+        /// </para>
+        /// <para>(s - x) * t = b</para>
+        /// <para>(s1 - x) * t1 = (s2 - x) * t2</para>
+        /// <para>
+        /// When solved for x and evaluated with all the measured pairs, the calculated internal speed
+        /// of the classical stream deck seems to be (almost exactly?) 3.50 MiB/s - A few tests indeed
+        /// showed that limiting the speed below that value seems to prevent glitches.
+        /// </para>
+        /// <para>
+        /// So long story short we set a limit of 3'200'000 bytes/s (~3.0 MiB/s)
+        /// for all devices that can't keep up or I haven't had the chance to test on a
+        /// particular Elgato Device (for example I don't own a StreamDeck Rev2) and for
+        /// other devices that work as expected we set <see cref="double.PositiveInfinity"/> (unlimited).
+        /// </para>
+        /// </remarks>
+        private readonly Throttle throttle;
 
+        private readonly IHardwareInternalInfos hardwareInfo;
         private HidStream dStream;
         private byte[] readReportBuffer;
 
-        public StreamDeckHidWrapper(HidDevice device)
+        public StreamDeckHidWrapper(HidDevice device, IHardwareInternalInfos hardwareInfo)
         {
             if (device is null)
             {
                 throw new ArgumentNullException(nameof(device));
+            }
+
+            this.hardwareInfo = hardwareInfo ?? throw new ArgumentNullException(nameof(hardwareInfo));
+
+            if (hardwareInfo.BytesPerSecondLimit < double.PositiveInfinity)
+            {
+                throttle = new() { BytesPerSecondLimit = hardwareInfo.BytesPerSecondLimit };
             }
 
             devicePath = device.DevicePath;
@@ -95,12 +114,12 @@ namespace StreamDeckSharp.Internals
             {
                 lock (hidStreamLock)
                 {
-                    throttle.MeasureAndBlock(data.Length);
+                    throttle?.MeasureAndBlock(data.Length);
                     targetStream.GetFeature(data);
                     return true;
                 }
             }
-            catch (Exception ex) when (ex is TimeoutException || ex is IOException)
+            catch (Exception ex) when (ex is TimeoutException or IOException)
             {
                 DisposeConnection();
                 return false;
@@ -128,7 +147,7 @@ namespace StreamDeckSharp.Internals
             {
                 lock (hidStreamLock)
                 {
-                    throttle.MeasureAndBlock(featureData.Length);
+                    throttle?.MeasureAndBlock(featureData.Length);
                     targetStream.SetFeature(featureData);
                 }
 
@@ -154,7 +173,7 @@ namespace StreamDeckSharp.Internals
             {
                 lock (hidStreamLock)
                 {
-                    throttle.MeasureAndBlock(reportData.Length);
+                    throttle?.MeasureAndBlock(reportData.Length);
                     targetStream.Write(reportData);
                 }
 
@@ -215,18 +234,33 @@ namespace StreamDeckSharp.Internals
 
         private void InitializeDeviceSettings(HidDevice device)
         {
+            var inputReportLength = device.GetMaxInputReportLength();
             OutputReportLength = device.GetMaxOutputReportLength();
             FeatureReportLength = device.GetMaxFeatureReportLength();
+
+            Debug.Assert(
+                OutputReportLength == hardwareInfo.ExpectedOutputReportLength,
+                $"Output report length unexpected. Found: {OutputReportLength}. Expected: {hardwareInfo.ExpectedOutputReportLength}"
+            );
+
+            Debug.Assert(
+                FeatureReportLength == hardwareInfo.ExpectedFeatureReportLength,
+                $"Feature report length unexpected. Found: {FeatureReportLength}. Expected: {hardwareInfo.ExpectedFeatureReportLength}"
+            );
+
+            Debug.Assert(
+                inputReportLength == hardwareInfo.ExpectedInputReportLength,
+                $"Input report length unexpected. Found: {inputReportLength}. Expected: {hardwareInfo.ExpectedInputReportLength}"
+            );
+
             readReportBuffer = new byte[OutputReportLength];
         }
 
         private void RefreshConnection()
         {
-            var device = DeviceList
-                            .Local
-                            .GetHidDevices()
-                            .Where(d => d.DevicePath == devicePath)
-                            .FirstOrDefault();
+            var device = DeviceList.Local
+                .GetHidDevices()
+                .FirstOrDefault(d => d.DevicePath == devicePath);
 
             var deviceFound = device != null;
             var deviceActive = dStream != null;

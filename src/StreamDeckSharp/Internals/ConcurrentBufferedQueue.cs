@@ -6,10 +6,10 @@ namespace StreamDeckSharp.Internals
 {
     internal sealed class ConcurrentBufferedQueue<TKey, TValue> : IDisposable
     {
-        private readonly object sync = new object();
+        private readonly object sync = new();
 
-        private readonly Dictionary<TKey, TValue> valueBuffer = new Dictionary<TKey, TValue>();
-        private readonly Queue<TKey> queue = new Queue<TKey>();
+        private readonly Dictionary<TKey, TValue> valueBuffer = new();
+        private readonly Queue<TKey> queue = new();
 
         private volatile bool isAddingCompleted;
         private volatile bool disposed;

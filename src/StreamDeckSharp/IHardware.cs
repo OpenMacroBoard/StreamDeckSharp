@@ -10,7 +10,7 @@ namespace StreamDeckSharp
         /// <summary>
         /// Key layout information
         /// </summary>
-        GridKeyPositionCollection Keys { get; }
+        GridKeyLayout Keys { get; }
 
         /// <summary>
         /// Name of the device
