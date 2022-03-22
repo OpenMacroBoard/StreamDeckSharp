@@ -17,7 +17,7 @@ namespace StreamDeckSharp
         private readonly object sync = new();
         private readonly List<DeviceState> knownDevices = new();
         private readonly List<Subscription> subscriptions = new();
-        private readonly Dictionary<string, StreamDeckDeviceReferenceHandle> knownDeviceLookup = new();
+        private readonly Dictionary<string, StreamDeckDeviceReference> knownDeviceLookup = new();
 
         private bool disposed = true;
 
@@ -99,13 +99,13 @@ namespace StreamDeckSharp
 
         private sealed class DeviceState
         {
-            public DeviceState(StreamDeckDeviceReferenceHandle deviceReference, bool connected)
+            public DeviceState(StreamDeckDeviceReference deviceReference, bool connected)
             {
                 DeviceReference = deviceReference ?? throw new ArgumentNullException(nameof(deviceReference));
                 Connected = connected;
             }
 
-            public StreamDeckDeviceReferenceHandle DeviceReference { get; }
+            public StreamDeckDeviceReference DeviceReference { get; }
             public bool Connected { get; set; }
         }
 

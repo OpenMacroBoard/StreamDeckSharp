@@ -5,9 +5,9 @@ namespace StreamDeckSharp
     /// <summary>
     /// A device reference pointing to a stream deck.
     /// </summary>
-    public sealed class StreamDeckDeviceReferenceHandle : IDeviceReference
+    public sealed class StreamDeckDeviceReference : IDeviceReference
     {
-        internal StreamDeckDeviceReferenceHandle(
+        internal StreamDeckDeviceReference(
             string devicePath,
             string deviceName,
             GridKeyLayout keyLayout
@@ -66,7 +66,7 @@ namespace StreamDeckSharp
                 return true;
             }
 
-            if (obj is not StreamDeckDeviceReferenceHandle other)
+            if (obj is not StreamDeckDeviceReference other)
             {
                 return false;
             }

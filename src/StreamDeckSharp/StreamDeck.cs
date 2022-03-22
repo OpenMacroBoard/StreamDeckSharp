@@ -60,7 +60,7 @@ namespace StreamDeckSharp
         /// Enumerate Elgato Stream Deck Devices that match a given type.
         /// </summary>
         /// <param name="hardware">If no types or null is passed as argument, all known types are found</param>
-        public static IEnumerable<IDeviceReference> EnumerateDevices(params IUsbHidHardware[] hardware)
+        public static IEnumerable<StreamDeckDeviceReference> EnumerateDevices(params IUsbHidHardware[] hardware)
         {
             return DeviceList.Local.GetStreamDecks(hardware);
         }

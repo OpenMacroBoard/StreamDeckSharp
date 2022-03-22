@@ -7,7 +7,7 @@ namespace StreamDeckSharp.Internals
 {
     internal static class DeviceListExtensions
     {
-        public static IEnumerable<StreamDeckDeviceReferenceHandle> GetStreamDecks(
+        public static IEnumerable<StreamDeckDeviceReference> GetStreamDecks(
             this DeviceList deviceList,
             params IUsbHidHardware[] hardware
         )
@@ -49,7 +49,7 @@ namespace StreamDeckSharp.Internals
                 .GetHidDevices()
                 .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
                 .Where(i => i.HardwareInfo != null)
-                .Select(i => new StreamDeckDeviceReferenceHandle(
+                .Select(i => new StreamDeckDeviceReference(
                     i.Device.DevicePath,
                     i.HardwareInfo.DeviceName,
                     i.HardwareInfo.Keys
