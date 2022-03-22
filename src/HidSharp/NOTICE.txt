@@ -1,2 +1,0 @@
-HIDSharp
-Copyright 2010-2019 James F. Bellinger <http://www.zer7.com/software/hidsharp>
