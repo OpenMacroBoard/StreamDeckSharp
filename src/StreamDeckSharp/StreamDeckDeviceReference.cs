@@ -38,7 +38,7 @@ namespace StreamDeckSharp
         /// <inheritdoc/>
         public IMacroBoard Open(bool useWriteCache)
         {
-            return StreamDeck.OpenDevice(DevicePath);
+            return StreamDeck.OpenDevice(DevicePath, useWriteCache);
         }
 
         /// <inheritdoc/>
