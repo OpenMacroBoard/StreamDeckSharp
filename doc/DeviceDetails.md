@@ -1,5 +1,12 @@
 # Device Details
 
+## Communication protocol(s)
+Different Devices use a different communication protocol to send bitmaps and key press events. Here is a collection of links with some implementations and details about the raw HID communication.
+- https://github.com/OpenMacroBoard/StreamDeckSharp/tree/master/src/StreamDeckSharp/Internals
+- https://gist.github.com/cliffrowley/d18a9c4569537b195f2b1eb6c68469e0
+- https://github.com/Julusian/node-elgato-stream-deck/tree/master/packages/core/src/models
+- https://den.dev/blog/reverse-engineering-stream-deck/
+
 ## Stream Deck Rev1
 ### Teardown
 

@@ -23,6 +23,12 @@ namespace StreamDeckSharp.Internals
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         };
 
+        public StreamDeckMiniHardwareInfo(int usbProductId, string deviceName)
+        {
+            UsbProductId = usbProductId;
+            DeviceName = deviceName;
+        }
+
         public int KeyCount => KeyPositions.Count;
         public int IconSize => ImgWidth;
         public int HeaderSize => 16;
@@ -33,8 +39,8 @@ namespace StreamDeckSharp.Internals
 
         public int KeyReportOffset => 1;
         public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
-        public int UsbProductId => ProductIds.StreamDeckMini;
-        public string DeviceName => "Stream Deck Mini";
+        public int UsbProductId { get; }
+        public string DeviceName { get; }
         public byte FirmwareVersionFeatureId => 4;
         public byte SerialNumberFeatureId => 3;
         public int FirmwareReportSkip => 5;

@@ -1,4 +1,4 @@
-﻿using StreamDeckSharp.Internals;
+using StreamDeckSharp.Internals;
 
 namespace StreamDeckSharp
 {
@@ -37,6 +37,12 @@ namespace StreamDeckSharp
         public static IUsbHidHardware StreamDeckMini
             => Internal_StreamDeckMini;
 
+        /// <summary>
+        /// Details about the Stream Deck Mini Rev2
+        /// </summary>
+        public static IUsbHidHardware SteamDeckMiniRev2
+            => Internal_StreamDeckMiniRev2;
+
         internal static IHardwareInternalInfos Internal_StreamDeck { get; }
             = new StreamDeckHardwareInfo();
 
@@ -50,6 +56,9 @@ namespace StreamDeckSharp
             = new StreamDeckXlHardwareInfo();
 
         internal static IHardwareInternalInfos Internal_StreamDeckMini { get; }
-            = new StreamDeckMiniHardwareInfo();
+            = new StreamDeckMiniHardwareInfo(UsbConstants.ProductIds.StreamDeckMini, "Stream Deck Mini");
+
+        internal static IHardwareInternalInfos Internal_StreamDeckMiniRev2 { get; }
+            = new StreamDeckMiniHardwareInfo(UsbConstants.ProductIds.StreamDeckMiniRev2, "Stream Deck Mini Rev2");
     }
 }

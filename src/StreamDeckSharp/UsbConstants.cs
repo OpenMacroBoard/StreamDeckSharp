@@ -1,4 +1,4 @@
-﻿namespace StreamDeckSharp
+namespace StreamDeckSharp
 {
     internal static class UsbConstants
     {
@@ -14,6 +14,7 @@
             public const int StreamDeckMK2 = 0x0080;
             public const int StreamDeckXL = 0x006c;
             public const int StreamDeckMini = 0x0063;
+            public const int StreamDeckMiniRev2 = 0x0090;
         }
     }
 }
