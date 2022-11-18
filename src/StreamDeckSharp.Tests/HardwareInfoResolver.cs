@@ -12,6 +12,7 @@ namespace StreamDeckSharp.Tests
             yield return Hardware.Internal_StreamDeckMK2;
             yield return Hardware.Internal_StreamDeckRev2;
             yield return Hardware.Internal_StreamDeckXL;
+            yield return Hardware.Internal_StreamDeckMiniRev2;
         }
     }
 }

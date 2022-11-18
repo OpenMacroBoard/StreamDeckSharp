@@ -1,4 +1,4 @@
-﻿using HidSharp;
+using HidSharp;
 using static StreamDeckSharp.UsbConstants;
 
 namespace StreamDeckSharp.Internals
@@ -24,6 +24,7 @@ namespace StreamDeckSharp.Internals
                 ProductIds.StreamDeckMK2 => Hardware.Internal_StreamDeckMK2,
                 ProductIds.StreamDeckXL => Hardware.Internal_StreamDeckXL,
                 ProductIds.StreamDeckMini => Hardware.Internal_StreamDeckMini,
+                ProductIds.StreamDeckMiniRev2 => Hardware.Internal_StreamDeckMiniRev2,
                 _ => null,
             };
         }
