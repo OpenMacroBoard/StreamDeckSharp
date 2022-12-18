@@ -53,7 +53,9 @@ namespace StreamDeckSharp
             = new StreamDeckMK2HardwareInfo();
 
         internal static IHardwareInternalInfos Internal_StreamDeckXL { get; }
-            = new StreamDeckXlHardwareInfo();
+            = new StreamDeckXlHardwareInfo(UsbConstants.ProductIds.StreamDeckXL, "Stream Deck XL");
+        internal static IHardwareInternalInfos Internal_StreamDeckXLRev2 { get; }
+            = new StreamDeckXlHardwareInfo(UsbConstants.ProductIds.StreamDeckXLRev2, "Stream Deck XL Rev2");
 
         internal static IHardwareInternalInfos Internal_StreamDeckMini { get; }
             = new StreamDeckMiniHardwareInfo(UsbConstants.ProductIds.StreamDeckMini, "Stream Deck Mini");

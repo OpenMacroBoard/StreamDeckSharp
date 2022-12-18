@@ -6,12 +6,14 @@ namespace StreamDeckSharp.Internals
     internal sealed class StreamDeckXlHardwareInfo
         : StreamDeckJpgHardwareBase
     {
-        public StreamDeckXlHardwareInfo()
+        public StreamDeckXlHardwareInfo(int usbProductId, string deviceName)
             : base(new GridKeyLayout(8, 4, 96, 38))
         {
+            UsbProductId = usbProductId;
+            DeviceName = deviceName;
         }
 
-        public override string DeviceName => "Stream Deck XL";
-        public override int UsbProductId => ProductIds.StreamDeckXL;
+        public override string DeviceName { get; }
+        public override int UsbProductId { get; }
     }
 }
