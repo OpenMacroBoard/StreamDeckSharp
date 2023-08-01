@@ -16,7 +16,7 @@ namespace StreamDeckSharp.Tests
 
         [Theory]
         [ClassData(typeof(AllHardwareInfoTestData))]
-        internal async Task BasicBitmapKeyOutputAsExpected(IHardwareInternalInfos hardware)
+        internal async Task BasicBitmapKeyOutputAsExpected(UsbHardwareIdAndDriver hardware)
         {
             // Arrange
             Verifier.Initialize();
@@ -58,7 +58,7 @@ namespace StreamDeckSharp.Tests
 
         [Theory]
         [ClassData(typeof(AllHardwareInfoTestData))]
-        internal async Task SetBitmapResultsInExpectedOutput8PxTiles(IHardwareInternalInfos hardware)
+        internal async Task SetBitmapResultsInExpectedOutput8PxTiles(UsbHardwareIdAndDriver hardware)
         {
             // Arrange
             Verifier.Initialize();
@@ -120,7 +120,7 @@ namespace StreamDeckSharp.Tests
                 }
             }
 
-            var colorFullKeyBitmap = KeyBitmap.FromBgr24Array(keySize, keySize, pixelData);
+            var colorFullKeyBitmap = KeyBitmap.Create.FromBgr24Array(keySize, keySize, pixelData);
 
             // Act
             context.Board.SetKeyBitmap(0, colorFullKeyBitmap);

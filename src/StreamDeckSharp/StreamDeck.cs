@@ -68,14 +68,14 @@ namespace StreamDeckSharp
         internal static IMacroBoard FromHid(HidDevice device, bool cached)
         {
             var hwInfo = device.GetHardwareInformation();
-            var hidWrapper = new StreamDeckHidWrapper(device, hwInfo);
+            var hidWrapper = new StreamDeckHidWrapper(device, hwInfo.Driver);
 
             if (cached)
             {
-                return new CachedHidClient(hidWrapper, hwInfo);
+                return new CachedHidClient(hidWrapper, hwInfo.Keys, hwInfo.Driver);
             }
 
-            return new BasicHidClient(hidWrapper, hwInfo);
+            return new BasicHidClient(hidWrapper, hwInfo.Keys, hwInfo.Driver);
         }
     }
 }

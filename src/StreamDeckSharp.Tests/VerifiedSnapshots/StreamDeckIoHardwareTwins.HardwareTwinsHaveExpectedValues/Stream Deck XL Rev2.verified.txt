@@ -1,5 +1,5 @@
 ﻿{
-  DeviceName: Stream Deck XL,
+  DeviceName: Stream Deck XL Rev2,
   Driver: {
     BytesPerSecondLimit: Infinity,
     ExpectedFeatureReportLength: 32,
@@ -688,7 +688,7 @@
     }
   ],
   UsbId: {
-    UsbProductId: 108,
+    UsbProductId: 143,
     UsbVendorId: 4057
   }
 }

@@ -11,7 +11,7 @@ namespace StreamDeckSharp.Tests
         [Theory]
         [MemberData(nameof(GetData))]
         internal void GettingFirmwareVersionWorksAsExpected(
-            IHardwareInternalInfos hardware,
+            UsbHardwareIdAndDriver hardware,
             byte[] featureData,
             string expectedParsedFirmware
         )
@@ -19,7 +19,7 @@ namespace StreamDeckSharp.Tests
             // Arrange
             using var context = new StreamDeckHidTestContext(hardware);
 
-            context.Hid.ReadFeatureResonseQueue.Enqueue((hardware.FirmwareVersionFeatureId, true, featureData));
+            context.Hid.ReadFeatureResonseQueue.Enqueue((hardware.Driver.FirmwareVersionFeatureId, true, featureData));
 
             // Act
             context.Board.GetFirmwareVersion().Should().Be(expectedParsedFirmware);
@@ -36,7 +36,7 @@ namespace StreamDeckSharp.Tests
 
             yield return new object[]
             {
-                Hardware.Internal_StreamDeck,
+                Hardware.StreamDeck,
                 new byte[]
                 {
                     0x04, 0x55, 0xAA, 0xD4, 0x04, 0x31, 0x2E, 0x30,
@@ -48,7 +48,7 @@ namespace StreamDeckSharp.Tests
 
             yield return new object[]
             {
-                Hardware.Internal_StreamDeckXL,
+                Hardware.StreamDeckXL,
                 new byte[]
                 {
                     0x05, 0x0C, 0xAC, 0x74, 0x1D, 0x08, 0x31, 0x2E,
@@ -61,7 +61,7 @@ namespace StreamDeckSharp.Tests
 
             yield return new object[]
             {
-                Hardware.Internal_StreamDeckMK2,
+                Hardware.StreamDeckMK2,
                 new byte[]
                 {
                     0x05, 0x0C, 0x9F, 0x8E, 0x29, 0xE3, 0x31, 0x2E,
@@ -74,7 +74,7 @@ namespace StreamDeckSharp.Tests
 
             yield return new object[]
             {
-                Hardware.Internal_StreamDeckMini,
+                Hardware.StreamDeckMini,
                 new byte[]
                 {
                     0x04, 0x00, 0x00, 0x00, 0x00, 0x32, 0x2E, 0x30,

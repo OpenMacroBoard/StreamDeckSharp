@@ -8,8 +8,8 @@ namespace StreamDeckSharp.Tests
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            return HardwareInfoResolver
-                .GetAllHardwareInfos()
+            return Hardware
+                .GetInternalStreamDeckHardwareInfos()
                 .Select(h => new object[] { h })
                 .GetEnumerator();
         }

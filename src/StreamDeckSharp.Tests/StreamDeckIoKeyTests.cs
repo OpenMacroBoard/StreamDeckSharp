@@ -22,7 +22,7 @@ namespace StreamDeckSharp.Tests
                 {
                     x.TestName,
                     x.Hardware,
-                    Unpack(x.InputReports, x.Hardware.ExpectedInputReportLength),
+                    Unpack(x.InputReports, x.Hardware.Driver.ExpectedInputReportLength),
                 }
             );
         }
@@ -31,7 +31,7 @@ namespace StreamDeckSharp.Tests
         [MemberData(nameof(GetReportTestData))]
         internal async Task InputReportsBehaveAsExpected(
             string testName,
-            IHardwareInternalInfos hardware,
+            UsbHardwareIdAndDriver hardware,
             IEnumerable<byte[]> inputReports
         )
         {
@@ -72,7 +72,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeckXL_EachKeyOnce",
-                Hardware = Hardware.Internal_StreamDeckXL,
+                Hardware = Hardware.StreamDeckXL.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 32, 4, 1 },
@@ -145,7 +145,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeckXL_MultipleKeysDown",
-                Hardware = Hardware.Internal_StreamDeckXL,
+                Hardware = Hardware.StreamDeckXL.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 32, 4, 1, 5, 1 },
@@ -165,7 +165,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeckMK2_EachKeyOnce",
-                Hardware = Hardware.Internal_StreamDeckMK2,
+                Hardware = Hardware.StreamDeckMK2.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 15 },
@@ -203,7 +203,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeckMK2_MultipleKeysDown",
-                Hardware = Hardware.Internal_StreamDeckMK2,
+                Hardware = Hardware.StreamDeckMK2.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 15, 4, 1, 5, 1 },
@@ -223,7 +223,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeck_EachKeyOnce",
-                Hardware = Hardware.Internal_StreamDeck,
+                Hardware = Hardware.StreamDeck.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 5, 1 },
@@ -262,7 +262,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeck_MultipleKeysDown",
-                Hardware = Hardware.Internal_StreamDeck,
+                Hardware = Hardware.StreamDeck.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 4, 1, 5, 1 },
@@ -282,7 +282,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeckMini_EachKeyOnce",
-                Hardware = Hardware.Internal_StreamDeckMini,
+                Hardware = Hardware.StreamDeckMini.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1 },
@@ -302,7 +302,7 @@ namespace StreamDeckSharp.Tests
             yield return new KeyPressTestCase()
             {
                 TestName = "StreamDeckMini_MultipleKeysDown",
-                Hardware = Hardware.Internal_StreamDeckMini,
+                Hardware = Hardware.StreamDeckMini.Internal(),
                 InputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 1, 1, 2, 1 },
@@ -341,7 +341,7 @@ namespace StreamDeckSharp.Tests
         {
             public string TestName { get; set; }
             public IEnumerable<byte[]> InputReports { get; set; }
-            public IHardwareInternalInfos Hardware { get; set; }
+            public UsbHardwareIdAndDriver Hardware { get; set; }
         }
     }
 }

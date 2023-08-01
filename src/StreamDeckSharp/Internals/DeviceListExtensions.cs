@@ -19,7 +19,7 @@ namespace StreamDeckSharp.Internals
 
             var matchAllKnowDevices = hardware is null || hardware.Length < 1;
 
-            IHardwareInternalInfos MatchingHardware(HidDevice d)
+            UsbHardwareIdAndDriver MatchingHardware(HidDevice d)
             {
                 var hwDetails = d.GetHardwareInformation();
 
@@ -35,8 +35,9 @@ namespace StreamDeckSharp.Internals
 
                 foreach (var h in hardware)
                 {
-                    if (d.VendorID == h.UsbVendorId &&
-                        d.ProductID == h.UsbProductId)
+                    var deviceUsbKey = new UsbVendorProductPair(d.VendorID, d.ProductID);
+
+                    if (deviceUsbKey == h.UsbId)
                     {
                         return hwDetails;
                     }

@@ -5,62 +5,79 @@ using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.IO;
 
-using static StreamDeckSharp.UsbConstants;
-
 namespace StreamDeckSharp.Internals
 {
-    internal abstract class StreamDeckJpgHardwareBase
-        : IHardwareInternalInfos
+    /// <summary>
+    /// HID Stream Deck communication driver for JPEG based devices.
+    /// </summary>
+    public sealed class HidComDriverStreamDeckJpeg
+        : IStreamDeckHidComDriver
     {
         private readonly int imgSize;
         private readonly JpegEncoder jpgEncoder;
 
         private byte[] cachedNullImage = null;
 
-        protected StreamDeckJpgHardwareBase(GridKeyLayout keyPositions)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HidComDriverStreamDeckJpeg"/> class.
+        /// </summary>
+        /// <param name="imgSize">The size of the button images in pixels.</param>
+        /// /// <exception cref="ArgumentOutOfRangeException">Thrown if the <paramref name="imgSize"/> is smaller than one.</exception>
+        public HidComDriverStreamDeckJpeg(int imgSize)
         {
+            if (imgSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(imgSize));
+            }
+
             jpgEncoder = new JpegEncoder()
             {
                 Quality = 100,
             };
 
-            Keys = keyPositions;
-            imgSize = keyPositions.KeySize;
+            this.imgSize = imgSize;
         }
 
-        public abstract int UsbProductId { get; }
-        public abstract string DeviceName { get; }
-
+        /// <inheritdoc/>
         public int HeaderSize => 8;
+
+        /// <inheritdoc/>
         public int ReportSize => 1024;
 
+        /// <inheritdoc/>
         public int ExpectedFeatureReportLength => 32;
+
+        /// <inheritdoc/>
         public int ExpectedOutputReportLength => 1024;
+
+        /// <inheritdoc/>
         public int ExpectedInputReportLength => 512;
 
+        /// <inheritdoc/>
         public int KeyReportOffset => 4;
-        public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
 
+        /// <inheritdoc/>
         public byte FirmwareVersionFeatureId => 5;
+
+        /// <inheritdoc/>
         public byte SerialNumberFeatureId => 6;
 
-        public int FirmwareReportSkip => 6;
+        /// <inheritdoc/>
+        public int FirmwareVersionReportSkip => 6;
+
+        /// <inheritdoc/>
         public int SerialNumberReportSkip => 2;
 
-        public GridKeyLayout Keys { get; }
+        /// <inheritdoc/>
+        public double BytesPerSecondLimit { get; set; } = double.PositiveInfinity;
 
-        /// <inheritdoc />
-        /// <remarks>
-        /// Unlimited because during my tests I couldn't see any glitches.
-        /// See <see cref="StreamDeckHidWrapper"/> for details.
-        /// </remarks>
-        public virtual double BytesPerSecondLimit => double.PositiveInfinity;
-
+        /// <inheritdoc/>
         public int ExtKeyIdToHardwareKeyId(int extKeyId)
         {
             return extKeyId;
         }
 
+        /// <inheritdoc/>
         public byte[] GeneratePayload(KeyBitmap keyBitmap)
         {
             var rawData = keyBitmap.GetScaledVersion(imgSize, imgSize);
@@ -73,12 +90,14 @@ namespace StreamDeckSharp.Internals
             return EncodeImageToJpg(rawData);
         }
 
+        /// <inheritdoc/>
         public int HardwareKeyIdToExtKeyId(int hardwareKeyId)
         {
             return hardwareKeyId;
         }
 
-        public void PrepareDataForTransmittion(
+        /// <inheritdoc/>
+        public void PrepareDataForTransmission(
             byte[] data,
             int pageNumber,
             int payloadLength,
@@ -95,6 +114,7 @@ namespace StreamDeckSharp.Internals
             data[6] = (byte)pageNumber;
         }
 
+        /// <inheritdoc/>
         public byte[] GetBrightnessMessage(byte percent)
         {
             if (percent > 100)
@@ -116,6 +136,7 @@ namespace StreamDeckSharp.Internals
             return buffer;
         }
 
+        /// <inheritdoc/>
         public byte[] GetLogoMessage()
         {
             return new byte[] { 0x03, 0x02 };
@@ -125,7 +146,7 @@ namespace StreamDeckSharp.Internals
         {
             if (cachedNullImage is null)
             {
-                var rawNullImg = KeyBitmap.FromBgr24Array(1, 1, new byte[] { 0, 0, 0 }).GetScaledVersion(imgSize, imgSize);
+                var rawNullImg = KeyBitmap.Create.FromBgr24Array(1, 1, new byte[] { 0, 0, 0 }).GetScaledVersion(imgSize, imgSize);
                 cachedNullImage = EncodeImageToJpg(rawNullImg);
             }
 

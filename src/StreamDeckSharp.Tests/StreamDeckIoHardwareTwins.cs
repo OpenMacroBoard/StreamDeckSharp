@@ -14,7 +14,7 @@ namespace StreamDeckSharp.Tests
 
         [Theory]
         [ClassData(typeof(AllHardwareInfoTestData))]
-        internal async Task HardwareTwinsHaveExpectedValues(IHardwareInternalInfos hardware)
+        internal async Task HardwareTwinsHaveExpectedValues(UsbHardwareIdAndDriver hardware)
         {
             // This test is to make sure we don't accidentially change some important constants.
             Verifier.Initialize();

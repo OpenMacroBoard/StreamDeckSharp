@@ -17,15 +17,15 @@ namespace StreamDeckSharp.Tests
         {
             var brighnessValues = new byte[] { 100, 0, 33, 66 };
 
-            return HardwareInfoResolver
-                .GetAllHardwareInfos()
+            return Hardware
+                .GetInternalStreamDeckHardwareInfos()
                 .CrossRef(brighnessValues)
                 .Select(x => new object[] { x.Item1, x.Item2 });
         }
 
         [Theory]
         [MemberData(nameof(GetDataForBrightnessTest))]
-        internal async Task SettingBrightnessCausesTheExpectedOuput(IHardwareInternalInfos hardware, byte brightness)
+        internal async Task SettingBrightnessCausesTheExpectedOuput(UsbHardwareIdAndDriver hardware, byte brightness)
         {
             // Arrange
             Verifier.Initialize();
@@ -46,7 +46,7 @@ namespace StreamDeckSharp.Tests
 
         [Theory]
         [ClassData(typeof(AllHardwareInfoTestData))]
-        internal async Task CallingShowLogoCausesTheExpectedOutput(IHardwareInternalInfos hardware)
+        internal async Task CallingShowLogoCausesTheExpectedOutput(UsbHardwareIdAndDriver hardware)
         {
             // Arrange
             Verifier.Initialize();

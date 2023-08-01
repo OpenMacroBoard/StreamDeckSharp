@@ -10,15 +10,19 @@ namespace StreamDeckSharp.Internals
         private readonly byte[] keyStates;
         private readonly object disposeLock = new();
 
-        public BasicHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
+        public BasicHidClient(
+            IStreamDeckHid deckHid,
+            IKeyLayout keys,
+            IStreamDeckHidComDriver hidComDriver
+        )
         {
             DeckHid = deckHid;
-            Keys = hardwareInformation.Keys;
+            Keys = keys;
 
             deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
             deckHid.ReportReceived += DeckHid_ReportReceived;
 
-            HardwareInfo = hardwareInformation;
+            HidComDriver = hidComDriver;
             Buffer = new byte[deckHid.OutputReportLength];
             keyStates = new byte[Keys.Count];
         }
@@ -31,7 +35,7 @@ namespace StreamDeckSharp.Internals
         public bool IsConnected => DeckHid.IsConnected;
 
         protected IStreamDeckHid DeckHid { get; }
-        protected IHardwareInternalInfos HardwareInfo { get; }
+        protected IStreamDeckHidComDriver HidComDriver { get; }
         protected byte[] Buffer { get; }
 
         public void Dispose()
@@ -42,33 +46,33 @@ namespace StreamDeckSharp.Internals
 
         public string GetFirmwareVersion()
         {
-            return ReadFeatureString(HardwareInfo.FirmwareVersionFeatureId, HardwareInfo.FirmwareReportSkip);
+            return ReadFeatureString(HidComDriver.FirmwareVersionFeatureId, HidComDriver.FirmwareVersionReportSkip);
         }
 
         public string GetSerialNumber()
         {
-            return ReadFeatureString(HardwareInfo.SerialNumberFeatureId, HardwareInfo.SerialNumberReportSkip);
+            return ReadFeatureString(HidComDriver.SerialNumberFeatureId, HidComDriver.SerialNumberReportSkip);
         }
 
         public void SetBrightness(byte percent)
         {
             ThrowIfAlreadyDisposed();
-            DeckHid.WriteFeature(HardwareInfo.GetBrightnessMessage(percent));
+            DeckHid.WriteFeature(HidComDriver.GetBrightnessMessage(percent));
         }
 
         public virtual void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
-            keyId = HardwareInfo.ExtKeyIdToHardwareKeyId(keyId);
+            keyId = HidComDriver.ExtKeyIdToHardwareKeyId(keyId);
 
-            var payload = HardwareInfo.GeneratePayload(bitmapData);
+            var payload = HidComDriver.GeneratePayload(bitmapData);
 
             var reports = OutputReportSplitter.Split(
                 payload,
                 Buffer,
-                HardwareInfo.ReportSize,
-                HardwareInfo.HeaderSize,
+                HidComDriver.ReportSize,
+                HidComDriver.HeaderSize,
                 keyId,
-                HardwareInfo.PrepareDataForTransmittion
+                HidComDriver.PrepareDataForTransmission
             );
 
             foreach (var report in reports)
@@ -141,11 +145,11 @@ namespace StreamDeckSharp.Internals
         {
             for (var i = 0; i < keyStates.Length; i++)
             {
-                var newStatePos = i + HardwareInfo.KeyReportOffset;
+                var newStatePos = i + HidComDriver.KeyReportOffset;
 
                 if (keyStates[i] != newStates[newStatePos])
                 {
-                    var externalKeyId = HardwareInfo.HardwareKeyIdToExtKeyId(i);
+                    var externalKeyId = HidComDriver.HardwareKeyIdToExtKeyId(i);
                     KeyStateChanged?.Invoke(this, new KeyEventArgs(externalKeyId, newStates[newStatePos] != 0));
                     keyStates[i] = newStates[newStatePos];
                 }
@@ -154,7 +158,7 @@ namespace StreamDeckSharp.Internals
 
         private void ShowLogoWithoutDisposeVerification()
         {
-            DeckHid.WriteFeature(HardwareInfo.GetLogoMessage());
+            DeckHid.WriteFeature(HidComDriver.GetLogoMessage());
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿{
-  DeviceName: Stream Deck Mini,
+  DeviceName: Stream Deck Mini Rev2,
   Driver: {
     BytesPerSecondLimit: Infinity,
     ExpectedFeatureReportLength: 17,
@@ -142,7 +142,7 @@
     }
   ],
   UsbId: {
-    UsbProductId: 99,
+    UsbProductId: 144,
     UsbVendorId: 4057
   }
 }

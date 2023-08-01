@@ -1,4 +1,4 @@
-﻿namespace StreamDeckSharp
+namespace StreamDeckSharp
 {
     /// <summary>
     /// USB HID specific hardware information
@@ -6,13 +6,8 @@
     public interface IUsbHidHardware : IHardware
     {
         /// <summary>
-        /// USB vendor id
+        /// Unique identifier for USB device. Vendor and product ID pair.
         /// </summary>
-        int UsbVendorId { get; }
-
-        /// <summary>
-        /// USB product id
-        /// </summary>
-        int UsbProductId { get; }
+        UsbVendorProductPair UsbId { get; }
     }
 }

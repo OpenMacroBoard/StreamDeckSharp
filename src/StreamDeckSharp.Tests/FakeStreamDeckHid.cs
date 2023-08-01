@@ -9,9 +9,9 @@ namespace StreamDeckSharp.Tests
     internal sealed class FakeStreamDeckHid : IStreamDeckHid
     {
         private readonly TextWriter log;
-        private readonly IHardwareInternalInfos hardware;
+        private readonly UsbHardwareIdAndDriver hardware;
 
-        public FakeStreamDeckHid(TextWriter log, IHardwareInternalInfos hardware)
+        public FakeStreamDeckHid(TextWriter log, UsbHardwareIdAndDriver hardware)
         {
             this.log = log ?? throw new ArgumentNullException(nameof(log));
             this.hardware = hardware ?? throw new ArgumentNullException(nameof(hardware));
@@ -21,7 +21,7 @@ namespace StreamDeckSharp.Tests
         public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
 
         public bool IsConnected => throw new NotImplementedException();
-        public int OutputReportLength => hardware.ExpectedOutputReportLength;
+        public int OutputReportLength => hardware.Driver.ExpectedOutputReportLength;
 
         public int BytesPerLineOutput { get; set; } = 16;
 

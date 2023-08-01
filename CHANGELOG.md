@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
+## [v5.0.0-preview] - 2023-08-01
+Again another preview because I'm pretty busy right now.
+- Restructure how the HID communication is abstracted internally. This is useful for consumers when Elgato releases new hardware that can be controlled with the same software. The user of the library can now register new devices with existing "HID drivers" (for example if a Stream Deck MK.3 is released)
+- `KeyBitmap.FromBgr24Array` was moved to `KeyBitmap.Create.FromBgr24Array`
+- More HID Verification Tests
+- Tested with real hardware
+  - Stream Deck XL (FW v1.01.000)
+  - Stream Deck Mini (FW v2.03.001)
+  - Stream Deck (FW v1.0.191203)
+  - Stream Deck MK.2 (FW v1.01.001)
+    - Saw visual glitches in ImageGlitchTest.Rainbow without throttling
+    - Added throttling to about 1,5 MB/s
+    - Example video frame rate looked still ok with throttling
+
+## [v4.0.0-preview] - 2022-11-18
+A preview version (v4.0.0-preview) is currently available on nuget. At the moment there isn't a migration guide, but Jon Skeet has a project that show a the changes he had to make: https://github.com/OpenMacroBoard/StreamDeckSharp/issues/45#issuecomment-1079933751
+Alternatively you can also take a look at the changes of the example projects: [Changes example projects](https://github.com/OpenMacroBoard/OpenMacroBoard.ExampleCollection/compare/1104c4f...3203bff)
+
 ## [3.2.0] - 2021-09-04
 - Support for Stream Deck MK.2 (by jdahlblom - https://github.com/OpenMacroBoard/StreamDeckSharp/pull/36)
 - Remove old cooldown mechanism and replace with a new throttle mechanism that limits the write speed

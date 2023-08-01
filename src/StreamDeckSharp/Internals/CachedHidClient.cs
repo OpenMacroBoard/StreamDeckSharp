@@ -11,8 +11,12 @@ namespace StreamDeckSharp.Internals
         private readonly ConcurrentBufferedQueue<int, byte[]> imageQueue;
         private readonly ConditionalWeakTable<KeyBitmap, byte[]> cacheKeyBitmaps = new();
 
-        public CachedHidClient(IStreamDeckHid deckHid, IHardwareInternalInfos hardwareInformation)
-            : base(deckHid, hardwareInformation)
+        public CachedHidClient(
+            IStreamDeckHid deckHid,
+            IKeyLayout keys,
+            IStreamDeckHidComDriver hidComDriver
+        )
+            : base(deckHid, keys, hidComDriver)
         {
             imageQueue = new ConcurrentBufferedQueue<int, byte[]>();
             writerTask = StartBitmapWriterTask();
@@ -21,9 +25,9 @@ namespace StreamDeckSharp.Internals
         public override void SetKeyBitmap(int keyId, KeyBitmap bitmapData)
         {
             ThrowIfAlreadyDisposed();
-            keyId = HardwareInfo.ExtKeyIdToHardwareKeyId(keyId);
+            keyId = HidComDriver.ExtKeyIdToHardwareKeyId(keyId);
 
-            var payload = cacheKeyBitmaps.GetValue(bitmapData, HardwareInfo.GeneratePayload);
+            var payload = cacheKeyBitmaps.GetValue(bitmapData, HidComDriver.GeneratePayload);
             imageQueue.Add(keyId, payload);
         }
 
@@ -56,10 +60,10 @@ namespace StreamDeckSharp.Internals
                     var reports = OutputReportSplitter.Split(
                         payload,
                         Buffer,
-                        HardwareInfo.ReportSize,
-                        HardwareInfo.HeaderSize,
+                        HidComDriver.ReportSize,
+                        HidComDriver.HeaderSize,
                         keyId,
-                        HardwareInfo.PrepareDataForTransmittion
+                        HidComDriver.PrepareDataForTransmission
                     );
 
                     foreach (var report in reports)

@@ -1,13 +1,18 @@
 ﻿{
-  BytesPerSecondLimit: Infinity,
   DeviceName: Stream Deck MK.2,
-  ExpectedFeatureReportLength: 32,
-  ExpectedInputReportLength: 512,
-  ExpectedOutputReportLength: 1024,
-  FirmwareReportSkip: 6,
-  FirmwareVersionFeatureId: 5,
-  HeaderSize: 8,
-  KeyReportOffset: 4,
+  Driver: {
+    BytesPerSecondLimit: 1500000.0,
+    ExpectedFeatureReportLength: 32,
+    ExpectedInputReportLength: 512,
+    ExpectedOutputReportLength: 1024,
+    FirmwareVersionFeatureId: 5,
+    FirmwareVersionReportSkip: 6,
+    HeaderSize: 8,
+    KeyReportOffset: 4,
+    ReportSize: 1024,
+    SerialNumberFeatureId: 6,
+    SerialNumberReportSkip: 2
+  },
   Keys: [
     {
       Bottom: 72,
@@ -325,9 +330,8 @@
       Y: 208
     }
   ],
-  ReportSize: 1024,
-  SerialNumberFeatureId: 6,
-  SerialNumberReportSkip: 2,
-  UsbProductId: 128,
-  UsbVendorId: 4057
+  UsbId: {
+    UsbProductId: 128,
+    UsbVendorId: 4057
+  }
 }

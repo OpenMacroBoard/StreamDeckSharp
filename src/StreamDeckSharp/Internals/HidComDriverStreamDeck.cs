@@ -1,17 +1,16 @@
 using OpenMacroBoard.SDK;
 using System;
 
-using static StreamDeckSharp.UsbConstants;
-
 namespace StreamDeckSharp.Internals
 {
-    internal sealed class StreamDeckHardwareInfo
-        : IHardwareInternalInfos
+    /// <summary>
+    /// HID Stream Deck communication driver for the classical Stream Deck.
+    /// </summary>
+    public sealed class HidComDriverStreamDeck
+        : IStreamDeckHidComDriver
     {
         private const int ImgWidth = 72;
         private const int ColorChannels = 3;
-
-        private static readonly GridKeyLayout KeyPositions = new(5, 3, ImgWidth, 30);
 
         private static readonly byte[] BmpHeader = new byte[]
         {
@@ -24,37 +23,40 @@ namespace StreamDeckSharp.Internals
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         };
 
-        public int KeyCount => KeyPositions.Count;
-        public int IconSize => ImgWidth;
+        /// <inheritdoc/>
         public int HeaderSize => 16;
+
+        /// <inheritdoc/>
         public int ReportSize => 7819;
+
+        /// <inheritdoc/>
         public int ExpectedFeatureReportLength => 17;
+
+        /// <inheritdoc/>
         public int ExpectedOutputReportLength => 8191;
+
+        /// <inheritdoc/>
         public int ExpectedInputReportLength => 17;
 
+        /// <inheritdoc/>
         public int KeyReportOffset => 1;
-        public int UsbVendorId => VendorIds.ElgatoSystemsGmbH;
-        public int UsbProductId => ProductIds.StreamDeck;
-        public string DeviceName => "Stream Deck";
+
+        /// <inheritdoc/>
         public byte FirmwareVersionFeatureId => 4;
+
+        /// <inheritdoc/>
         public byte SerialNumberFeatureId => 3;
-        public int FirmwareReportSkip => 5;
+
+        /// <inheritdoc/>
+        public int FirmwareVersionReportSkip => 5;
+
+        /// <inheritdoc/>
         public int SerialNumberReportSkip => 5;
-        public GridKeyLayout Keys
-            => KeyPositions;
 
-        /// <inheritdoc />
-        /// <remarks>
-        /// <para>
-        /// Limit of 3'200'000 bytes/s (~3.0 MiB/s)
-        /// because without that limit glitches will happen on fast writes.
-        /// </para>
-        /// <para>
-        /// See <see cref="StreamDeckHidWrapper"/> for details.
-        /// </para>
-        /// </remarks>
-        public double BytesPerSecondLimit => 3_200_000;
+        /// <inheritdoc/>
+        public double BytesPerSecondLimit { get; set; } = double.PositiveInfinity;
 
+        /// <inheritdoc/>
         public byte[] GeneratePayload(KeyBitmap keyBitmap)
         {
             var rawData = keyBitmap.GetScaledVersion(ImgWidth, ImgWidth);
@@ -81,17 +83,20 @@ namespace StreamDeckSharp.Internals
             return bmp;
         }
 
+        /// <inheritdoc/>
         public int ExtKeyIdToHardwareKeyId(int extKeyId)
         {
             return FlipIdsHorizontal(extKeyId);
         }
 
+        /// <inheritdoc/>
         public int HardwareKeyIdToExtKeyId(int hardwareKeyId)
         {
             return FlipIdsHorizontal(hardwareKeyId);
         }
 
-        public void PrepareDataForTransmittion(
+        /// <inheritdoc/>
+        public void PrepareDataForTransmission(
             byte[] data,
             int pageNumber,
             int payloadLength,
@@ -106,6 +111,7 @@ namespace StreamDeckSharp.Internals
             data[5] = (byte)(keyId + 1);
         }
 
+        /// <inheritdoc/>
         public byte[] GetBrightnessMessage(byte percent)
         {
             if (percent > 100)
@@ -124,11 +130,13 @@ namespace StreamDeckSharp.Internals
             return buffer;
         }
 
+        /// <inheritdoc/>
         public byte[] GetLogoMessage()
         {
             return new byte[] { 0x0B, 0x63 };
         }
 
+        /// <inheritdoc/>
         private static int FlipIdsHorizontal(int keyId)
         {
             var diff = ((keyId % 5) - 2) * -2;

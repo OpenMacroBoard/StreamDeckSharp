@@ -60,11 +60,11 @@ namespace StreamDeckSharp.Internals
         /// </remarks>
         private readonly Throttle throttle;
 
-        private readonly IHardwareInternalInfos hardwareInfo;
+        private readonly IStreamDeckHidComDriver hardwareInfo;
         private HidStream dStream;
         private byte[] readReportBuffer;
 
-        public StreamDeckHidWrapper(HidDevice device, IHardwareInternalInfos hardwareInfo)
+        public StreamDeckHidWrapper(HidDevice device, IStreamDeckHidComDriver hardwareInfo)
         {
             if (device is null)
             {

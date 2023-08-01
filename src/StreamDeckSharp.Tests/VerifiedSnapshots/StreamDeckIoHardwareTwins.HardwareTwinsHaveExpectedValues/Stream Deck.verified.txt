@@ -1,15 +1,18 @@
 ﻿{
-  BytesPerSecondLimit: 3200000.0,
   DeviceName: Stream Deck,
-  ExpectedFeatureReportLength: 17,
-  ExpectedInputReportLength: 17,
-  ExpectedOutputReportLength: 8191,
-  FirmwareReportSkip: 5,
-  FirmwareVersionFeatureId: 4,
-  HeaderSize: 16,
-  IconSize: 72,
-  KeyCount: 15,
-  KeyReportOffset: 1,
+  Driver: {
+    BytesPerSecondLimit: 3200000.0,
+    ExpectedFeatureReportLength: 17,
+    ExpectedInputReportLength: 17,
+    ExpectedOutputReportLength: 8191,
+    FirmwareVersionFeatureId: 4,
+    FirmwareVersionReportSkip: 5,
+    HeaderSize: 16,
+    KeyReportOffset: 1,
+    ReportSize: 7819,
+    SerialNumberFeatureId: 3,
+    SerialNumberReportSkip: 5
+  },
   Keys: [
     {
       Bottom: 72,
@@ -327,9 +330,8 @@
       Y: 204
     }
   ],
-  ReportSize: 7819,
-  SerialNumberFeatureId: 3,
-  SerialNumberReportSkip: 5,
-  UsbProductId: 96,
-  UsbVendorId: 4057
+  UsbId: {
+    UsbProductId: 96,
+    UsbVendorId: 4057
+  }
 }

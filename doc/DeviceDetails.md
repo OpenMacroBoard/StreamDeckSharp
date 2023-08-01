@@ -16,7 +16,7 @@ Different Devices use a different communication protocol to send bitmaps and key
 - https://imgur.com/gallery/XyKiL
 
 ### Hardware
-Accoring to description of the German tear down video:
+According to description of the German tear down video:
 
 |                           |                                     |
 | ------------------------- | ----------------------------------- |
@@ -34,11 +34,11 @@ No details atm.
 ## Stream Deck XL
 
 ### Button Auto-Press Issue
-My (and according to a quick google search also some other customers) stream deck xl started to automatically
+My (and according to a quick google search also some other customers) Stream Deck XL started to automatically
 trigger random buttons and sometimes event kept some buttons pressed for quite a while.
 
-It looks like the stream deck xl has a design issue where some buttons are randomly pressed.
-For my device (and accoring to some other customer videos) the following buttons seem to be affected:
+It looks like the Stream Deck XL has a design issue where some buttons are randomly pressed.
+For my device (and according to some other customer videos) the following buttons seem to be affected:
 
 🔲🔲🔲❌🔲🔲🔲🔲
 🔲🔲🔲❌🔲🔲❌❌

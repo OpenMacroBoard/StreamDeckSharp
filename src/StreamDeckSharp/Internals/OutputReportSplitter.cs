@@ -5,7 +5,7 @@ namespace StreamDeckSharp.Internals
 {
     internal static class OutputReportSplitter
     {
-        public delegate void PrepareDataForTransmittion(
+        public delegate void PrepareDataForTransmission(
             byte[] data,
             int pageNumber,
             int payloadLength,
@@ -19,7 +19,7 @@ namespace StreamDeckSharp.Internals
             int bufferLength,
             int headerSize,
             int keyId,
-            PrepareDataForTransmittion prepareData
+            PrepareDataForTransmission prepareData
         )
         {
             var maxPayloadLength = bufferLength - headerSize;
