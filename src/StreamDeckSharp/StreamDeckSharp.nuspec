@@ -4,7 +4,7 @@
 		<id>StreamDeckSharp</id>
 		<version>$version$</version>
 		<title>StreamDeckSharp</title>
-		<authors>Christian Wischenbart</authors>
+		<authors>Christian Franzl</authors>
 		<license type="expression">MIT</license>
 		<repository type="git" url="https://github.com/OpenMacroBoard/StreamDeckSharp" />
 		<projectUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</projectUrl>
@@ -15,7 +15,7 @@
 		<tags>streamdeck elgato stream deck open macro board openmacroboard streamdeckmini</tags>
 		<dependencies>
 			<group targetFramework="netstandard2.0">
-				<dependency id="OpenMacroBoard.SDK" version="[3.0, 4.0)" exclude="Build,Analyzers" />
+				<dependency id="OpenMacroBoard.SDK" version="[5.0, 6.0)" exclude="Build,Analyzers" />
 				<dependency id="System.Drawing.Common" version="6.0.0" exclude="Build,Analyzers" />
 			</group>
 		</dependencies>
