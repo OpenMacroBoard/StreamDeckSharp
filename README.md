@@ -12,10 +12,6 @@
 
 #### [Recent Changes](CHANGELOG.md)
 
-## Changes in v4.0.0-preview
-A preview version (v4.0.0-preview) is currently available on nuget. At the moment there isn't a migration guide, but Jon Skeet has a project that show a the changes he had to make: https://github.com/OpenMacroBoard/StreamDeckSharp/issues/45#issuecomment-1079933751
-Alternativly you can also take a look at the changes of the example projects: [Changes example projects](https://github.com/OpenMacroBoard/OpenMacroBoard.ExampleCollection/compare/1104c4f...3203bff)
-
 ## Quickstart _(TL;DR)_
 ***At the moment only Windows is "officially" supported.***  
 *Need help with Linux or macOS? → Wiki: [Supported Platforms](https://github.com/OpenMacroBoard/StreamDeckSharp/wiki/Supported-Platforms-and-Devices)*
