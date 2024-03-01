@@ -19,7 +19,7 @@ namespace StreamDeckSharp.Internals
             DeckHid = deckHid;
             Keys = keys;
 
-            deckHid.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
+            deckHid.ConnectionStateChanged += (_, e) => ConnectionStateChanged?.Invoke(this, e);
             deckHid.ReportReceived += DeckHid_ReportReceived;
 
             HidComDriver = hidComDriver;
@@ -130,7 +130,9 @@ namespace StreamDeckSharp.Internals
         {
             if (!DeckHid.ReadFeatureData(featureId, out var featureData))
             {
+#pragma warning disable AV1135 // Do not return null for strings, collections or tasks
                 return null;
+#pragma warning restore AV1135
             }
 
             return Encoding.UTF8.GetString(featureData, skipBytes, featureData.Length - skipBytes).Trim('\0');

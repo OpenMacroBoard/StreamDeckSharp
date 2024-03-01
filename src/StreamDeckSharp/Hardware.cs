@@ -6,6 +6,8 @@ using System.Linq;
 
 using static StreamDeckSharp.UsbConstants;
 
+#pragma warning disable AV1710 // Member name includes the name of its containing type
+
 namespace StreamDeckSharp
 {
     /// <summary>

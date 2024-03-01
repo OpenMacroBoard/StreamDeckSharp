@@ -1,6 +1,5 @@
 using OpenMacroBoard.Meta.TestUtils;
 using StreamDeckSharp.Internals;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VerifyXunit;
@@ -13,29 +12,35 @@ namespace StreamDeckSharp.Tests
     {
         public ExtendedVerifySettings Verifier { get; } = DefaultVerifySettings.Build();
 
-        public static IEnumerable<object[]> GetDataForBrightnessTest()
+        public static TheoryData<IUsbHidHardware, byte> GetDataForBrightnessTest()
         {
             var brighnessValues = new byte[] { 100, 0, 33, 66 };
 
             return Hardware
                 .GetInternalStreamDeckHardwareInfos()
+                .Cast<IUsbHidHardware>()
                 .CrossRef(brighnessValues)
-                .Select(x => new object[] { x.Item1, x.Item2 });
+                .ToTheoryData();
         }
 
         [Theory]
         [MemberData(nameof(GetDataForBrightnessTest))]
-        internal async Task SettingBrightnessCausesTheExpectedOuput(UsbHardwareIdAndDriver hardware, byte brightness)
+        internal async Task SettingBrightnessCausesTheExpectedOuput(
+            IUsbHidHardware hardware,
+            byte brightness
+        )
         {
+            var hardwareInternal = hardware.Internal();
+
             // Arrange
             Verifier.Initialize();
 
             Verifier
                 .UseFileNameAsDirectory()
-                .UseFileName(hardware.DeviceName)
+                .UseFileName(hardwareInternal.DeviceName)
                 .UseUniqueSuffix($"Value={brightness}");
 
-            using var context = new StreamDeckHidTestContext(hardware);
+            using var context = new StreamDeckHidTestContext(hardwareInternal);
 
             // Act
             context.Board.SetBrightness(brightness);

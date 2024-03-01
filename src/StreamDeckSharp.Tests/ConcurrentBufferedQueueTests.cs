@@ -92,7 +92,9 @@ namespace StreamDeckSharp.Tests
 
             Task.Factory.StartNew(() =>
             {
+#pragma warning disable S2925 // "Thread.Sleep" should not be used in tests
                 Thread.Sleep(50);  // Make sure Take is called before the next line is executed
+#pragma warning restore S2925
                 q.Add(3, "Hallo");
             });
 
@@ -110,7 +112,9 @@ namespace StreamDeckSharp.Tests
 
             Task.Factory.StartNew(() =>
             {
+#pragma warning disable S2925 // "Thread.Sleep" should not be used in tests
                 Thread.Sleep(50);  // Make sure Take is called before the next line is executed
+#pragma warning restore S2925
                 q.CompleteAdding();
             });
 
@@ -129,8 +133,13 @@ namespace StreamDeckSharp.Tests
             q.CompleteAdding();
             takeAction();
 
+#pragma warning disable AV2202 // Prefer language syntax over explicit calls to underlying implementations
             success.HasValue.Should().BeTrue();
+#pragma warning restore AV2202
+
+#pragma warning disable S3655 // Empty nullable value should not be accessed
             success.Value.Should().BeFalse();
+#pragma warning restore S3655
         }
 
         [Fact]

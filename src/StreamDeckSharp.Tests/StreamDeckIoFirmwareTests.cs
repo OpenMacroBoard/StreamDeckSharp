@@ -1,6 +1,4 @@
 using FluentAssertions;
-using StreamDeckSharp.Internals;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
@@ -9,17 +7,19 @@ namespace StreamDeckSharp.Tests
     public class StreamDeckIoFirmwareTests
     {
         [Theory]
-        [MemberData(nameof(GetData))]
-        internal void GettingFirmwareVersionWorksAsExpected(
-            UsbHardwareIdAndDriver hardware,
+        [MemberData(nameof(TestData))]
+        public void GettingFirmwareVersionWorksAsExpected(
+            IUsbHidHardware hardware,
             byte[] featureData,
             string expectedParsedFirmware
         )
         {
-            // Arrange
-            using var context = new StreamDeckHidTestContext(hardware);
+            var internalHardware = hardware.Internal();
 
-            context.Hid.ReadFeatureResonseQueue.Enqueue((hardware.Driver.FirmwareVersionFeatureId, true, featureData));
+            // Arrange
+            using var context = new StreamDeckHidTestContext(internalHardware);
+
+            context.Hid.ReadFeatureResonseQueue.Enqueue((internalHardware.Driver.FirmwareVersionFeatureId, true, featureData));
 
             // Act
             context.Board.GetFirmwareVersion().Should().Be(expectedParsedFirmware);
@@ -29,12 +29,12 @@ namespace StreamDeckSharp.Tests
             context.Log.ToString().Should().BeEmpty();
         }
 
-        [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1202:Elements should be ordered by access", Justification = "Readability")]
-        public static IEnumerable<object[]> GetData()
+        /// <summary>
+        /// Real world examples from my devices.
+        /// </summary>
+        [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test before test-data.")]
+        public static TheoryData<IUsbHidHardware, byte[], string> TestData { get; } = new()
         {
-            // Real world examples from my devices
-
-            yield return new object[]
             {
                 Hardware.StreamDeck,
                 new byte[]
@@ -43,10 +43,8 @@ namespace StreamDeckSharp.Tests
                     0x2E, 0x31, 0x39, 0x31, 0x32, 0x30, 0x33, 0x00,
                     0x00,
                 },
-                "1.0.191203",
-            };
-
-            yield return new object[]
+                "1.0.191203"
+            },
             {
                 Hardware.StreamDeckXL,
                 new byte[]
@@ -56,10 +54,8 @@ namespace StreamDeckSharp.Tests
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 },
-                "1.00.006",
-            };
-
-            yield return new object[]
+                "1.00.006"
+            },
             {
                 Hardware.StreamDeckMK2,
                 new byte[]
@@ -69,10 +65,8 @@ namespace StreamDeckSharp.Tests
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 },
-                "1.00.001",
-            };
-
-            yield return new object[]
+                "1.00.001"
+            },
             {
                 Hardware.StreamDeckMini,
                 new byte[]
@@ -81,8 +75,8 @@ namespace StreamDeckSharp.Tests
                     0x33, 0x2E, 0x30, 0x30, 0x31, 0x00, 0x00, 0x00,
                     0x00,
                 },
-                "2.03.001",
-            };
-        }
+                "2.03.001"
+            },
+        };
     }
 }

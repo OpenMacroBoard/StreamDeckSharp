@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Threading;
 
+#pragma warning disable AV1710 // Member name includes the name of its containing type
+
 namespace StreamDeckSharp.Internals
 {
     internal class Throttle

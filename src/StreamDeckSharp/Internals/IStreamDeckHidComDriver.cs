@@ -29,7 +29,7 @@ namespace StreamDeckSharp.Internals
         /// Gets the feature report length for the device.
         /// </summary>
         /// <remarks>
-        /// This is asserted (in debug mode).
+        /// <para>This is asserted (in debug mode).</para>
         /// </remarks>
         int ExpectedFeatureReportLength { get; }
 
@@ -37,15 +37,15 @@ namespace StreamDeckSharp.Internals
         /// Gets the output report length for the device.
         /// </summary>
         /// <remarks>
-        /// This is asserted (in debug mode).
+        /// <para>This is asserted (in debug mode).</para>
         /// </remarks>
         int ExpectedOutputReportLength { get; }
 
         /// <summary>
-        /// Gets the input wreport length for the device.
+        /// Gets the input report length for the device.
         /// </summary>
         /// <remarks>
-        /// This is asserted (in debug mode).
+        /// <para>This is asserted (in debug mode).</para>
         /// </remarks>
         int ExpectedInputReportLength { get; }
 
@@ -63,7 +63,7 @@ namespace StreamDeckSharp.Internals
         /// Number of bytes to skip before the firmware version string starts.
         /// </summary>
         /// <remarks>
-        /// For details see property documentation of <see cref="SerialNumberReportSkip"/>.
+        /// <para>For details see property documentation of <see cref="SerialNumberReportSkip"/>.</para>
         /// </remarks>
         int FirmwareVersionReportSkip { get; }
 
@@ -76,10 +76,10 @@ namespace StreamDeckSharp.Internals
         /// Number of bytes to skip before the serial number string starts.
         /// </summary>
         /// <remarks>
-        /// For some reason some string reports have some "weird" data prefixed.
+        /// <para>For some reason some string reports have some "weird" data prefixed.
         /// I guess they are some binary encoded details or headers - no idea.
         /// This property can be tweaked so the resulting string doesn't contain
-        /// strange unicode characters.
+        /// strange Unicode characters.</para>
         /// </remarks>
         int SerialNumberReportSkip { get; }
 
@@ -87,10 +87,10 @@ namespace StreamDeckSharp.Internals
         /// Limits the USB transfer speed.
         /// </summary>
         /// <remarks>
-        /// Some stream decks produce artifacts and glitches when data comes in to fast.
+        /// <para>Some stream decks produce artifacts and glitches when data comes in to fast.
         /// I'm not sure if this happens because of this library or because of a bug in
         /// the stream deck's firmware but currently the work-around is to limit the transfer rate.
-        /// This value has to be determined experimentally.
+        /// This value has to be determined experimentally.</para>
         /// </remarks>
         double BytesPerSecondLimit { get; }
 
@@ -103,17 +103,16 @@ namespace StreamDeckSharp.Internals
         /// This is used to convert between keyId conventions
         /// </summary>
         /// <remarks>
-        /// The original stream deck has a pretty weird way of enumerating keys.
+        /// <para>The original stream deck has a pretty weird way of enumerating keys.
         /// Index 0 starts right top and they are enumerated right to left,
         /// and top to bottom. Most developers would expect it to be left-to-right
-        /// instead of right-to-left, so we change that ;-)
+        /// instead of right-to-left, so we change that ;-)</para>
         /// </remarks>
         int ExtKeyIdToHardwareKeyId(int extKeyId);
 
         /// <summary>
         /// This is used to convert between keyId conventions
         /// </summary>
-        /// <param name="hardwareKeyId"></param>
         int HardwareKeyIdToExtKeyId(int hardwareKeyId);
 
         /// <summary>
@@ -121,11 +120,6 @@ namespace StreamDeckSharp.Internals
         /// prepare meta information and details in the report header. This depends on the target device
         /// and has to be reverse engineered with a USB traffic analyzer.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="pageNumber"></param>
-        /// <param name="payloadLength"></param>
-        /// <param name="keyId"></param>
-        /// <param name="isLast"></param>
         void PrepareDataForTransmission(
             byte[] data,
             int pageNumber,

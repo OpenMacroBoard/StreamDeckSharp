@@ -1,5 +1,4 @@
 using OpenMacroBoard.Meta.TestUtils;
-using StreamDeckSharp.Internals;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,41 +11,33 @@ namespace StreamDeckSharp.Tests
     [UsesVerify]
     public class StreamDeckIoKeyTests
     {
+        public static TheoryData<KeyPressTestCase> TestData { get; } = GetData().ToTheoryData();
+
         public ExtendedVerifySettings Verifier { get; } = DefaultVerifySettings.Build();
 
-        public static IEnumerable<object[]> GetReportTestData()
-        {
-            // Unpack report and map for xunit injection use.
-            return GetData().Select(x =>
-                new object[]
-                {
-                    x.TestName,
-                    x.Hardware,
-                    Unpack(x.InputReports, x.Hardware.Driver.ExpectedInputReportLength),
-                }
-            );
-        }
-
         [Theory]
-        [MemberData(nameof(GetReportTestData))]
-        internal async Task InputReportsBehaveAsExpected(
-            string testName,
-            UsbHardwareIdAndDriver hardware,
-            IEnumerable<byte[]> inputReports
-        )
+        [MemberData(nameof(TestData))]
+        internal async Task InputReportsBehaveAsExpected(KeyPressTestCase testCase)
         {
+            var internalHardware = testCase.Hardware.Internal();
+
+            var inputReports = Unpack(
+                testCase.PackedInputReports,
+                internalHardware.Driver.ExpectedInputReportLength
+            );
+
             // Arrange
             Verifier.Initialize();
 
             Verifier
                 .UseFileNameAsDirectory()
-                .UseFileName(testName);
+                .UseFileName(testCase.TestName);
 
-            using var context = new StreamDeckHidTestContext(hardware);
+            using var context = new StreamDeckHidTestContext(internalHardware);
 
             var keyLog = new StringBuilder();
 
-            context.Board.KeyStateChanged += (s, e)
+            context.Board.KeyStateChanged += (_, e)
                 => keyLog.Append(e.Key).Append(" - ").AppendLine(e.IsDown ? "DOWN" : "UP");
 
             // Act
@@ -73,7 +64,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeckXL_EachKeyOnce",
                 Hardware = Hardware.StreamDeckXL.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 32, 4, 1 },
                     new byte[] { 0, 1, 2, 32 },
@@ -146,7 +137,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeckXL_MultipleKeysDown",
                 Hardware = Hardware.StreamDeckXL.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 32, 4, 1, 5, 1 },
                     new byte[] { 0, 1, 2, 32, 4, 1, 5, 1, 6, 1 },
@@ -166,7 +157,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeckMK2_EachKeyOnce",
                 Hardware = Hardware.StreamDeckMK2.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 15 },
                     new byte[] { 0, 1, 2, 15, 5, 1 },
@@ -204,7 +195,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeckMK2_MultipleKeysDown",
                 Hardware = Hardware.StreamDeckMK2.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 2, 15, 4, 1, 5, 1 },
                     new byte[] { 0, 1, 2, 15, 4, 1, 5, 1, 6, 1 },
@@ -224,7 +215,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeck_EachKeyOnce",
                 Hardware = Hardware.StreamDeck.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 5, 1 },
                     new byte[] { 0, 1 },
@@ -263,7 +254,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeck_MultipleKeysDown",
                 Hardware = Hardware.StreamDeck.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 4, 1, 5, 1 },
                     new byte[] { 0, 1, 3, 1, 4, 1, 5, 1 },
@@ -283,7 +274,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeckMini_EachKeyOnce",
                 Hardware = Hardware.StreamDeckMini.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1 },
                     new byte[] { 0, 1, 2, 1 },
@@ -303,7 +294,7 @@ namespace StreamDeckSharp.Tests
             {
                 TestName = "StreamDeckMini_MultipleKeysDown",
                 Hardware = Hardware.StreamDeckMini.Internal(),
-                InputReports = new List<byte[]>
+                PackedInputReports = new List<byte[]>
                 {
                     new byte[] { 0, 1, 1, 1, 2, 1 },
                     new byte[] { 0, 1, 1, 1, 2, 1, 3, 1 },
@@ -337,11 +328,11 @@ namespace StreamDeckSharp.Tests
             return unpacked;
         }
 
-        private class KeyPressTestCase
+        public class KeyPressTestCase
         {
             public string TestName { get; set; }
-            public IEnumerable<byte[]> InputReports { get; set; }
-            public UsbHardwareIdAndDriver Hardware { get; set; }
+            public IEnumerable<byte[]> PackedInputReports { get; set; }
+            public IUsbHidHardware Hardware { get; set; }
         }
     }
 }

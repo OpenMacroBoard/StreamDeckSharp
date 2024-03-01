@@ -3,7 +3,7 @@ using System;
 
 namespace StreamDeckSharp.Tests
 {
-    internal static class GetInternalHardwareExtension
+    internal static class GetInternalHardwareExtensions
     {
         public static UsbHardwareIdAndDriver Internal(this IUsbHidHardware hardware)
         {
