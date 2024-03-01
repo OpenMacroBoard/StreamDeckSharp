@@ -27,13 +27,7 @@ namespace StreamDeckSharp
         /// <exception cref="StreamDeckNotFoundException">Thrown if no Stream Deck is found</exception>
         public static IMacroBoard OpenDevice(bool useWriteCache, params IUsbHidHardware[] hardware)
         {
-            var dev = EnumerateDevices(hardware).FirstOrDefault();
-
-            if (dev is null)
-            {
-                throw new StreamDeckNotFoundException();
-            }
-
+            var dev = EnumerateDevices(hardware).FirstOrDefault() ?? throw new StreamDeckNotFoundException();
             return dev.Open();
         }
 
