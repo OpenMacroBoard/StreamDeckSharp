@@ -53,7 +53,7 @@ namespace StreamDeckSharp.Tests
         }
 
         [Fact(DisplayName = "Adding and elements with same id doesn't increase the Count value.")]
-        public void AddingAnElementWithSameIdDoesntIncreasesCount()
+        public void AddingAnElementWithSameIdDoesNotIncreasesCount()
         {
             using var q = new ConcurrentBufferedQueue<int, string>();
 
