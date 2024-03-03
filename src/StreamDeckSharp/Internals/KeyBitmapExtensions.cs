@@ -1,6 +1,4 @@
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
 
@@ -18,15 +16,13 @@ namespace StreamDeckSharp.Internals
                 return default;
             }
 
-            var underlyingData = keyDataAccess.GetData();
-
             if (keyBitmap.Width == width && keyBitmap.Height == height)
             {
                 // if it is already the size we need just return the underlying data
-                return underlyingData;
+                return keyDataAccess.GetData();
             }
 
-            using var image = Image.LoadPixelData<Bgr24>(underlyingData, keyBitmap.Width, keyBitmap.Height);
+            using var image = keyDataAccess.ToImage();
 
             image.Mutate(x => x.Resize(width, height));
 
