@@ -13,8 +13,8 @@
 #### [Recent Changes](CHANGELOG.md)
 
 ## Quickstart _(TL;DR)_
-***At the moment only Windows is "officially" supported.***  
-*Need help with Linux or macOS? → Wiki: [Supported Platforms](https://github.com/OpenMacroBoard/StreamDeckSharp/wiki/Supported-Platforms-and-Devices)*
+***Should work on all major operating systems.***  
+I typically test on Windows and Linux (Debian, Ubuntu), but it should also work on macOS. See Wiki: [Supported Platforms](https://github.com/OpenMacroBoard/StreamDeckSharp/wiki/Supported-Platforms-and-Devices)
 
 1. Add StreamDeckSharp reference (via nuget or download latest release)
 2. Add a using directive for StreamDeckSharp: `using StreamDeckSharp;`
