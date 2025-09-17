@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using StreamDeckSharp.Internals;
 using System;
 using System.Threading;

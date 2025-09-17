@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
 using StreamDeckSharp.Internals;
@@ -34,22 +34,22 @@ namespace StreamDeckSharp.Tests
             var blue = KeyBitmap.Create.FromRgb(0, 0, 0xFF);
 
             // Act
-            context.Log.WriteLine("Set all keys to a defined color.");
+            await context.Log.WriteLineAsync("Set all keys to a defined color.");
             context.Board.SetKeyBitmap(colorEachChannelDifferent);
 
-            context.Log.WriteLine("Clear all keys.");
+            await context.Log.WriteLineAsync("Clear all keys.");
             context.Board.ClearKeys();
 
-            context.Log.WriteLine("Set key 0 to red.");
+            await context.Log.WriteLineAsync("Set key 0 to red.");
             context.Board.SetKeyBitmap(0, red);
 
-            context.Log.WriteLine("Clear key 0.");
+            await context.Log.WriteLineAsync("Clear key 0.");
             context.Board.ClearKey(0);
 
-            context.Log.WriteLine("Set key 0 to blue");
+            await context.Log.WriteLineAsync("Set key 0 to blue");
             context.Board.SetKeyBitmap(0, blue);
 
-            context.Log.WriteLine("Set key 0 to KeyBitmap.Black");
+            await context.Log.WriteLineAsync("Set key 0 to KeyBitmap.Black");
             context.Board.SetKeyBitmap(0, KeyBitmap.Black);
 
             // Assert

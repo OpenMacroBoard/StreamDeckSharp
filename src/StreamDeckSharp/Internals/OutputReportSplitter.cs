@@ -27,6 +27,7 @@ namespace StreamDeckSharp.Internals
             var remainingBytes = data.Length;
             var bytesSent = 0;
 
+#pragma warning disable S1994 // "for" loop increment clauses should modify the loops' counters
             for (var splitNumber = 0; remainingBytes > 0; splitNumber++)
             {
                 var isLast = remainingBytes <= maxPayloadLength;
@@ -39,6 +40,7 @@ namespace StreamDeckSharp.Internals
                 bytesSent += bytesToSend;
                 remainingBytes -= bytesToSend;
             }
+#pragma warning restore S1994 // "for" loop increment clauses should modify the loops' counters
         }
     }
 }
