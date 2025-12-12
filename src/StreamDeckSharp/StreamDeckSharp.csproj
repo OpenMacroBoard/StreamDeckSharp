@@ -18,8 +18,8 @@
   <Import Project="..\..\..\analyzers.targets" />
 
   <ItemGroup>
-    <PackageReference Include="HidSharp" Version="2.1.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.11" />
+    <PackageReference Include="HidSharp" Version="2.6.4" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
     <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
     <None Include="icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
