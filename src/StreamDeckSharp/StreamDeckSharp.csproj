@@ -9,7 +9,7 @@
   <!-- nuget stuff -->
   <PropertyGroup>
     <Title>StreamDeckSharp</Title>
-    <Version>6.1.0</Version>
+    <Version>7.0.0</Version>
     <Description>A simple .NET wrapper for StreamDeck (using OpenMacroBoard.SDK)</Description>
     <RepositoryUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</RepositoryUrl>
   </PropertyGroup>
