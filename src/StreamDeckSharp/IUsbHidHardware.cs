@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace StreamDeckSharp
 {
     /// <summary>
@@ -8,6 +10,6 @@ namespace StreamDeckSharp
         /// <summary>
         /// Unique identifier for USB device. Vendor and product ID pair.
         /// </summary>
-        UsbVendorProductPair UsbId { get; }
+        IReadOnlyList<UsbVendorProductPair> UsbIds { get; }
     }
 }

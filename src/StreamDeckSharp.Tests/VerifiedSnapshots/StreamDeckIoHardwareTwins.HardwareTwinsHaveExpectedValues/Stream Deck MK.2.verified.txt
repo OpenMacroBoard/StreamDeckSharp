@@ -330,8 +330,10 @@
       Y: 208
     }
   ],
-  UsbId: {
-    UsbProductId: 128,
-    UsbVendorId: 4057
-  }
+  UsbIds: [
+    {
+      UsbProductId: 128,
+      UsbVendorId: 4057
+    }
+  ]
 }

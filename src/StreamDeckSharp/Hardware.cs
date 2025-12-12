@@ -27,11 +27,6 @@ namespace StreamDeckSharp
 
             StreamDeck =
                 RegisterNewHardwareInternal(
-                    new
-                    (
-                        VendorIds.ElgatoSystemsGmbH,
-                        ProductIds.StreamDeck
-                    ),
                     "Stream Deck",
                     streamDeckKeys,
                     new HidComDriverStreamDeck()
@@ -39,18 +34,14 @@ namespace StreamDeckSharp
                         // Limit of 3'200'000 bytes/s (~3.0 MiB/s)
                         // because without that limit glitches will happen on fast writes.
                         BytesPerSecondLimit = 3_200_000,
-                    }
+                    },
+                    ElgatoUsbId(0x0060)
                 );
 
             var streamDeckKeysNew = new GridKeyLayout(5, 3, 72, 32);
 
             StreamDeckMK2 =
                 RegisterNewHardwareInternal(
-                    new
-                    (
-                        VendorIds.ElgatoSystemsGmbH,
-                        ProductIds.StreamDeckMK2
-                    ),
                     "Stream Deck MK.2",
                     streamDeckKeysNew,
                     new HidComDriverStreamDeckJpeg(72)
@@ -58,16 +49,12 @@ namespace StreamDeckSharp
                         // Limit of 1'500'000 bytes/s (~1.5 MB/s),
                         // because ImageGlitchTest.Rainbow has glitches with higher speeds
                         BytesPerSecondLimit = 1_500_000,
-                    }
+                    },
+                    ElgatoUsbId(0x0080)
                 );
 
             StreamDeckRev2 =
                 RegisterNewHardwareInternal(
-                    new
-                    (
-                        VendorIds.ElgatoSystemsGmbH,
-                        ProductIds.StreamDeckRev2
-                    ),
                     "Stream Deck Rev2",
                     streamDeckKeysNew,
                     new HidComDriverStreamDeckJpeg(72)
@@ -75,69 +62,35 @@ namespace StreamDeckSharp
                         // Limit of 3'200'000 bytes/s (~3.0 MiB/s) just to be safe,
                         // because I don't own a StreamDeck Rev2 to test it.
                         BytesPerSecondLimit = 3_200_000,
-                    }
+                    },
+                    ElgatoUsbId(0x006d)
                 );
 
             // .----------------.
             // | Stream Deck XL |
             // '----------------'
 
-            var streamDeckXlkeys = new GridKeyLayout(8, 4, 96, 38);
-            var streamDeckXlDriver = new HidComDriverStreamDeckJpeg(96);
-
             StreamDeckXL =
                 RegisterNewHardwareInternal(
-                    new
-                    (
-                        VendorIds.ElgatoSystemsGmbH,
-                        ProductIds.StreamDeckXL
-                    ),
                     "Stream Deck XL",
-                    streamDeckXlkeys,
-                    streamDeckXlDriver
-                );
-
-            StreamDeckXlRev2 =
-                RegisterNewHardwareInternal(
-                    new
-                    (
-                        VendorIds.ElgatoSystemsGmbH,
-                        ProductIds.StreamDeckXLRev2
-                    ),
-                    "Stream Deck XL Rev2",
-                    streamDeckXlkeys,
-                    streamDeckXlDriver
+                    new GridKeyLayout(8, 4, 96, 38),
+                    new HidComDriverStreamDeckJpeg(96),
+                    ElgatoUsbId(0x006c),
+                    ElgatoUsbId(0x008f),
+                    ElgatoUsbId(0x00ba)
                 );
 
             // .------------------.
             // | Stream Deck Mini |
             // '------------------'
 
-            var streamDeckMiniKeys = new GridKeyLayout(3, 2, 80, 32);
-            var streamDeckMiniDriver = new HidComDriverStreamDeckMini(80);
-
             StreamDeckMini =
                 RegisterNewHardwareInternal(
-                    new
-                    (
-                        VendorIds.ElgatoSystemsGmbH,
-                        ProductIds.StreamDeckMini
-                    ),
                     "Stream Deck Mini",
-                    streamDeckMiniKeys,
-                    streamDeckMiniDriver
-                );
-
-            SteamDeckMiniRev2 =
-                RegisterNewHardwareInternal(
-                    new
-                    (
-                        VendorIds.ElgatoSystemsGmbH,
-                        ProductIds.StreamDeckMiniRev2
-                    ),
-                    "Stream Deck Mini Rev2",
-                    streamDeckMiniKeys,
-                    streamDeckMiniDriver
+                    new GridKeyLayout(3, 2, 80, 32),
+                    new HidComDriverStreamDeckMini(80),
+                    ElgatoUsbId(0x0063),
+                    ElgatoUsbId(0x0090)
                 );
         }
 
@@ -162,19 +115,9 @@ namespace StreamDeckSharp
         public static IUsbHidHardware StreamDeckXL { get; }
 
         /// <summary>
-        /// Details about the Stream Deck XL Rev2
-        /// </summary>
-        public static IUsbHidHardware StreamDeckXlRev2 { get; }
-
-        /// <summary>
         /// Details about the Stream Deck Mini
         /// </summary>
         public static IUsbHidHardware StreamDeckMini { get; }
-
-        /// <summary>
-        /// Details about the Stream Deck Mini Rev2
-        /// </summary>
-        public static IUsbHidHardware SteamDeckMiniRev2 { get; }
 
         /// <summary>
         /// This method registers a new (currently unknown to this library) hardware driver.
@@ -207,26 +150,39 @@ namespace StreamDeckSharp
             IStreamDeckHidComDriver driver
         )
         {
-            return RegisterNewHardwareInternal(usbId, deviceName, keyLayout, driver);
+            return RegisterNewHardwareInternal(
+                deviceName,
+                keyLayout,
+                driver,
+                usbId
+            );
         }
 
         internal static UsbHardwareIdAndDriver RegisterNewHardwareInternal(
-            UsbVendorProductPair usbId,
             string deviceName,
             GridKeyLayout keyLayout,
-            IStreamDeckHidComDriver driver
+            IStreamDeckHidComDriver driver,
+            params UsbVendorProductPair[] usbIds
         )
         {
-            var internalReference = new UsbHardwareIdAndDriver(usbId, deviceName, keyLayout, driver);
+            var internalReference = new UsbHardwareIdAndDriver(
+                usbIds.ToList(),
+                deviceName,
+                keyLayout,
+                driver
+            );
 
-            RegisteredHardware.AddOrUpdate(usbId, internalReference, (_, _) => internalReference);
+            foreach (var id in usbIds)
+            {
+                RegisteredHardware.AddOrUpdate(id, internalReference, (_, _) => internalReference);
+            }
 
             return internalReference;
         }
 
         internal static IEnumerable<UsbHardwareIdAndDriver> GetInternalStreamDeckHardwareInfos()
         {
-            return RegisteredHardware.Values.ToList();
+            return RegisteredHardware.Values.Distinct().ToList();
         }
 
         internal static UsbHardwareIdAndDriver GetInternalHardwareInfos(UsbVendorProductPair usbId)

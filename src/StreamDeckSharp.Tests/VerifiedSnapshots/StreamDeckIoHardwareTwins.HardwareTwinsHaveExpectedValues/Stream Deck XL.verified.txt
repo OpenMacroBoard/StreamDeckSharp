@@ -687,8 +687,18 @@
       Y: 402
     }
   ],
-  UsbId: {
-    UsbProductId: 108,
-    UsbVendorId: 4057
-  }
+  UsbIds: [
+    {
+      UsbProductId: 108,
+      UsbVendorId: 4057
+    },
+    {
+      UsbProductId: 143,
+      UsbVendorId: 4057
+    },
+    {
+      UsbProductId: 186,
+      UsbVendorId: 4057
+    }
+  ]
 }

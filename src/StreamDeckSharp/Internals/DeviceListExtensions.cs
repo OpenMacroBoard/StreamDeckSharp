@@ -1,4 +1,5 @@
 using HidSharp;
+using OpenMacroBoard.SDK.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,37 +20,38 @@ namespace StreamDeckSharp.Internals
 
             var matchAllKnowDevices = hardware is null || hardware.Length < 1;
 
-            UsbHardwareIdAndDriver MatchingHardware(HidDevice d)
+            (bool Success, UsbHardwareIdAndDriver Hardware) MatchingHardware(HidDevice d)
             {
                 var hwDetails = d.GetHardwareInformation();
 
                 if (hwDetails is null)
                 {
-                    return null;
+                    return (false, default);
                 }
 
                 if (matchAllKnowDevices)
                 {
-                    return hwDetails;
+                    return (true, hwDetails);
                 }
 
-                foreach (var h in hardware)
-                {
-                    var deviceUsbKey = new UsbVendorProductPair(d.VendorID, d.ProductID);
+                var deviceUsbKey = new UsbVendorProductPair(d.VendorID, d.ProductID);
+                var hardwareMatches = hardware.Any(h => h.UsbIds.Contains(deviceUsbKey));
 
-                    if (deviceUsbKey == h.UsbId)
-                    {
-                        return hwDetails;
-                    }
-                }
-
-                return null;
+                return (
+                    hardwareMatches,
+                    hardwareMatches ? hwDetails : default
+                );
             }
 
             return deviceList
                 .GetHidDevices()
-                .Select(device => new { HardwareInfo = MatchingHardware(device), Device = device })
-                .Where(i => i.HardwareInfo != null)
+                .SelectWhere(device =>
+                {
+                    var (success, hardware) = MatchingHardware(device);
+                    var value = success ? new { HardwareInfo = hardware, Device = device } : default;
+
+                    return (success, value);
+                })
                 .Select(i => new StreamDeckDeviceReference(
                     i.Device.DevicePath,
                     i.HardwareInfo.DeviceName,
