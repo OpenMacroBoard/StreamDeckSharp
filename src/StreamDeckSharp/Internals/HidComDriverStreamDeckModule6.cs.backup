@@ -1,0 +1,99 @@
+using OpenMacroBoard.SDK;
+using System;
+
+namespace StreamDeckSharp.Internals
+{
+    public sealed class HidComDriverStreamDeckModule6 : IStreamDeckHidComDriver
+    {
+        private const int ColorChannels = 3;
+        private readonly int imgSize;
+        private readonly byte[] bmpHeader;
+
+        public HidComDriverStreamDeckModule6(int imgSize)
+        {
+            if (imgSize < 1) throw new ArgumentOutOfRangeException(nameof(imgSize));
+            this.imgSize = imgSize;
+            this.bmpHeader = GenerateBmpHeader(imgSize);
+        }
+
+        private static byte[] GenerateBmpHeader(int size)
+        {
+            int fileSize = 54 + (size * size * 3);
+            return new byte[]
+            {
+                0x42, 0x4d, // BM
+                (byte)(fileSize & 0xFF), (byte)((fileSize >> 8) & 0xFF), (byte)((fileSize >> 16) & 0xFF), (byte)((fileSize >> 24) & 0xFF),
+                0x00, 0x00, 0x00, 0x00, // Reserved
+                0x36, 0x00, 0x00, 0x00, // Offset to pixel data
+                0x28, 0x00, 0x00, 0x00, // DIB header size
+                (byte)(size & 0xFF), (byte)((size >> 8) & 0xFF), 0x00, 0x00, // Width
+                (byte)(size & 0xFF), (byte)((size >> 8) & 0xFF), 0x00, 0x00, // Height
+                0x01, 0x00, // Planes
+                0x18, 0x00, // Bits per pixel (24)
+                0x00, 0x00, 0x00, 0x00, // Compression
+                (byte)((size * size * 3) & 0xFF), (byte)(((size * size * 3) >> 8) & 0xFF), (byte)(((size * size * 3) >> 16) & 0xFF), 0x00,
+                0xc4, 0x0e, 0x00, 0x00, // X pixels per meter
+                0xc4, 0x0e, 0x00, 0x00, // Y pixels per meter  
+                0x00, 0x00, 0x00, 0x00, // Colors in palette
+                0x00, 0x00, 0x00, 0x00, // Important colors
+            };
+        }
+
+        public int HeaderSize => 16;
+        public int ReportSize => 1024;
+        public int ExpectedFeatureReportLength => 17;
+        public int ExpectedOutputReportLength => 1024;
+        public int ExpectedInputReportLength => 17;
+        public int KeyReportOffset => 1;
+        public byte FirmwareVersionFeatureId => 4;
+        public byte SerialNumberFeatureId => 3;
+        public int FirmwareVersionReportSkip => 5;
+        public int SerialNumberReportSkip => 5;
+        public double BytesPerSecondLimit => double.PositiveInfinity;
+
+        public byte[] GeneratePayload(KeyBitmap keyBitmap)
+        {
+            var rawData = keyBitmap.GetScaledVersion(imgSize, imgSize);
+            var bmp = new byte[imgSize * imgSize * ColorChannels + bmpHeader.Length];
+            Array.Copy(bmpHeader, 0, bmp, 0, bmpHeader.Length);
+
+            if (rawData.Length != 0)
+            {
+                for (var y = 0; y < imgSize; y++)
+                {
+                    for (var x = 0; x < imgSize; x++)
+                    {
+                        var src = (y * imgSize + x) * ColorChannels;
+                        var tar = ((imgSize - x - 1) * imgSize + y) * ColorChannels + bmpHeader.Length;
+                        bmp[tar + 0] = rawData[src + 0];
+                        bmp[tar + 1] = rawData[src + 1];
+                        bmp[tar + 2] = rawData[src + 2];
+                    }
+                }
+            }
+            return bmp;
+        }
+
+        public int ExtKeyIdToHardwareKeyId(int extKeyId) => extKeyId;
+        public int HardwareKeyIdToExtKeyId(int hardwareKeyId) => hardwareKeyId;
+
+        public void PrepareDataForTransmission(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast)
+        {
+            data[0] = 2;
+            data[1] = 1;
+            data[2] = (byte)pageNumber;
+            data[4] = (byte)(isLast ? 1 : 0);
+            data[5] = (byte)(keyId + 1);
+        }
+
+        public byte[] GetBrightnessMessage(byte percent)
+        {
+            if (percent > 100) throw new ArgumentOutOfRangeException(nameof(percent));
+            var buffer = new byte[] { 0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+            buffer[5] = percent;
+            return buffer;
+        }
+
+        public byte[] GetLogoMessage() => new byte[] { 0x0B, 0x63 };
+    }
+}

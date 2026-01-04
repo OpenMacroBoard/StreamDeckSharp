@@ -1,0 +1,35 @@
+﻿diff --git a/src/StreamDeckSharp/Hardware.cs b/src/StreamDeckSharp/Hardware.cs
+index ...
+--- a/src/StreamDeckSharp/Hardware.cs
++++ b/src/StreamDeckSharp/Hardware.cs
+@@ -87,6 +87,18 @@ namespace StreamDeckSharp
+                     ElgatoUsbId(0x0063),
+                     ElgatoUsbId(0x0090)
+                 );
++
++            // .---------------------.
++            // | Stream Deck Module 6 |
++            // '---------------------'
++
++            StreamDeckModule6 =
++                RegisterNewHardwareInternal(
++                    "Stream Deck Module 6",
++                    new GridKeyLayout(3, 2, 96, 14),
++                    new HidComDriverStreamDeckMini(96),
++                    ElgatoUsbId(0x00B8)
++                );
+         }
+ 
+         /// <summary>
+@@ -113,6 +125,11 @@ namespace StreamDeckSharp
+         /// </summary>
+         public static IUsbHidHardware StreamDeckMini { get; }
+ 
++        /// <summary>
++        /// Details about the Stream Deck Module 6
++        /// </summary>
++        public static IUsbHidHardware StreamDeckModule6 { get; }
++
+         /// <summary>
+         /// This method registers a new (currently unknown to this library) hardware driver.
+         /// </summary>

@@ -74,7 +74,7 @@ namespace StreamDeckSharp
                 RegisterNewHardwareInternal(
                     "Stream Deck XL",
                     new GridKeyLayout(8, 4, 96, 38),
-                    new HidComDriverStreamDeckJpeg(96),
+                    new HidComDriverStreamDeckModule6(96),
                     ElgatoUsbId(0x006c),
                     ElgatoUsbId(0x008f),
                     ElgatoUsbId(0x00ba)
@@ -99,8 +99,8 @@ namespace StreamDeckSharp
             StreamDeckModule6 =
                 RegisterNewHardwareInternal(
                     "Stream Deck Module 6",
-                    new GridKeyLayout(3, 2, 80, 25),
-                    new HidComDriverStreamDeckModule6(),
+                    new GridKeyLayout(3, 2, 96, 14),
+                    new HidComDriverStreamDeckModule6(96),
                     ElgatoUsbId(0x00B8)
                 );
         }
