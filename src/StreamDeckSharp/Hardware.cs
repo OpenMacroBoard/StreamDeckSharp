@@ -92,6 +92,17 @@ namespace StreamDeckSharp
                     ElgatoUsbId(0x0063),
                     ElgatoUsbId(0x0090)
                 );
+            // .----------------------.
+            // | Stream Deck Module 6 |
+            // '----------------------'
+
+            StreamDeckModule6 =
+                RegisterNewHardwareInternal(
+                    "Stream Deck Module 6",
+                    new GridKeyLayout(3, 2, 80, 25),
+                    new HidComDriverStreamDeckModule6(),
+                    ElgatoUsbId(0x00B8)
+                );
         }
 
         /// <summary>
@@ -118,6 +129,10 @@ namespace StreamDeckSharp
         /// Details about the Stream Deck Mini
         /// </summary>
         public static IUsbHidHardware StreamDeckMini { get; }
+        /// <summary>
+        /// Details about the Stream Deck Module 6
+        /// </summary>
+        public static IUsbHidHardware StreamDeckModule6 { get; }
 
         /// <summary>
         /// This method registers a new (currently unknown to this library) hardware driver.
@@ -196,3 +211,6 @@ namespace StreamDeckSharp
         }
     }
 }
+
+
+
