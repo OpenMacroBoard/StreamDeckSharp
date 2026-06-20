@@ -6,7 +6,7 @@ namespace StreamDeckSharp.Internals
     /// <summary>
     /// HID Stream Deck communication driver for the Stream Deck Mini.
     /// </summary>
-    public sealed class HidComDriverStreamDeckMini
+    public class HidComDriverStreamDeckMini
         : IStreamDeckHidComDriver
     {
         private const int ColorChannels = 3;
@@ -46,22 +46,22 @@ namespace StreamDeckSharp.Internals
         public int ReportSize => 1024;
 
         /// <inheritdoc/>
-        public int ExpectedFeatureReportLength => 17;
+        public virtual int ExpectedFeatureReportLength => 17;
 
         /// <inheritdoc/>
-        public int ExpectedOutputReportLength => 1024;
+        public virtual int ExpectedOutputReportLength => 1024;
 
         /// <inheritdoc/>
-        public int ExpectedInputReportLength => 17;
+        public virtual int ExpectedInputReportLength => 17;
 
         /// <inheritdoc/>
-        public int KeyReportOffset => 1;
+        public virtual int KeyReportOffset => 1;
 
         /// <inheritdoc/>
-        public byte FirmwareVersionFeatureId => 4;
+        public virtual byte FirmwareVersionFeatureId => 4;
 
         /// <inheritdoc/>
-        public byte SerialNumberFeatureId => 3;
+        public virtual byte SerialNumberFeatureId => 3;
 
         /// <inheritdoc/>
         public int FirmwareVersionReportSkip => 5;
@@ -112,7 +112,7 @@ namespace StreamDeckSharp.Internals
         }
 
         /// <inheritdoc/>
-        public void PrepareDataForTransmission(
+        public virtual void PrepareDataForTransmission(
             byte[] data,
             int pageNumber,
             int payloadLength,
@@ -128,7 +128,7 @@ namespace StreamDeckSharp.Internals
         }
 
         /// <inheritdoc/>
-        public byte[] GetBrightnessMessage(byte percent)
+        public virtual byte[] GetBrightnessMessage(byte percent)
         {
             if (percent > 100)
             {
@@ -147,7 +147,7 @@ namespace StreamDeckSharp.Internals
         }
 
         /// <inheritdoc/>
-        public byte[] GetLogoMessage()
+        public virtual byte[] GetLogoMessage()
         {
             return [0x0B, 0x63];
         }
