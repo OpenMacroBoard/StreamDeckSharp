@@ -1,0 +1,16 @@
+<#=H( "Quick Start" )#>
+
+Create a new console project in Visual Studio (<#=NETV#>), add <#=OMB_SDK_NG#> as a reference and at least one device provider.
+
+In this example we use
+
+- <#=OMB_SocketIO_NG#> to support the `VirtualMacroBoard`
+- <#=SDS_NG#> to support the [Elgato Stream Deck family](https://www.elgato.com/de/de/s/welcome-to-stream-deck)  
+  <sub>_**Note**: Neither OpenMacroBoard nor StreamDeckSharp are made or endorsed by Elgato_</sub>
+
+Once you added the NuGet packages copy-paste the following lines:
+
+<#@ include file="getting-started-code.tt" #>
+
+Here is what the example looks like after pressing some keys:
+![](https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/refs/heads/main/doc/images/rainbow_example.png)

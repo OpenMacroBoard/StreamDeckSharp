@@ -1,0 +1,53 @@
+<#
+    // Some global definitions that are used on the README snippet templates
+    string NETV = ".NET 10+";
+
+    string OMB_SDK_NG = "[`OpenMacroBoard.SDK`](https://www.nuget.org/packages/OpenMacroBoard.SDK/)";
+    string OMB_SocketIO_NG = "[`OpenMacroBoard.SocketIO`](https://www.nuget.org/packages/OpenMacroBoard.SocketIO/)";
+    string SDS_NG = "[`StreamDeckSharp`](https://www.nuget.org/packages/StreamDeckSharp/)";
+
+    string OMB_SDK_GH = "[`OpenMacroBoard.SDK`](https://github.com/OpenMacroBoard/OpenMacroBoard.SDK)";
+    string SDS_GH = "[`StreamDeckSharp`](https://github.com/OpenMacroBoard/StreamDeckSharp)";
+
+    int hDepth = 1;
+
+    bool sd_disclaimer = false;
+
+    void ElgatoDisclaimerOnce()
+    {
+        if (sd_disclaimer)
+        {
+            return;
+        }
+
+        WriteLine("First things first, StreamDeckSharp is not official software by Elgato, nor is it endorsed by them.");
+        sd_disclaimer = true;
+    }
+
+    string HPush()
+    {
+        hDepth += 1;
+        return string.Empty;
+    }
+
+    string HPop()
+    {
+        if (hDepth <= 1)
+        {
+            throw new InvalidOperationException("Heading pop mismatch.");
+        }
+
+        hDepth -= 1;
+        return string.Empty;
+    }
+
+    string H(string title = null)
+    {
+        if (title is null)
+        {
+            return new string('#', hDepth);
+        }
+
+        return new string('#', hDepth) + " " + title;
+    }
+#>

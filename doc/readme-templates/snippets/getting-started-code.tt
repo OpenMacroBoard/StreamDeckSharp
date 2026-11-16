@@ -1,0 +1,3 @@
+```csharp
+<#@ include file="..\..\src\OpenMacroBoard.ExampleCollection\src\OpenMacroBoard.Examples.GettingStarted\Program.cs" #>
+```

@@ -1,0 +1,12 @@
+<# ElgatoDisclaimerOnce(); #>
+
+NuGet: <#=SDS_NG#>
+
+| Device                                                                | Description |
+| --------------------------------------------------------------------- | ----------- |
+| Stream Deck _(original/legacy)_                                       | 5 x 3       |
+| [Stream Deck](https://www.elgato.com/de/gaming/stream-deck) _(MK2)_   | 5 x 3       |
+| [Stream Deck XL](https://www.elgato.com/ww/de/p/stream-deck-xl)       | 8 x 4       |
+| [Stream Deck Mini](https://www.elgato.com/de/gaming/stream-deck-mini) | 3 x 2       |
+
+Keep in mind that Elgato sometimes releases new revisions of their devices with different PIDs (USB product IDs) which might break compatibility. If you have a device like that, please open an issue on GitHub with the new PID.

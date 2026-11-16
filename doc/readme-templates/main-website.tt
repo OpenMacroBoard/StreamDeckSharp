@@ -1,0 +1,21 @@
+<#@ include file="globals.tt" #><##>
+<#= HPush() #><##>
+<#@ include file=".\snippets\what-is-openmarcoboard.tt" #><##>
+
+At the moment OpenMacroBoard is for developers only and there is no easy-to-use
+software or installer - just a bunch of libraries ;-)
+
+<#@ include file=".\snippets\examples.tt" #>
+
+<#@ include file=".\snippets\quick-start.tt" #>
+
+<#@ include file=".\snippets\devices-all.tt" #>
+
+<#=H( "Vision" )#>
+
+My original idea was to write an open source alternative for the Elgato Stream Deck software, that supports more devices and lets developers write functions/plugins/widgets for all devices with an existing `IMacroBoard` provider. Currently I don't have enough
+time to seriously work on that. If you want to help feel free to contact me (just create a ticket or send me a mail).
+
+<#=H( "Details" )#>
+
+For more details and information please visit the [github repositories](https://github.com/OpenMacroBoard).

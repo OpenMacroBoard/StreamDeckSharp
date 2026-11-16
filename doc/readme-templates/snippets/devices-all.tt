@@ -1,0 +1,21 @@
+<#= H("Providers and supported devices") #>
+
+Providers are libraries that manage the communication to the macro boards.
+This abstraction is needed to allow third parties to implement devices without changes to the core functionality.
+
+At the moment there are just two providers that are maintained by me.
+
+<#= HPush() #>
+<#= H("StreamDeckSharp") #>
+
+<#@ include file="devices-sds.tt" #>
+
+<#= H("OpenMacroBoard.SocketIO") #> 
+
+<#@ include file="devices-socketio.tt" #>
+<#= HPop() #>
+
+<#= H("Is device _XYZ_ supported?") #>
+
+If I find the time I'd love to add more, but you can also implement one yourself by referencing `OpenMacroBoard.SDK` and writing a class that implements `IObservable<DeviceStateReport>`. This class can then be added as a device listener in a `DeviceContext`.
+If you want me to implement it, you can donate hardware (or the money so I can buy that specific hardware you want implemented) - just create a ticket and we talk about it ;-)

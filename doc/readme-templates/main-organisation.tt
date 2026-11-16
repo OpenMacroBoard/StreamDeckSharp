@@ -1,0 +1,6 @@
+<#@ include file="globals.tt" #><##>
+<#= HPush() #><##>
+<#@ include file=".\snippets\what-is-openmarcoboard.tt" #>
+
+<#= H("Quick Start") #>
+For details about how to get started check out the README.md here: <#=OMB_SDK_GH#>

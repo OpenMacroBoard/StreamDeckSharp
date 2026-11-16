@@ -1,0 +1,29 @@
+<#@ include file="globals.tt" #><##>
+
+![StreamDeckSharp Banner](https://raw.githubusercontent.com/OpenStreamDeck/StreamDeckSharp/master/doc/images/banner/StreamDeckSharpBanner_150px.png)
+
+-----------------
+
+**StreamDeckSharp is a simple (unofficial) library (<#=NETV#>) for the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck) family**
+
+[![license](https://img.shields.io/github/license/OpenStreamDeck/StreamDeckSharp.svg)](https://github.com/OpenStreamDeck/StreamDeckSharp/blob/master/LICENSE.md)
+[![GitHub release](https://img.shields.io/github/release/OpenStreamDeck/StreamDeckSharp.svg)](https://github.com/OpenStreamDeck/StreamDeckSharp/releases)
+[![Nuget version](https://img.shields.io/nuget/v/streamdecksharp.svg)](https://www.nuget.org/packages/StreamDeckSharp/)
+
+<# ElgatoDisclaimerOnce(); #>
+
+StreamDeckSharp is a device provider implementation for <#=OMB_SDK_GH#>.
+
+<#@ include file=".\snippets\quick-start.tt" #>
+
+<#= H("Supported devices") #>
+<#@ include file=".\snippets\devices-sds.tt" #>
+
+<#@ include file=".\snippets\examples.tt" #>
+
+
+---
+ 
+###### This project is not related to *Elgato Systems GmbH* in any way
+
+---

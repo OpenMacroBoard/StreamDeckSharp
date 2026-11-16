@@ -1,0 +1,308 @@
+﻿root = true
+
+# All files
+[*]
+indent_style = space
+vsspell_section_id = 987a634b554f986
+vsspell_ignored_words_987a634b554f986 = File:dictionary.txt
+
+# XML project files
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj,targets}]
+indent_style = space
+indent_size = 2
+
+# Code files
+[*.{cs,csx,vb,vbx}]
+indent_size = 4
+insert_final_newline = true
+charset = utf-8
+
+[*.cs]
+# Enable all rules as warning per default
+dotnet_analyzer_diagnostic.severity = warning
+
+# == IDE ==
+
+# IDE0005: Using directive is unnecessary.
+dotnet_diagnostic.IDE0005.severity = warning
+
+# IDE0008: Use explicit type
+dotnet_diagnostic.IDE0008.severity = none
+
+# IDE0010: Add missing cases
+dotnet_diagnostic.IDE0010.severity = none
+
+# IDE0046: Convert to conditional expression
+dotnet_diagnostic.IDE0046.severity = none
+
+# IDE0048: Add parentheses for clarity
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:none
+
+# IDE0048: Add parentheses for clarity
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:none
+
+# IDE0048: Add parentheses for clarity
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary:none
+
+# IDE0048: Add parentheses for clarity
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:none
+
+# IDE0058: Expression value is never used
+csharp_style_unused_value_expression_statement_preference = discard_variable:none
+
+# IDE0060: Remove unused parameter
+dotnet_code_quality_unused_parameters = all:none
+
+# IDE0130: Namespace does not match expected folder structure
+dotnet_diagnostic.IDE0130.severity = none
+
+# IDE0160: Convert to block scoped namespace
+dotnet_diagnostic.IDE0160.severity = none
+
+# IDE0210: Convert to top-level statements
+csharp_style_prefer_top_level_statements = false
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = silent
+
+# IDE0305: Simplify collection initialization
+dotnet_diagnostic.IDE0305.severity = suggestion
+
+# == CA ==
+
+# CA1000: Do not declare static members on generic types
+dotnet_diagnostic.CA1000.severity = none
+
+# CA1040: Avoid empty interfaces
+dotnet_diagnostic.CA1040.severity = none
+
+# CA1303: Do not pass literals as localized parameters
+dotnet_diagnostic.CA1303.severity = none
+
+# CA1805: Do not initialize unnecessarily
+dotnet_diagnostic.CA1805.severity = none
+
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
+
+# CA2229: Implement serialization constructors
+dotnet_diagnostic.CA2229.severity = none
+
+
+
+
+
+
+# == SA ==
+
+# SA1006: Preprocessor keywords should not be preceded by space
+dotnet_diagnostic.SA1006.severity = none
+
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1110: Opening parenthesis or bracket should be on declaration line
+dotnet_diagnostic.SA1110.severity = none
+
+# SA1516: Elements should be separated by blank line
+dotnet_diagnostic.SA1516.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1611: Element parameters should be documented
+dotnet_diagnostic.SA1611.severity = none
+
+# SA1614: Element parameter documentation should have text
+dotnet_diagnostic.SA1614.severity = none
+
+# SA1615: Element return value should be documented
+dotnet_diagnostic.SA1615.severity = none
+
+# SA1616: Element return value documentation should have text
+dotnet_diagnostic.SA1616.severity = none
+
+# SA1623: Property summary documentation should match accessors
+dotnet_diagnostic.SA1623.severity = none
+
+# SA1629: Documentation text should end with a period
+dotnet_diagnostic.SA1629.severity = none
+
+# SA1633: File should have header
+dotnet_diagnostic.SA1633.severity = none
+
+# SA1005: Single line comments should begin with single space
+dotnet_diagnostic.SA1005.severity = warning
+
+# SA1028: Code should not contain trailing whitespace
+dotnet_diagnostic.SA1028.severity = warning
+
+# SA1208: System using directives should be placed before other using directives
+dotnet_diagnostic.SA1208.severity = none
+
+# SA1200: Using directives should be placed correctly
+dotnet_diagnostic.SA1200.severity = none
+
+# SA1116: Split parameters should start on line after declaration
+dotnet_diagnostic.SA1116.severity = none
+
+# SA1407: Arithmetic expressions should declare precedence
+dotnet_diagnostic.SA1407.severity = none
+
+# SA1648: inheritdoc should be used with inheriting class
+dotnet_diagnostic.SA1648.severity = none
+
+# SA1009: Closing parenthesis should be spaced correctly
+dotnet_diagnostic.SA1009.severity = none
+
+# SA1111: Closing parenthesis should be on line of last parameter
+dotnet_diagnostic.SA1111.severity = none
+
+# SA1512: Single-line comments should not be followed by blank line
+dotnet_diagnostic.SA1512.severity = none
+
+# SA1602: Enumeration items should be documented
+dotnet_diagnostic.SA1602.severity = none
+
+
+
+# == Sonar ===
+
+# S2368: Public methods should not have multidimensional array parameters
+dotnet_diagnostic.S2368.severity = none
+
+# S3925: "ISerializable" should be implemented correctly
+# Rule still seems to be broken right now: https://github.com/SonarSource/sonar-dotnet/issues/8377
+dotnet_diagnostic.S3925.severity = none
+
+
+
+
+# == RCS ==
+
+# RCS1123: Add parentheses when necessary.
+dotnet_diagnostic.RCS1123.severity = none
+
+# RCS1129: Remove redundant field initialization.
+dotnet_diagnostic.RCS1129.severity = none
+
+# RCS1141: Add 'param' element to documentation comment.
+dotnet_diagnostic.RCS1141.severity = none
+
+# RCS1158: Static member in generic type should use a type parameter.
+dotnet_diagnostic.RCS1158.severity = none
+
+# RCS1161: Enum should declare explicit values.
+dotnet_diagnostic.RCS1161.severity = none
+
+# RCS1163: Unused parameter.
+dotnet_diagnostic.RCS1163.severity = none
+
+# RCS1175: Unused this parameter.
+dotnet_diagnostic.RCS1175.severity = none
+
+# RCS1187: Use constant instead of field.
+dotnet_diagnostic.RCS1187.severity = none
+
+# RCS1224: Make method an extension method.
+dotnet_diagnostic.RCS1224.severity = none
+
+
+
+
+# == SCS ==
+
+# SCS0005: Weak random number generator.
+dotnet_diagnostic.SCS0005.severity = none
+
+
+
+
+# == DOC ==
+
+# DOC900: Render documentation as Markdown (Refactoring)
+dotnet_diagnostic.DOC900.severity = silent
+
+
+# == AV ==
+
+# AV1580: Method argument calls a nested method
+dotnet_diagnostic.AV1580.severity = none
+
+# AV2305: Missing XML comment for internally visible type, member or parameter
+dotnet_diagnostic.AV2305.severity = none
+
+# AV1706: Identifier contains an abbreviation or is too short
+dotnet_diagnostic.AV1706.severity = none
+
+# AV1738: Event handlers should be named according to the pattern '(InstanceName)On(EventName)'
+dotnet_diagnostic.AV1738.severity = none
+
+# AV1704: Identifier contains one or more digits in its name
+dotnet_diagnostic.AV1704.severity = none
+
+# AV1500: Member or local function contains too many statements
+dotnet_diagnostic.AV1500.severity = none
+
+# AV1561: Signature contains too many parameters
+dotnet_diagnostic.AV1561.severity = none
+
+# AV1562: Do not declare a parameter as ref or out
+dotnet_diagnostic.AV1562.severity = none
+
+# AV1008: Class should not be static
+dotnet_diagnostic.AV1008.severity = none
+
+# AV1532: Loop statement contains nested loop
+dotnet_diagnostic.AV1532.severity = none
+
+# AV1568: Parameter value should not be overwritten in method body
+dotnet_diagnostic.AV1568.severity = none
+
+# AV1564: Parameter in public or internal member is of type bool or bool?
+dotnet_diagnostic.AV1564.severity = none
+
+# AV1551: Method overload should call another overload
+dotnet_diagnostic.AV1551.severity = none
+
+# AV1536: Non-exhaustive switch statement requires a default case clause
+dotnet_diagnostic.AV1536.severity = none
+
+# AV1537: If-else-if construct should end with an unconditional else clause
+dotnet_diagnostic.AV1537.severity = none
+
+# AV1708: Type name contains term that should be avoided
+dotnet_diagnostic.AV1708.severity = none
+
+# AV1130: Return type in method signature should be an interface to an unchangeable collection
+dotnet_diagnostic.AV1130.severity = none
+
+# AV1225: Method that raises an event should be protected virtual and be named 'On' followed by event name
+dotnet_diagnostic.AV1225.severity = none
+
+# AV1115: Member or local function contains the word 'and', which suggests doing multiple things
+dotnet_diagnostic.AV1115.severity = none
+
+# AV1210: Catch a specific exception instead of Exception, SystemException or ApplicationException
+dotnet_diagnostic.AV1210.severity = suggestion
+
+# AV1250: Evaluate LINQ query before returning it
+dotnet_diagnostic.AV1250.severity = none
+
+# AV1535: Missing block in case or default clause of switch statement
+dotnet_diagnostic.AV1535.severity = none
+
+
+
+# == xUNit ==
+
+# xUnit1045: Avoid using TheoryData type arguments that might not be serializable
+# This is only needed to support running single cases in the Visual Studio Runner
+# and not worth the hassle to maintain, so we disable that one.
+dotnet_diagnostic.xUnit1045.severity = none
+
+# xUnit1050: The class referenced by the ClassData attribute returns untyped data rows
+dotnet_diagnostic.xUnit1050.severity = suggestion
+
+# xUnit1051: Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken
+dotnet_diagnostic.xUnit1051.severity = suggestion

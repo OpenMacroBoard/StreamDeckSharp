@@ -1,0 +1,5 @@
+NuGet: <#=OMB_SocketIO_NG#>
+
+| Device       | Description                                              |
+| ------------ | -------------------------------------------------------- |
+| VirtualBoard | Software emulated board with arbitrary key configuration |

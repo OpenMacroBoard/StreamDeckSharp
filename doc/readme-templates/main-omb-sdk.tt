@@ -1,0 +1,14 @@
+<#@ include file="globals.tt" #><##>
+<#= HPush() #><##>
+<#@ include file=".\snippets\what-is-openmarcoboard.tt" #>
+
+The OpenMacroBoard.SDK defines the common base types and logic for macro boards.
+The SDK by itself is not very useful on its own, because it doesn't implement any concrete devices.
+
+The concrete device implementations (device providers) are in different libraries.
+
+<#@ include file=".\snippets\quick-start.tt" #>
+
+<#@ include file=".\snippets\devices-all.tt" #>
+
+<#@ include file=".\snippets\examples.tt" #>

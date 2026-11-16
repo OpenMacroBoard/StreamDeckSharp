@@ -1,0 +1,6 @@
+<#= H("What is OpenMacroBoard?") #>
+
+OpenMacroBoard (maintained by [Christian Franzl](https://github.com/wischi-chr))
+is a collection of .NET libraries (<#=NETV#>),
+that help you implement custom functionality for various macro boards
+mainly focusing on devices with key displays.
