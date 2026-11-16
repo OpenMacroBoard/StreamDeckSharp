@@ -1,0 +1,19 @@
+<Project>
+  <Import Project="settings.targets" />
+  <Choose>
+    <When Condition="'$(ReferenceType)' == 'local'">
+      <ItemGroup>
+        <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+        <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
+        <ProjectReference Include="..\..\..\StreamDeckSharp\src\StreamDeckSharp\StreamDeckSharp.csproj" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="OpenMacroBoard.SDK" Version="10.0.0" />
+        <PackageReference Include="OpenMacroBoard.SocketIO" Version="10.0.0" />
+        <PackageReference Include="StreamDeckSharp" Version="10.0.0" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+</Project>

@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+        <!-- Use 'local' or 'nuget' -->
+        <ReferenceType>nuget</ReferenceType>
+    </PropertyGroup>
+</Project>

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net10.0-windows</TargetFrameworks>
+    <LangVersion>default</LangVersion>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <Import Project="..\commonrefs.targets" />
+  <Import Project="..\..\..\analyzers.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\OpenMacroBoard.Examples.CommonStuff\OpenMacroBoard.Examples.CommonStuff.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Emgu.CV" Version="4.13.0.5924" />
+    <PackageReference Include="Emgu.CV.Bitmap" Version="4.13.0.5924" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.13.0.5924" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
+  </ItemGroup>
+
+</Project>
