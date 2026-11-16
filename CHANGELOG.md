@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
+## [Unreleased]
+### Added
+- `StreamDeckOptions`: options for opening devices. `JpegEncoder` sets the JPEG encoder for devices that expect JPEG images (default: the built-in `OmbJpegEncoder` of `OpenMacroBoard.SDK`), `UseWriteCache` replaces the `useWriteCache` flags.
+- Overloads that take `StreamDeckOptions`: `StreamDeck.OpenDevice`, `StreamDeck.EnumerateDevices` and the constructor of `StreamDeckListener`.
+
+### Changed
+- StreamDeckSharp no longer uses ImageSharp to prepare key images. Scaling, rotating and encoding (BMP and JPEG) are done with the dependency-free code of `OpenMacroBoard.SDK`. The package still gets ImageSharp indirectly through `OpenMacroBoard.SDK` for now.
+- Key bitmaps that do not have the key size of the device are scaled with a different algorithm than before, so their pixels can differ slightly. Bitmaps that already have the key size are sent unchanged, as before.
+- **Breaking** (only for custom HID drivers): `IStreamDeckHidComDriver.GeneratePayload` now takes a `KeyBitmap` and an `IJpegEncoder` instead of an ImageSharp image. To migrate, scale and rotate with the new `KeyBitmap` extension methods (`Resize`, `Rotate180`, ...) and encode with the given encoder. The helper class `HidComDriverExtensions` was removed.
+
+### Fixed
+- `StreamDeck.OpenDevice(bool useWriteCache, params IUsbHidHardware[] hardware)` ignored `useWriteCache` and always used the write cache.
+
 ## [v5.0.0-preview] - 2023-08-01
 Again another preview because I'm pretty busy right now.
 - Restructure how the HID communication is abstracted internally. This is useful for consumers when Elgato releases new hardware that can be controlled with the same software. The user of the library can now register new devices with existing "HID drivers" (for example if a Stream Deck MK.3 is released)

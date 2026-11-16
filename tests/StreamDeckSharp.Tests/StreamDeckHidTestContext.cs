@@ -1,3 +1,4 @@
+using OpenMacroBoard.SDK;
 using StreamDeckSharp.Internals;
 using System;
 using System.IO;
@@ -14,7 +15,7 @@ internal sealed class StreamDeckHidTestContext : IDisposable
 
         Log = new StringWriter();
         Hid = new FakeStreamDeckHid(Log, Hardware);
-        Board = new BasicHidClient(Hid, Hardware.Keys, Hardware.Driver);
+        Board = new BasicHidClient(Hid, Hardware.Keys, Hardware.Driver, OmbJpegEncoder.Default);
     }
 
     public TextWriter Log { get; }

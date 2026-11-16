@@ -1,5 +1,4 @@
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using OpenMacroBoard.SDK;
 
 namespace StreamDeckSharp.Internals.HidComDriver;
 
@@ -111,9 +110,11 @@ public interface IStreamDeckHidComDriver
     IKeyIdMapper KeyIdMapper { get; }
 
     /// <summary>
-    /// Generate the payload for a given <paramref name="image"/>.
+    /// Generate the payload for a given <paramref name="keyBitmap"/>.
     /// </summary>
-    byte[] GeneratePayload(Image<Bgr24> image);
+    /// <param name="keyBitmap">The bitmap, in any size and not rotated.</param>
+    /// <param name="jpegEncoder">The encoder to use if the device expects JPEG images.</param>
+    byte[] GeneratePayload(KeyBitmap keyBitmap, IJpegEncoder jpegEncoder);
 
     /// <summary>
     /// Before the report is sent to the stream deck (human interface device) this is called to

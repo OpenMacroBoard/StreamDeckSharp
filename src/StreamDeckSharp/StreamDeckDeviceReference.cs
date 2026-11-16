@@ -7,12 +7,16 @@ namespace StreamDeckSharp;
 /// </summary>
 public sealed class StreamDeckDeviceReference : IDeviceReference
 {
+    private readonly StreamDeckOptions options;
+
     internal StreamDeckDeviceReference(
         string devicePath,
         string deviceName,
-        GridKeyLayout keyLayout
+        GridKeyLayout keyLayout,
+        StreamDeckOptions options
     )
     {
+        this.options = options;
         DevicePath = devicePath;
         DeviceName = deviceName;
         Keys = keyLayout;
@@ -38,13 +42,13 @@ public sealed class StreamDeckDeviceReference : IDeviceReference
     /// <inheritdoc/>
     public IMacroBoard Open(bool useWriteCache)
     {
-        return StreamDeck.OpenDevice(DevicePath, useWriteCache);
+        return StreamDeck.OpenDevice(DevicePath, options with { UseWriteCache = useWriteCache });
     }
 
     /// <inheritdoc/>
     public IMacroBoard Open()
     {
-        return StreamDeck.OpenDevice(DevicePath);
+        return StreamDeck.OpenDevice(DevicePath, options);
     }
 
     /// <inheritdoc/>

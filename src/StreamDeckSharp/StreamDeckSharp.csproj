@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <PackageReference Include="HidSharp" Version="2.6.4" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
   </ItemGroup>
   

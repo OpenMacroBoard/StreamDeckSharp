@@ -21,13 +21,29 @@ public sealed class StreamDeckListener :
     private readonly List<Subscription> subscriptions = [];
     private readonly Dictionary<string, StreamDeckDeviceReference> knownDeviceLookup = [];
 
+    private readonly StreamDeckOptions options;
+
     private bool disposed = true;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StreamDeckListener"/> class.
     /// </summary>
     public StreamDeckListener()
+        : this(StreamDeckOptions.Default)
     {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StreamDeckListener"/> class.
+    /// </summary>
+    /// <param name="options">
+    /// Options that are used for the devices this listener finds, for example the JPEG encoder to use.
+    /// </param>
+    public StreamDeckListener(StreamDeckOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        this.options = options;
+
         // register event handler before we load the entire list
         // so we don't miss stream decks connecting between the calls.
         DeviceList.Local.Changed += DeviceListChanged;
@@ -64,7 +80,7 @@ public sealed class StreamDeckListener :
             // because the HidDevice event doesn't tell us what changed
             // we calculate the difference ourselves.
             var currentDevices = DeviceList.Local
-                .GetStreamDecks()
+                .GetStreamDecks(options)
                 .ToDictionary(s => s.DevicePath, s => s);
 
             // update connection states of known devices
