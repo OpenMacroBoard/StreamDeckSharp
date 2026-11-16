@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check out the commit log ;-)
 
+## [Unreleased]
+### Added
+  - `IJpegEncoder`: interface for JPEG encoders, so device providers can let users bring their own encoder.
+  - `OmbJpegEncoder`: built-in baseline JPEG encoder without unsafe code or native libraries.
+  - `KeyBitmap` extension methods `Resize`, `Rotate90`, `Rotate180`, `Rotate270`, `FlipHorizontal` and `FlipVertical`.
+
 ## [0.4.0] - 2019-06-28
 ### Changed
   - Prepare for netstandard/netcore release
