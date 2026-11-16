@@ -26,12 +26,12 @@
     <PackageReference Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>
 
-  <Import Project="..\..\..\analyzers.targets" />
+  <Import Project="..\..\analyzers.targets" />
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OpenMacroBoard.Meta.TestUtils\OpenMacroBoard.Meta.TestUtils.csproj" />
-    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
-    <ProjectReference Include="..\StreamDeckSharp\StreamDeckSharp.csproj" />
+    <ProjectReference Include="..\OpenMacroBoard.Meta.TestUtils\OpenMacroBoard.Meta.TestUtils.csproj" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\..\src\StreamDeckSharp\StreamDeckSharp.csproj" />
   </ItemGroup>
 
 </Project>

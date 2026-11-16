@@ -14,15 +14,15 @@
     <RepositoryUrl>https://github.com/OpenMacroBoard/OpenMacroBoard.SDK</RepositoryUrl>
   </PropertyGroup>
 
-  <Import Project="..\..\..\package-defaults.targets" />
-  <Import Project="..\..\..\analyzers.targets" />
+  <Import Project="..\..\package-defaults.targets" />
+  <Import Project="..\..\analyzers.targets" />
 
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
     <None Include="icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 

@@ -15,8 +15,8 @@
     <RepositoryUrl>https://github.com/OpenMacroBoard/OpenMacroBoard.SDK</RepositoryUrl>
   </PropertyGroup>
 
-  <Import Project="..\..\..\package-defaults.targets" />
-  <Import Project="..\..\..\analyzers.targets" />
+  <Import Project="..\..\package-defaults.targets" />
+  <Import Project="..\..\analyzers.targets" />
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
@@ -26,7 +26,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\OpenMacroBoard.SDK\README.md" Pack="true" PackagePath="" />
     <None Include="icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 

@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
-    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
-    <ProjectReference Include="..\..\..\StreamDeckSharp\src\StreamDeckSharp\StreamDeckSharp.csproj" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
+    <ProjectReference Include="..\..\src\StreamDeckSharp\StreamDeckSharp.csproj" />
   </ItemGroup>
 
 </Project>

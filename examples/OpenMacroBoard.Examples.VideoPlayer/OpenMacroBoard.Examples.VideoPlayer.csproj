@@ -12,7 +12,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <Import Project="..\commonrefs.targets" />
-  <Import Project="..\..\..\analyzers.targets" />
+  <Import Project="..\..\analyzers.targets" />
   <ItemGroup>
     <ProjectReference Include="..\OpenMacroBoard.Examples.CommonStuff\OpenMacroBoard.Examples.CommonStuff.csproj" />
   </ItemGroup>

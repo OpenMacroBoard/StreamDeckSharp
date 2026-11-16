@@ -48,8 +48,8 @@ function Copy-ReceivedToVerified {
 # Standardizing on Write-Output to bypass any Write-Host suppression issues
 Write-Output "Starting Verify auto-approval..."
 
-Copy-ReceivedToVerified -RelativePath "..\src\OpenMacroBoard.SDK\src\OpenMacroBoard.Tests\VerifiedSnapshots"
-Copy-ReceivedToVerified -RelativePath "..\src\OpenMacroBoard.SDK\src\OpenMacroBoard.Tests-Win\VerifiedSnapshots"
-Copy-ReceivedToVerified -RelativePath "..\src\StreamDeckSharp\src\StreamDeckSharp.Tests\VerifiedSnapshots"
+Copy-ReceivedToVerified -RelativePath "..\tests\OpenMacroBoard.Tests\VerifiedSnapshots"
+Copy-ReceivedToVerified -RelativePath "..\tests\OpenMacroBoard.Tests-Win\VerifiedSnapshots"
+Copy-ReceivedToVerified -RelativePath "..\tests\StreamDeckSharp.Tests\VerifiedSnapshots"
 
 Write-Output "Done!"

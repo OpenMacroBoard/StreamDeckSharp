@@ -14,13 +14,13 @@
     <RepositoryUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</RepositoryUrl>
   </PropertyGroup>
 
-  <Import Project="..\..\..\package-defaults.targets" />
-  <Import Project="..\..\..\analyzers.targets" />
+  <Import Project="..\..\package-defaults.targets" />
+  <Import Project="..\..\analyzers.targets" />
 
   <ItemGroup>
     <PackageReference Include="HidSharp" Version="2.6.4" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
-    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
   </ItemGroup>
   
   <ItemGroup>

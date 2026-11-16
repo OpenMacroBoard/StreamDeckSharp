@@ -1,4 +1,4 @@
 {
   "$schema": "./build.schema.json",
-  "Solution": "src/OpenMacroBoard.MetaProject.sln"
+  "Solution": "StreamDeckSharp.sln"
 }
