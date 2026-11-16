@@ -1,4 +1,4 @@
-using SixLabors.ImageSharp;
+using OpenMacroBoard.SDK;
 using System.IO;
 using System.Reflection;
 
@@ -6,13 +6,12 @@ namespace OpenMacroBoard.Tests;
 
 internal static class AssetLoader
 {
-    public static Image LoadImage(string assetName)
+    /// <summary>
+    /// Loads an image asset with the built-in decoder.
+    /// </summary>
+    public static KeyBitmap LoadBitmap(string assetName)
     {
-        using var resStream = Assembly
-            .GetExecutingAssembly()
-            .GetManifestResourceStream($"OpenMacroBoard.Tests.Assets.{assetName}");
-
-        return Image.Load(resStream);
+        return OmbImageDecoder.Default.Decode(LoadBytes(assetName));
     }
 
     public static byte[] LoadBytes(string assetName)

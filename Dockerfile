@@ -29,7 +29,8 @@ FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
 
 ARG CONFIGURATION=Release
 # NuGet's vulnerability audit runs during restore, and most projects treat its warnings
-# as errors. Pass --build-arg NUGET_AUDIT=false to build despite known advisories.
+# as errors. If a new advisory breaks the build before a fix is available, pass
+# --build-arg NUGET_AUDIT=false to build anyway.
 ARG NUGET_AUDIT=true
 
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1 \

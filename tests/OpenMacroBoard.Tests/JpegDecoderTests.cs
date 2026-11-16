@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
 using System;
 using System.Globalization;
@@ -83,23 +82,46 @@ public class JpegDecoderTests
     }
 
     [Fact]
-    public void LargePhotoIsDecodedCloseToImageSharp()
+    public void LargePhotoIsDecodedLikeLibjpeg()
     {
-        // 3840 x 2160 pixels. ImageSharp enlarges the color channels differently,
-        // so the pixels are close but not identical.
-        var jpeg = AssetLoader.LoadBytes("ExampleImageText.jpg");
+        // 3840 x 2160 pixels. A reference image of that size would be too large for the repository,
+        // so a few pixels are compared with what libjpeg decodes (red, green, blue).
+        (int X, int Y, byte R, byte G, byte B)[] expected =
+        [
+            (0, 0, 121, 107, 72),
+            (3839, 0, 167, 160, 141),
+            (0, 2159, 81, 101, 125),
+            (3839, 2159, 60, 60, 60),
+            (1326, 617, 8, 15, 33),
+            (1617, 197, 73, 89, 167),
+            (296, 385, 48, 65, 83),
+            (1497, 237, 13, 20, 38),
+            (3726, 2078, 68, 68, 68),
+            (879, 153, 221, 219, 204),
+            (352, 1776, 42, 57, 88),
+            (1712, 286, 6, 13, 31),
+            (985, 371, 121, 129, 142),
+            (2257, 1738, 208, 194, 209),
+            (242, 507, 38, 64, 91),
+            (914, 253, 165, 164, 170),
+        ];
 
-        var decoded = KeyBitmap.Create.FromStream(new MemoryStream(jpeg));
+        var decoded = AssetLoader.LoadBitmap("ExampleImageText.jpg");
 
-        using var reference = SixLabors.ImageSharp.Image.Load(jpeg);
-        var expected = ImageDecoderTests.GetData(reference.ToKeyBitmap());
+        decoded.Width.Should().Be(3840);
+        decoded.Height.Should().Be(2160);
 
-        decoded.Width.Should().Be(reference.Width);
-        decoded.Height.Should().Be(reference.Height);
+        var data = ((IKeyBitmapDataAccess)decoded).GetData().Span;
 
-        var (largest, mean) = Compare(ImageDecoderTests.GetData(decoded), expected);
-        largest.Should().BeLessThanOrEqualTo(4);
-        mean.Should().BeLessThan(0.5);
+        foreach (var (x, y, r, g, b) in expected)
+        {
+            var index = ((y * decoded.Width) + x) * 3;
+
+            // libjpeg converts the colors with integer tables, so its rounding can differ a little
+            Math.Abs(data[index + 2] - r).Should().BeLessThanOrEqualTo(2);
+            Math.Abs(data[index + 1] - g).Should().BeLessThanOrEqualTo(2);
+            Math.Abs(data[index] - b).Should().BeLessThanOrEqualTo(2);
+        }
     }
 
     private static (int Largest, double Mean) Compare(byte[] actual, byte[] expected)

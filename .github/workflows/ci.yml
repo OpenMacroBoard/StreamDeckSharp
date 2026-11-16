@@ -17,12 +17,6 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  # The ImageSharp version in use has known advisories, and the projects treat
-  # audit warnings as errors. Remove these two settings once ImageSharp is gone.
-  DOCKER_AUDIT_ARG: --build-arg NUGET_AUDIT=false
-  NuGetAudit: false
-
 jobs:
   docker:
     name: Build and test (Docker, Linux)
@@ -33,7 +27,7 @@ jobs:
       # Runs the build and the tests. This step does not fail on test failures,
       # so the results can be uploaded first; the "Check" step below fails then.
       - name: Build and run tests
-        run: docker build $DOCKER_AUDIT_ARG --target test-results --output type=local,dest=output/test-results .
+        run: docker build --target test-results --output type=local,dest=output/test-results .
 
       - name: Upload test results
         if: always()
@@ -44,12 +38,12 @@ jobs:
           if-no-files-found: ignore
 
       - name: Check test outcome
-        run: docker build $DOCKER_AUDIT_ARG .
+        run: docker build .
 
       # Proves that packing works. The packages get a local pre-release
       # version and are only kept as a build artifact.
       - name: Create NuGet packages
-        run: docker build $DOCKER_AUDIT_ARG --target packages --output type=local,dest=output/packages .
+        run: docker build --target packages --output type=local,dest=output/packages .
 
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v7

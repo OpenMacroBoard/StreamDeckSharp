@@ -1,10 +1,5 @@
 using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -50,8 +45,8 @@ public class KeyBitmapVisualTests
 
         await VerifyBoardStateAsync("BoardCleared");
 
-        using var fullImg = AssetLoader.LoadImage("ExampleImageText.jpg");
-        board.DrawFullScreenBitmap(fullImg.ToKeyBitmap());
+        var fullImg = AssetLoader.LoadBitmap("ExampleImageText.jpg");
+        board.DrawFullScreenBitmap(fullImg);
 
         await VerifyBoardStateAsync("FullscreenDrawn");
 
@@ -87,15 +82,8 @@ public class KeyBitmapVisualTests
         var underlyingBoard = new FakeMacroBoard(DeviceGridKeyPositionDataProvider.Medium);
         using var board = underlyingBoard.WithButtonPressEffect();
 
-        var keyImage = new Image<Bgr24>(72, 72);
-
-        keyImage.Mutate(x =>
-        {
-            var circle = new EllipsePolygon(36, 36, 20);
-            x.Fill(Color.Green, circle);
-        });
-
-        var key = keyImage.ToKeyBitmap();
+        // a green circle on black, 72 x 72 pixels
+        var key = AssetLoader.LoadBitmap("GreenCircle.png");
 
         board.SetKeyBitmap(7, key);
 

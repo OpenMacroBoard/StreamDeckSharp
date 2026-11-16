@@ -1,7 +1,5 @@
 using AwesomeAssertions;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using StreamDeckSharp.Internals;
 using System;
 using System.Collections.Generic;
@@ -71,14 +69,12 @@ public class StreamDeckJpegEncoderTests
         var payload = hardware.Driver.GeneratePayload(source, OmbJpegEncoder.Default);
 
         // Assert
-        // Decoded with ImageSharp, as an independent check of the built-in encoder.
-        using var decoded = Image.Load<Bgr24>(payload);
+        var decoded = OmbImageDecoder.Default.Decode(payload);
 
         decoded.Width.Should().Be(keySize);
         decoded.Height.Should().Be(keySize);
 
-        var decodedPixels = new byte[keySize * keySize * 3];
-        decoded.CopyPixelDataTo(decodedPixels);
+        var decodedPixels = GetData(decoded);
 
         // The devices show the image upside down, so the payload is rotated by 180 degrees.
         var errorRotated = MeanAbsoluteDifference(decodedPixels, GetData(source.Rotate180()));

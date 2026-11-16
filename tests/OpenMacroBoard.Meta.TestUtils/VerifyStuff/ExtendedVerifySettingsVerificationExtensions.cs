@@ -1,3 +1,4 @@
+using OpenMacroBoard.SDK;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -47,6 +48,15 @@ public static class ExtendedVerifySettingsVerificationExtensions
 #pragma warning disable AV1840 // ValueTask should be awaited before assignment
         return Verifier.Verify(target, settings.BuildVerifySettings(), settings.GetSourceFileOrThrow());
 #pragma warning restore AV1840
+    }
+
+    /// <summary>
+    /// Verifies an image as PNG snapshot. The pixels are compared, not the bytes of the file.
+    /// </summary>
+    public static SettingsTask VerifyImageAsync(this ExtendedVerifySettings settings, KeyBitmap image)
+    {
+        var png = new MemoryStream(PngSnapshot.Encode(image));
+        return Verifier.Verify(png, "png", settings.BuildVerifySettings(), sourceFile: settings.GetSourceFileOrThrow());
     }
 
     public static SettingsTask VerifyFileAsync(this ExtendedVerifySettings settings, string path)

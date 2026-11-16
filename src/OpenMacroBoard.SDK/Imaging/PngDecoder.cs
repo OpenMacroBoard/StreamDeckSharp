@@ -327,7 +327,7 @@ internal static class PngDecoder
         return info.BitDepth switch
         {
             8 => (byte)sample,
-            16 => (byte)(sample >> 8),
+            16 => (byte)(((sample * Opaque) + 32767) / 65535),
             _ => (byte)(sample * Opaque / ((1 << info.BitDepth) - 1)),
         };
     }

@@ -1,9 +1,5 @@
 using AwesomeAssertions;
-using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.Linq;
 using Xunit;
@@ -69,18 +65,17 @@ public class KeyBitmapTransformTests
     }
 
     [Fact]
-    public void RotateAndFlipMatchImageSharp()
+    public void RotationsAndFlipsCombineAsExpected()
     {
         var source = CreateRandom(13, 7, 1);
+        var original = GetData(source);
 
-        GetData(source.Rotate90()).Should().Equal(WithImageSharp(source, x => x.Rotate(RotateMode.Rotate90)));
-        GetData(source.Rotate180()).Should().Equal(WithImageSharp(source, x => x.Rotate(RotateMode.Rotate180)));
-        GetData(source.Rotate270()).Should().Equal(WithImageSharp(source, x => x.Rotate(RotateMode.Rotate270)));
-        GetData(source.FlipHorizontal()).Should().Equal(WithImageSharp(source, x => x.Flip(FlipMode.Horizontal)));
-        GetData(source.FlipVertical()).Should().Equal(WithImageSharp(source, x => x.Flip(FlipMode.Vertical)));
-
-        GetData(source.Rotate270().FlipVertical())
-            .Should().Equal(WithImageSharp(source, x => x.RotateFlip(RotateMode.Rotate270, FlipMode.Vertical)));
+        GetData(source.Rotate90().Rotate90()).Should().Equal(GetData(source.Rotate180()));
+        GetData(source.Rotate90().Rotate270()).Should().Equal(original);
+        GetData(source.Rotate180().Rotate180()).Should().Equal(original);
+        GetData(source.FlipHorizontal().FlipHorizontal()).Should().Equal(original);
+        GetData(source.FlipVertical().FlipVertical()).Should().Equal(original);
+        GetData(source.FlipHorizontal().FlipVertical()).Should().Equal(GetData(source.Rotate180()));
     }
 
     [Fact]
@@ -136,21 +131,54 @@ public class KeyBitmapTransformTests
     }
 
     [Theory]
-    [InlineData(72, 72)]
-    [InlineData(96, 96)]
-    [InlineData(300, 120)]
-    [InlineData(37, 91)]
-    public void ResizeIsCloseToImageSharp(int width, int height)
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(8)]
+    public void ScalingDownKeepsTheAverageBrightness(int factor)
     {
-        using var logo = AssetLoader.LoadImage("OpenMacroBoard-Logo.png");
-        using var reference = logo.CloneAs<Bgr24>();
-        var source = reference.ToKeyBitmap();
+        const int size = 16;
+        var source = CreateRandom(size * factor, size * factor, 5);
 
-        var expected = WithImageSharp(source, x => x.Resize(width, height, KnownResamplers.Triangle));
-        var actual = GetData(source.Resize(width, height));
+        var result = GetData(source.Resize(size, size));
 
-        actual.Should().HaveCount(expected.Length);
-        MeanAbsoluteDifference(actual, expected).Should().BeLessThan(2.0);
+        Average(result).Should().BeApproximately(Average(GetData(source)), 1.0);
+    }
+
+    [Fact]
+    public void ScalingKeepsTheTwoHalvesOfAnImage()
+    {
+        // left half black, right half white
+        const int width = 40;
+        const int height = 10;
+        var pixels = new byte[width * height * 3];
+
+        for (var y = 0; y < height; y++)
+        {
+            pixels.AsSpan(((y * width) + (width / 2)) * 3, width / 2 * 3).Fill(255);
+        }
+
+        var source = KeyBitmap.Create.FromBgr24Array(width, height, pixels);
+
+        foreach (var targetWidth in new[] { 10, 20, 80, 200 })
+        {
+            var result = GetData(source.Resize(targetWidth, 5));
+
+            // well inside of each half the color is unchanged
+            result[targetWidth / 8 * 3].Should().Be(0);
+            result[targetWidth * 7 / 8 * 3].Should().Be(255);
+        }
+    }
+
+    private static double Average(byte[] data)
+    {
+        long sum = 0;
+
+        foreach (var value in data)
+        {
+            sum += value;
+        }
+
+        return (double)sum / data.Length;
     }
 
     internal static double MeanAbsoluteDifference(byte[] left, byte[] right)
@@ -206,15 +234,5 @@ public class KeyBitmapTransformTests
         }
 
         return [.. Enumerable.Range(0, data.Length / 3).Select(i => (int)data[i * 3])];
-    }
-
-    private static byte[] WithImageSharp(KeyBitmap bitmap, Action<IImageProcessingContext> operation)
-    {
-        using var image = Image.LoadPixelData<Bgr24>(GetData(bitmap), bitmap.Width, bitmap.Height);
-        image.Mutate(operation);
-
-        var result = new byte[image.Width * image.Height * 3];
-        image.CopyPixelDataTo(result);
-        return result;
     }
 }

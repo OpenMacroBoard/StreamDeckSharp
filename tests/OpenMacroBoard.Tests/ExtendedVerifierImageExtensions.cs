@@ -13,6 +13,6 @@ public static class ExtendedVerifierImageExtensions
 
         await settings
             .WithFileNameSuffix("_Image")
-            .VerifyAsync(target.BoardImage);
+            .VerifyImageAsync(target.BoardImage);
     }
 }

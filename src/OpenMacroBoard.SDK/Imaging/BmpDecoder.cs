@@ -218,7 +218,8 @@ internal static class BmpDecoder
         var shift = BitOperations.TrailingZeroCount(mask);
         var max = mask >> shift;
 
-        return (byte)((((value & mask) >> shift) * Opaque) / max);
+        // rounded to the nearest value
+        return (byte)(((((value & mask) >> shift) * Opaque) + (max / 2)) / max);
     }
 
     private readonly record struct ChannelMasks(uint Red, uint Green, uint Blue, uint Alpha);

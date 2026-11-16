@@ -15,7 +15,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\ExampleImageText.jpg" />
     <EmbeddedResource Include="Assets\OpenMacroBoard-Logo.png" />
+    <EmbeddedResource Include="Assets\GreenCircle.png" />
     <EmbeddedResource Include="Assets\Jpeg\*" />
+    <EmbeddedResource Include="Assets\Imaging\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +25,6 @@
     <PackageReference Include="FakeItEasy" Version="9.0.1" />
     <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="Verify.XunitV3" Version="31.20.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">

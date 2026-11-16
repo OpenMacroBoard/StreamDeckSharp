@@ -1,7 +1,5 @@
 using AwesomeAssertions;
-using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp.PixelFormats;
 using Xunit;
 
 namespace OpenMacroBoard.Tests;
@@ -11,33 +9,28 @@ public class KeyBitmapFactoryTests
     [Fact]
     public void RgbFactoryShouldCreateASinglePixelKeyBitmap()
     {
-        byte red = 100;
-        byte green = 200;
-        byte blue = 0;
+        var keyBitmap = KeyBitmap.Create.FromRgb(100, 200, 0);
 
-        var keyBitmap = KeyBitmap.Create.FromBgr24Array(1, 1, [blue, green, red]);
+        keyBitmap.Width.Should().Be(1);
+        keyBitmap.Height.Should().Be(1);
 
-        var dataAccess = (IKeyBitmapDataAccess)keyBitmap;
-        using var image = dataAccess.ToImage();
-
-        image[0, 0].Should().Be(new Bgr24(red, green, blue));
+        // stored as blue, green, red
+        ImageDecoderTests.GetData(keyBitmap).Should().Equal(0, 200, 100);
     }
 
     [Fact]
-    public void PixelFormatIsRgbLeftToRightAndTopToBottom()
+    public void PixelFormatIsBgrLeftToRightAndTopToBottom()
     {
-        var keyBitmap = KeyBitmap.Create.FromBgr24Array(2, 2,
+        byte[] pixels =
         [
             000, 001, 002,  010, 011, 012,
             020, 021, 022,  030, 031, 032,
-        ]);
+        ];
 
-        var dataAccess = (IKeyBitmapDataAccess)keyBitmap;
-        using var image = dataAccess.ToImage();
+        var keyBitmap = KeyBitmap.Create.FromBgr24Array(2, 2, pixels);
 
-        image[0, 0].Should().Be(new Bgr24(2, 1, 0));
-        image[1, 0].Should().Be(new Bgr24(12, 11, 10));
-        image[0, 1].Should().Be(new Bgr24(22, 21, 20));
-        image[1, 1].Should().Be(new Bgr24(32, 31, 30));
+        keyBitmap.Width.Should().Be(2);
+        keyBitmap.Height.Should().Be(2);
+        ImageDecoderTests.GetData(keyBitmap).Should().Equal(pixels);
     }
 }

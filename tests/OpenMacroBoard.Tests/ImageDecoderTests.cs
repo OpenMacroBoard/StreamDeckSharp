@@ -1,11 +1,5 @@
 using AwesomeAssertions;
-using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Bmp;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.Buffers.Binary;
 using System.IO;
@@ -15,32 +9,34 @@ using Xunit;
 namespace OpenMacroBoard.Tests;
 
 /// <summary>
-/// Tests for the built-in image decoders. ImageSharp writes the test files and is the reference decoder.
+/// Tests for the built-in PNG and BMP decoders. The test files in Assets/Imaging were written with
+/// ImageMagick from the logo (33 x 21 pixels, with transparency). Next to every file is a reference
+/// with the pixels ImageMagick decodes from it, as raw red, green, blue, alpha bytes.
 /// </summary>
 public class ImageDecoderTests
 {
-    public static TheoryData<PngColorType, PngBitDepth, PngInterlaceMode> PngVariants
+    private const int AssetWidth = 33;
+    private const int AssetHeight = 21;
+
+    public static TheoryData<string> PngFiles
     {
         get
         {
-            var data = new TheoryData<PngColorType, PngBitDepth, PngInterlaceMode>();
+            var data = new TheoryData<string>();
 
-            (PngColorType Color, PngBitDepth[] Depths)[] variants =
+            string[] names =
             [
-                (PngColorType.Grayscale, [PngBitDepth.Bit1, PngBitDepth.Bit2, PngBitDepth.Bit4, PngBitDepth.Bit8, PngBitDepth.Bit16]),
-                (PngColorType.Palette, [PngBitDepth.Bit1, PngBitDepth.Bit2, PngBitDepth.Bit4, PngBitDepth.Bit8]),
-                (PngColorType.Rgb, [PngBitDepth.Bit8, PngBitDepth.Bit16]),
-                (PngColorType.GrayscaleWithAlpha, [PngBitDepth.Bit8, PngBitDepth.Bit16]),
-                (PngColorType.RgbWithAlpha, [PngBitDepth.Bit8, PngBitDepth.Bit16]),
+                "png_gray_1", "png_gray_2", "png_gray_4", "png_gray_8", "png_gray_16",
+                "png_palette_1", "png_palette_2", "png_palette_4", "png_palette_8", "png_palette_alpha",
+                "png_rgb_8", "png_rgb_16",
+                "png_grayalpha_8", "png_grayalpha_16",
+                "png_rgba_8", "png_rgba_16",
             ];
 
-            foreach (var (color, depths) in variants)
+            foreach (var name in names)
             {
-                foreach (var depth in depths)
-                {
-                    data.Add(color, depth, PngInterlaceMode.None);
-                    data.Add(color, depth, PngInterlaceMode.Adam7);
-                }
+                data.Add($"{name}.png");
+                data.Add($"{name}_interlaced.png");
             }
 
             return data;
@@ -48,12 +44,58 @@ public class ImageDecoderTests
     }
 
     [Theory]
-    [MemberData(nameof(PngVariants))]
-    public void PngIsDecodedLikeImageSharp(PngColorType colorType, PngBitDepth bitDepth, PngInterlaceMode interlace)
+    [MemberData(nameof(PngFiles))]
+    public void PngIsDecodedLikeImageMagick(string file)
     {
-        var png = Encode(new PngEncoder { ColorType = colorType, BitDepth = bitDepth, InterlaceMethod = interlace });
+        AssertDecodedLikeReference(file);
+    }
 
-        AssertDecodedLikeImageSharp(png);
+    [Theory]
+    [InlineData("bmp_1.bmp")]
+    [InlineData("bmp_4.bmp")]
+    [InlineData("bmp_8.bmp")]
+    [InlineData("bmp_16_555.bmp")]
+    [InlineData("bmp_16_565.bmp")]
+    [InlineData("bmp_24.bmp")]
+    [InlineData("bmp_32_alpha.bmp")]
+    [InlineData("bmp_os2_24.bmp")]
+    public void BmpIsDecodedLikeImageMagick(string file)
+    {
+        AssertDecodedLikeReference(file);
+    }
+
+    [Fact]
+    public void CompressedBmpIsRejected()
+    {
+        // run-length encoded, 8 bits per pixel
+        var bmp = AssetLoader.LoadBytes("Imaging.unsupported_rle8.bmp");
+
+        Action act = () => OmbImageDecoder.Default.Decode(bmp);
+
+        act.Should().Throw<ImageDecodingException>().WithMessage("*Compressed BMP*");
+    }
+
+    [Fact]
+    public void BmpWithRowsFromTopToBottomIsDecoded()
+    {
+        // A negative height means that the rows are stored from top to bottom. The test file stores
+        // them from bottom to top, so the rows are put in reverse order and the height is negated.
+        var bmp = AssetLoader.LoadBytes("Imaging.bmp_24.bmp");
+        var expected = GetData(OmbImageDecoder.Default.Decode(bmp));
+
+        var pixelOffset = BinaryPrimitives.ReadInt32LittleEndian(bmp.AsSpan(10));
+        var rowLength = ((AssetWidth * 3) + 3) / 4 * 4;
+        var topDown = (byte[])bmp.Clone();
+
+        for (var y = 0; y < AssetHeight; y++)
+        {
+            bmp.AsSpan(pixelOffset + (y * rowLength), rowLength)
+                .CopyTo(topDown.AsSpan(pixelOffset + ((AssetHeight - 1 - y) * rowLength)));
+        }
+
+        BinaryPrimitives.WriteInt32LittleEndian(topDown.AsSpan(22), -AssetHeight);
+
+        GetData(OmbImageDecoder.Default.Decode(topDown)).Should().Equal(expected);
     }
 
     [Theory]
@@ -62,8 +104,8 @@ public class ImageDecoderTests
     [InlineData(9, 1, "iVBORw0KGgoAAAANSUhEUgAAAAkAAAABBAMAAAGJ66nYAAAAG1BMVEVuJsiCLb2WNLKqO6cKA/8eCvQyEelGGN5aH9M2so/lAAAAEUlEQVQImWNwZmhgSGQIZwIAB1UBfpxtv9oAAAAASUVORK5CYII=")]
     public void SmallInterlacedPngIsDecoded(int width, int height, string base64)
     {
-        // Some of the seven interlacing passes are empty for images this small. The files were
-        // written with netpbm (pnmtopng -interlace); ImageSharp writes such files incorrectly.
+        // Some of the seven interlacing passes are empty for images this small.
+        // The files were written with netpbm (pnmtopng -interlace).
         // Pixel number i (row by row) has the color (i * 20 + 10, i * 7 + 3, 255 - i * 11).
         var decoded = KeyBitmap.Create.FromStream(new MemoryStream(Convert.FromBase64String(base64)));
 
@@ -80,32 +122,29 @@ public class ImageDecoderTests
         }
     }
 
-    [Theory]
-    [InlineData(BmpBitsPerPixel.Pixel1)]
-    [InlineData(BmpBitsPerPixel.Pixel4)]
-    [InlineData(BmpBitsPerPixel.Pixel8)]
-    [InlineData(BmpBitsPerPixel.Pixel16)]
-    [InlineData(BmpBitsPerPixel.Pixel24)]
-    [InlineData(BmpBitsPerPixel.Pixel32)]
-    public void BmpIsDecodedLikeImageSharp(BmpBitsPerPixel bitsPerPixel)
-    {
-        var bmp = Encode(new BmpEncoder { BitsPerPixel = bitsPerPixel });
-
-        AssertDecodedLikeImageSharp(bmp);
-    }
-
     [Fact]
-    public void BmpWithTransparencyIsDecodedLikeImageSharp()
+    public void TransparentPixelsAreBlendedOntoBlack()
     {
-        var bmp = Encode(new BmpEncoder { BitsPerPixel = BmpBitsPerPixel.Pixel32, SupportTransparency = true });
+        // red with 50% opacity on black is half as bright
+        byte[] bgra = [0, 0, 255, 128];
 
-        AssertDecodedLikeImageSharp(bmp);
+        var bitmap = KeyBitmap.Create.FromBgra32Array(1, 1, bgra);
+
+        // FromBgra32Array ignores alpha; decoding a file with transparency does not
+        GetData(bitmap).Should().Equal(0, 0, 255);
+
+        var decoded = GetData(OmbImageDecoder.Default.Decode(AssetLoader.LoadBytes("Imaging.png_rgba_8.png")));
+        var reference = AssetLoader.LoadBytes("Imaging.png_rgba_8.rgba");
+
+        // the logo has fully transparent pixels in its corners, they must be black
+        reference[3].Should().Be(0);
+        decoded[..3].Should().Equal(0, 0, 0);
     }
 
     [Fact]
     public async Task FileAndStreamOverloadsGiveTheSameResult()
     {
-        var png = Encode(new PngEncoder());
+        var png = AssetLoader.LoadBytes("Imaging.png_rgba_8.png");
         var expected = GetData(KeyBitmap.Create.FromStream(new MemoryStream(png)));
 
         var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.png");
@@ -127,7 +166,7 @@ public class ImageDecoderTests
     [Fact]
     public void PngThatClaimsAHugeSizeIsRejected()
     {
-        var png = Encode(new PngEncoder());
+        var png = AssetLoader.LoadBytes("Imaging.png_rgba_8.png");
 
         // width and height are the first two fields of the header chunk, which follows the signature
         BinaryPrimitives.WriteUInt32BigEndian(png.AsSpan(16), 60000);
@@ -138,18 +177,16 @@ public class ImageDecoderTests
         act.Should().Throw<ImageDecodingException>().WithMessage("*too large*");
     }
 
-    [Fact]
-    public void DamagedPngEitherDecodesOrFailsWithTheDocumentedException()
+    [Theory]
+    [InlineData("png_rgba_8_interlaced.png")]
+    [InlineData("png_palette_4.png")]
+    [InlineData("png_gray_16.png")]
+    [InlineData("bmp_8.bmp")]
+    [InlineData("bmp_32_alpha.bmp")]
+    [InlineData("bmp_16_565.bmp")]
+    public void DamagedFileEitherDecodesOrFailsWithTheDocumentedException(string file)
     {
-        AssertDamagedDataIsHandled(Encode(new PngEncoder { InterlaceMethod = PngInterlaceMode.Adam7 }, 40, 30));
-        AssertDamagedDataIsHandled(Encode(new PngEncoder { ColorType = PngColorType.Palette, BitDepth = PngBitDepth.Bit4 }, 40, 30));
-    }
-
-    [Fact]
-    public void DamagedBmpEitherDecodesOrFailsWithTheDocumentedException()
-    {
-        AssertDamagedDataIsHandled(Encode(new BmpEncoder { BitsPerPixel = BmpBitsPerPixel.Pixel8 }, 40, 30));
-        AssertDamagedDataIsHandled(Encode(new BmpEncoder { BitsPerPixel = BmpBitsPerPixel.Pixel32, SupportTransparency = true }, 40, 30));
+        AssertDamagedDataIsHandled(AssetLoader.LoadBytes($"Imaging.{file}"));
     }
 
     /// <summary>
@@ -187,23 +224,6 @@ public class ImageDecoderTests
         return ((IKeyBitmapDataAccess)bitmap).GetData().ToArray();
     }
 
-    /// <summary>
-    /// The decoded pixels may differ by one from ImageSharp, because blending transparent pixels
-    /// onto black can be rounded up or down.
-    /// </summary>
-    internal static void AssertDecodedLikeImageSharp(byte[] file, int tolerance = 1)
-    {
-        using var reference = Image.Load(file);
-        var expected = GetData(reference.ToKeyBitmap());
-
-        var decoded = KeyBitmap.Create.FromStream(new MemoryStream(file));
-
-        decoded.Width.Should().Be(reference.Width);
-        decoded.Height.Should().Be(reference.Height);
-
-        GetLargestDifference(GetData(decoded), expected).Should().BeLessThanOrEqualTo(tolerance);
-    }
-
     internal static int GetLargestDifference(byte[] actual, byte[] expected)
     {
         actual.Should().HaveCount(expected.Length);
@@ -218,6 +238,44 @@ public class ImageDecoderTests
         return largestDifference;
     }
 
+    /// <summary>
+    /// Compares the decoded file with its reference. The reference has an alpha channel;
+    /// the decoder blends transparent pixels onto black, so the reference is blended the same way.
+    /// </summary>
+    private static void AssertDecodedLikeReference(string file)
+    {
+        var decoded = OmbImageDecoder.Default.Decode(AssetLoader.LoadBytes($"Imaging.{file}"));
+        var reference = AssetLoader.LoadBytes($"Imaging.{Path.GetFileNameWithoutExtension(file)}.rgba");
+
+        decoded.Width.Should().Be(AssetWidth);
+        decoded.Height.Should().Be(AssetHeight);
+        reference.Should().HaveCount(AssetWidth * AssetHeight * 4);
+
+        var expected = new byte[AssetWidth * AssetHeight * 3];
+
+        for (var i = 0; i < AssetWidth * AssetHeight; i++)
+        {
+            int alpha = reference[(i * 4) + 3];
+
+            // reference is red, green, blue; the bitmap is blue, green, red
+            expected[(i * 3) + 2] = Blend(reference[i * 4], alpha);
+            expected[(i * 3) + 1] = Blend(reference[(i * 4) + 1], alpha);
+            expected[i * 3] = Blend(reference[(i * 4) + 2], alpha);
+        }
+
+        // Files with 16 bits per sample (or 5 and 6 bits in 16 bit BMP files) have to be reduced
+        // or extended to 8 bits. The result can differ by one from ImageMagick, which does not
+        // always round to the nearest value.
+        var tolerance = file.Contains("16", StringComparison.Ordinal) ? 1 : 0;
+
+        GetLargestDifference(GetData(decoded), expected).Should().BeLessThanOrEqualTo(tolerance);
+    }
+
+    private static byte Blend(int value, int alpha)
+    {
+        return (byte)(((value * alpha) + 127) / 255);
+    }
+
     private static void TryDecode(byte[] data)
     {
         try
@@ -228,19 +286,5 @@ public class ImageDecoderTests
         {
             // expected for damaged files
         }
-    }
-
-    /// <summary>
-    /// Encodes the logo (which has transparent parts) in a size that is not a multiple of eight.
-    /// </summary>
-    private static byte[] Encode(SixLabors.ImageSharp.Formats.IImageEncoder encoder, int width = 61, int height = 47)
-    {
-        using var logo = AssetLoader.LoadImage("OpenMacroBoard-Logo.png");
-        using var image = logo.CloneAs<Rgba32>();
-        image.Mutate(x => x.Resize(width, height));
-
-        using var stream = new MemoryStream();
-        image.Save(stream, encoder);
-        return stream.ToArray();
     }
 }

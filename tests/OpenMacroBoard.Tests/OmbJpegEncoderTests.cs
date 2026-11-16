@@ -1,10 +1,6 @@
 using AwesomeAssertions;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.PixelFormats;
 using System;
-using System.IO;
 using Xunit;
 
 namespace OpenMacroBoard.Tests;
@@ -66,27 +62,25 @@ public class OmbJpegEncoderTests
     }
 
     [Theory]
-    [InlineData(1, 1)]
-    [InlineData(7, 5)]
-    [InlineData(8, 8)]
-    [InlineData(16, 16)]
-    [InlineData(17, 33)]
-    [InlineData(72, 72)]
-    [InlineData(96, 96)]
-    [InlineData(120, 120)]
-    [InlineData(200, 100)]
-    public void GradientSurvivesEncodingAsWellAsWithImageSharp(int width, int height)
+    [InlineData(1, 1, 1.0)]
+    [InlineData(7, 5, 22.0)]
+    [InlineData(8, 8, 17.5)]
+    [InlineData(16, 16, 8.5)]
+    [InlineData(17, 33, 6.0)]
+    [InlineData(72, 72, 2.8)]
+    [InlineData(96, 96, 2.4)]
+    [InlineData(120, 120, 2.0)]
+    [InlineData(200, 100, 2.0)]
+    public void GradientSurvivesEncoding(int width, int height, double largestMeanError)
     {
+        // A color gradient from corner to corner. In very small images it is steep, and a lot of it
+        // is lost, as with any JPEG encoder at this quality. The limits are a little above what
+        // the encoder loses today, so the test notices when it gets worse.
         var pixels = CreateGradient(width, height);
 
         var decoded = Decode(new OmbJpegEncoder().Encode(pixels, width, height), width, height);
-        var error = KeyBitmapTransformTests.MeanAbsoluteDifference(decoded, pixels);
 
-        // Small images with steep gradients lose a lot in any JPEG encoder, so the
-        // reference is what ImageSharp's encoder loses with the same settings.
-        var referenceError = GetImageSharpError(pixels, width, height, OmbJpegEncoder.DefaultQuality);
-
-        error.Should().BeLessThan((referenceError * 1.25) + 1.0);
+        KeyBitmapTransformTests.MeanAbsoluteDifference(decoded, pixels).Should().BeLessThan(largestMeanError);
     }
 
     [Theory]
@@ -119,16 +113,12 @@ public class OmbJpegEncoderTests
     [Fact]
     public void LogoSurvivesEncoding()
     {
-        using var logo = AssetLoader.LoadImage("OpenMacroBoard-Logo.png");
-        using var image = logo.CloneAs<Bgr24>();
+        var logo = AssetLoader.LoadBitmap("OpenMacroBoard-Logo.png");
+        var pixels = ImageDecoderTests.GetData(logo);
 
-        var pixels = new byte[image.Width * image.Height * 3];
-        image.CopyPixelDataTo(pixels);
+        var decoded = Decode(new OmbJpegEncoder(90).Encode(pixels, logo.Width, logo.Height), logo.Width, logo.Height);
 
-        var decoded = Decode(new OmbJpegEncoder(90).Encode(pixels, image.Width, image.Height), image.Width, image.Height);
-        var error = KeyBitmapTransformTests.MeanAbsoluteDifference(decoded, pixels);
-
-        error.Should().BeLessThan((GetImageSharpError(pixels, image.Width, image.Height, 90) * 1.25) + 1.0);
+        KeyBitmapTransformTests.MeanAbsoluteDifference(decoded, pixels).Should().BeLessThan(1.3);
     }
 
     [Fact]
@@ -152,31 +142,16 @@ public class OmbJpegEncoderTests
     }
 
     /// <summary>
-    /// Decodes with ImageSharp, as an independent check that the output is a valid JPEG.
+    /// Decodes with the built-in decoder, which is tested against libjpeg on its own.
     /// </summary>
     private static byte[] Decode(byte[] jpeg, int expectedWidth, int expectedHeight)
     {
-        using var image = Image.Load<Bgr24>(jpeg);
+        var image = OmbImageDecoder.Default.Decode(jpeg);
 
         image.Width.Should().Be(expectedWidth);
         image.Height.Should().Be(expectedHeight);
 
-        var result = new byte[image.Width * image.Height * 3];
-        image.CopyPixelDataTo(result);
-        return result;
-    }
-
-    /// <summary>
-    /// Encodes and decodes with ImageSharp and returns how far the result is from the original.
-    /// </summary>
-    private static double GetImageSharpError(byte[] pixels, int width, int height, int quality)
-    {
-        using var image = Image.LoadPixelData<Bgr24>(pixels, width, height);
-        using var stream = new MemoryStream();
-
-        image.SaveAsJpeg(stream, new JpegEncoder { Quality = quality });
-
-        return KeyBitmapTransformTests.MeanAbsoluteDifference(Decode(stream.ToArray(), width, height), pixels);
+        return ImageDecoderTests.GetData(image);
     }
 
     private static byte[] CreateGradient(int width, int height)

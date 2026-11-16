@@ -1,12 +1,10 @@
-using VerifyTests;
-
 namespace OpenMacroBoard.Meta.TestUtils;
 
 public static class DefaultVerifySettings
 {
     static DefaultVerifySettings()
     {
-        VerifyImageSharp.Initialize();
+        PngSnapshot.Initialize();
     }
 
     public static ExtendedVerifySettings Build(bool autoVerify = false)

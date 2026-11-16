@@ -1,8 +1,4 @@
-using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.Text;
 
@@ -11,7 +7,12 @@ namespace OpenMacroBoard.Tests;
 public sealed class FakeMacroBoard : IMacroBoard
 {
     private readonly GridKeyLayout keyPosition;
-    private readonly Image<Bgr24> logoImage;
+    private const int ChannelCount = 3;
+
+    private readonly KeyBitmap logoImage;
+    private readonly byte[] boardPixels;
+    private readonly int boardWidth;
+    private readonly int boardHeight;
 
     private byte brightness = 100;
     private bool isLogoShown = false;
@@ -22,11 +23,10 @@ public sealed class FakeMacroBoard : IMacroBoard
         ArgumentNullException.ThrowIfNull(keyPosition);
         this.keyPosition = keyPosition;
 
-        BoardImage = new Image<Bgra32>(
-            keyPosition.Area.Width + 2 * keyPosition.GapSize,
-            keyPosition.Area.Height + 2 * keyPosition.GapSize,
-            Color.FromRgba(0, 0, 0, 200)
-        );
+        // the keys with a black border of one gap around them
+        boardWidth = keyPosition.Area.Width + (2 * keyPosition.GapSize);
+        boardHeight = keyPosition.Area.Height + (2 * keyPosition.GapSize);
+        boardPixels = new byte[boardWidth * boardHeight * ChannelCount];
 
         logoImage = CreateLogoImage();
 
@@ -64,7 +64,7 @@ public sealed class FakeMacroBoard : IMacroBoard
         }
     } = true;
 
-    public Image<Bgra32> BoardImage { get; }
+    public KeyBitmap BoardImage => KeyBitmap.Create.FromBgr24Array(boardWidth, boardHeight, boardPixels);
 
     public event EventHandler<KeyEventArgs> KeyStateChanged;
     public event EventHandler<ConnectionEventArgs> ConnectionStateChanged;
@@ -74,9 +74,6 @@ public sealed class FakeMacroBoard : IMacroBoard
         ObjectDisposedException.ThrowIf(disposed, this);
 
         disposed = true;
-
-        BoardImage.Dispose();
-        logoImage.Dispose();
     }
 
     /// <inheritdoc />
@@ -116,11 +113,7 @@ public sealed class FakeMacroBoard : IMacroBoard
             this.ClearKeys();
         }
 
-        var dataAccess = (IKeyBitmapDataAccess)bitmapData;
-
-        // load given image
-        using var keyImage = dataAccess.ToImage();
-        ResizeAndApplyImage(keyId, keyImage);
+        ResizeAndApplyImage(keyId, bitmapData);
     }
 
     public void TriggerKeyEvent(int keyId, bool down)
@@ -142,7 +135,7 @@ public sealed class FakeMacroBoard : IMacroBoard
             return;
         }
 
-        this.DrawFullScreenBitmap(logoImage.ToKeyBitmap());
+        this.DrawFullScreenBitmap(logoImage);
 
         // set isLogoShown after drawing the image, 
         // because drawing the image calls SetKeyBitmap
@@ -177,59 +170,68 @@ public sealed class FakeMacroBoard : IMacroBoard
         return "fake-serial-number";
     }
 
-    private Image<Bgr24> CreateLogoImage()
+    /// <summary>
+    /// Creates the logo in the size of all keys together: scaled to 95% of that area and centered on black.
+    /// </summary>
+    private KeyBitmap CreateLogoImage()
     {
-        using var logoImg = AssetLoader.LoadImage("OpenMacroBoard-Logo.png");
+        var logo = AssetLoader.LoadBitmap("OpenMacroBoard-Logo.png");
+        var logoPixels = ((IKeyBitmapDataAccess)logo).GetData().Span;
 
         const double scalar = 0.95;
 
-        var maxHeight = keyPosition.Area.Height * scalar;
-        var maxWidth = keyPosition.Area.Width * scalar;
+        var areaWidth = keyPosition.Area.Width;
+        var areaHeight = keyPosition.Area.Height;
 
-        var scaleFactorY = maxHeight / logoImg.Height;
-        var scaleFactorX = maxWidth / logoImg.Width;
-
+        var scaleFactorY = areaHeight * scalar / logo.Height;
+        var scaleFactorX = areaWidth * scalar / logo.Width;
         var scaleFactor = Math.Min(scaleFactorX, scaleFactorY);
 
-        var newHeight = (int)Math.Round(logoImg.Height * scaleFactor);
-        var newWidth = (int)Math.Round(logoImg.Width * scaleFactor);
+        var newHeight = (int)Math.Round(logo.Height * scaleFactor);
+        var newWidth = (int)Math.Round(logo.Width * scaleFactor);
 
-        var resizeOptions = new ResizeOptions()
+        var leftOffset = (areaWidth - newWidth) / 2;
+        var topOffset = (areaHeight - newHeight) / 2;
+
+        // Scaled by picking the nearest pixel, without smoothing.
+        var widthFactor = logo.Width / (float)newWidth;
+        var heightFactor = logo.Height / (float)newHeight;
+
+        var total = new byte[areaWidth * areaHeight * ChannelCount];
+
+        for (var y = 0; y < newHeight; y++)
         {
-            Size = new Size(newWidth, newHeight),
-            Sampler = KnownResamplers.NearestNeighbor,
-        };
+            var sourceY = (int)(y * heightFactor);
 
-        logoImg.Mutate(x => x.Resize(resizeOptions));
+            for (var x = 0; x < newWidth; x++)
+            {
+                var sourceX = (int)(x * widthFactor);
 
-        var totalImage = new Image<Bgr24>(keyPosition.Area.Width, keyPosition.Area.Height);
+                var from = ((sourceY * logo.Width) + sourceX) * ChannelCount;
+                var to = (((y + topOffset) * areaWidth) + x + leftOffset) * ChannelCount;
 
-        var leftOffset = (keyPosition.Area.Width - newWidth) / 2;
-        var topOffset = (keyPosition.Area.Height - newHeight) / 2;
+                logoPixels.Slice(from, ChannelCount).CopyTo(total.AsSpan(to, ChannelCount));
+            }
+        }
 
-        totalImage.Mutate(x => x.DrawImage(logoImg, new Point(leftOffset, topOffset), 1));
-
-        return totalImage;
+        return KeyBitmap.Create.FromBgr24Array(areaWidth, areaHeight, total);
     }
 
-    private void ResizeAndApplyImage(int keyId, Image<Bgr24> image)
+    private void ResizeAndApplyImage(int keyId, KeyBitmap image)
     {
-        if (image.Width != keyPosition.KeySize || image.Height != keyPosition.KeySize)
-        {
-            // resize to target key size
-            image.Mutate(x => x.Resize(keyPosition.KeySize, keyPosition.KeySize));
-        }
+        // resize to target key size (returns the same bitmap if it already has that size)
+        var keySize = keyPosition.KeySize;
+        var pixels = ((IKeyBitmapDataAccess)image.Resize(keySize, keySize)).GetData().Span;
 
         // draw to target position
         var targetPosition = keyPosition[keyId];
+        var left = targetPosition.X + keyPosition.GapSize;
+        var top = targetPosition.Y + keyPosition.GapSize;
 
-        BoardImage.Mutate(x => x.DrawImage(
-            image,
-            new Point(
-                targetPosition.X + keyPosition.GapSize,
-                targetPosition.Y + keyPosition.GapSize
-            ),
-            1
-        ));
+        for (var y = 0; y < keySize; y++)
+        {
+            var row = pixels.Slice(y * keySize * ChannelCount, keySize * ChannelCount);
+            row.CopyTo(boardPixels.AsSpan((((top + y) * boardWidth) + left) * ChannelCount));
+        }
     }
 }

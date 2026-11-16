@@ -1,7 +1,0 @@
-﻿{
-  Width: 1110,
-  Height: 574,
-  HorizontalResolution: 3780.0,
-  VerticalResolution: 3780.0,
-  ResolutionUnits: PixelsPerMeter
-}
