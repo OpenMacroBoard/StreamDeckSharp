@@ -8,14 +8,15 @@
 #
 #   docker build .
 #
-# Create the NuGet packages in ./output/packages:
+# Create NuGet packages for local testing in ./output/packages. They get a local
+# pre-release version such as 11.0.0-local.20261116201530, so they can never be
+# mistaken for a release or collide with one in your NuGet cache:
 #
 #   docker build --target packages --output type=local,dest=output/packages .
 #
-#   For local testing add a version suffix, so the packages do not collide with a
-#   released version in your NuGet cache (gives for example 11.0.0-local.1):
+# Create packages with the release version (for publishing; pass an empty suffix):
 #
-#   docker build --target packages --build-arg VERSION_SUFFIX=local.1 \
+#   docker build --target packages --build-arg VERSION_SUFFIX= \
 #       --output type=local,dest=output/packages .
 #
 # Copy the test results (.trx) to ./output/test-results, also when tests fail:
@@ -56,8 +57,10 @@ FROM build AS test
 # OpenMacroBoard.Tests-Win needs GDI+ and is left out, it only runs on Windows.
 # Every test project runs, even if an earlier one fails. The outcome is only recorded here,
 # so the test results can still be copied out; the last stage fails the build if a test failed.
+# The README check makes sure the quick start code in the READMEs is the compiled example.
 RUN --mount=type=cache,target=/root/.nuget/packages \
     failed=0; \
+    sh scripts/check-readme-code.sh || failed=1; \
     for project in \
         tests/OpenMacroBoard.Tests/OpenMacroBoard.Tests.csproj \
         tests/StreamDeckSharp.Tests/StreamDeckSharp.Tests.csproj \
@@ -76,13 +79,19 @@ COPY --from=test /test-results /
 
 FROM build AS pack
 
-# Optional pre-release suffix, for example "local.1". Empty gives the release version.
-ARG VERSION_SUFFIX=
+# Pre-release suffix of the package version:
+#   local (default)  a local test version, 11.0.0-local.<UTC timestamp>; the timestamp
+#                    changes whenever the sources change, so NuGet never serves a stale copy
+#   empty            the release version, 11.0.0
+#   anything else    used as given, for example beta.1
+ARG VERSION_SUFFIX=local
 
 # Packing does not depend on the test stage, so packages for local testing can be
 # created while a test is failing. Run the tests before publishing anything.
 RUN --mount=type=cache,target=/root/.nuget/packages \
     set -e; \
+    suffix="$VERSION_SUFFIX"; \
+    if [ "$suffix" = local ]; then suffix="local.$(date -u +%Y%m%d%H%M%S)"; fi; \
     for project in \
         src/OpenMacroBoard.SDK/OpenMacroBoard.SDK.csproj \
         src/OpenMacroBoard.SocketIO/OpenMacroBoard.SocketIO.csproj \
@@ -91,7 +100,7 @@ RUN --mount=type=cache,target=/root/.nuget/packages \
     ; do \
         dotnet pack "$project" \
             --configuration "${CONFIGURATION}" \
-            ${VERSION_SUFFIX:+--version-suffix "$VERSION_SUFFIX"} \
+            ${suffix:+--version-suffix "$suffix"} \
             --output /packages; \
     done
 
