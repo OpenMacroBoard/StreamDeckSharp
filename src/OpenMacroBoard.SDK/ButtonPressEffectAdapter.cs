@@ -1,6 +1,3 @@
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 
@@ -87,33 +84,54 @@ public class ButtonPressEffectAdapter : MacroBoardAdapter
         return IsKeyPressed(keyId) ? ResizeBitmap(bitmap) : bitmap;
     }
 
+    /// <summary>
+    /// Draws a smaller version of the bitmap on the background color.
+    /// </summary>
     private KeyBitmap ResizeBitmap(KeyBitmap keyBitmap)
     {
-        var bitmapDataAccess = (IKeyBitmapDataAccess)keyBitmap;
+        const int channelCount = 3;
 
-        var targetWidth = (int)Math.Round(Config.Scale * keyBitmap.Width);
-        var targetHeight = (int)Math.Round(Config.Scale * keyBitmap.Height);
+        var width = keyBitmap.Width;
+        var height = keyBitmap.Height;
 
-        var smallerImage = bitmapDataAccess.ToImage();
-        smallerImage.Mutate(x => x.Resize(targetWidth, targetHeight));
+        var targetWidth = (int)Math.Round(Config.Scale * width);
+        var targetHeight = (int)Math.Round(Config.Scale * height);
 
-        var offsetLeft = (int)Math.Round((keyBitmap.Width - targetWidth) * Config.OriginX);
-        var offsetTop = (int)Math.Round((keyBitmap.Height - targetHeight) * Config.OriginY);
+        var offsetLeft = (int)Math.Round((width - targetWidth) * Config.OriginX);
+        var offsetTop = (int)Math.Round((height - targetHeight) * Config.OriginY);
 
-        var color = Color.FromRgb(
-            Config.BackgroundColor.R,
-            Config.BackgroundColor.G,
-            Config.BackgroundColor.B
-        );
+        var result = new byte[width * height * channelCount];
 
-        var newImage = new Image<Bgr24>(keyBitmap.Width, keyBitmap.Height);
-
-        newImage.Mutate(x =>
+        for (var i = 0; i < result.Length; i += channelCount)
         {
-            x.BackgroundColor(color);
-            x.DrawImage(smallerImage, new Point(offsetLeft, offsetTop), 1);
-        });
+            result[i] = Config.BackgroundColor.B;
+            result[i + 1] = Config.BackgroundColor.G;
+            result[i + 2] = Config.BackgroundColor.R;
+        }
 
-        return KeyBitmap.Create.FromImageSharpImage(newImage);
+        if (targetWidth >= 1 && targetHeight >= 1)
+        {
+            var smaller = ((IKeyBitmapDataAccess)keyBitmap.Resize(targetWidth, targetHeight)).GetData().Span;
+
+            // Only the part that lies inside of the key is copied.
+            var firstX = Math.Max(0, -offsetLeft);
+            var lastX = Math.Min(targetWidth, width - offsetLeft);
+
+            for (var y = Math.Max(0, -offsetTop); y < Math.Min(targetHeight, height - offsetTop); y++)
+            {
+                if (lastX <= firstX)
+                {
+                    break;
+                }
+
+                var from = ((y * targetWidth) + firstX) * channelCount;
+                var to = (((y + offsetTop) * width) + firstX + offsetLeft) * channelCount;
+                var length = (lastX - firstX) * channelCount;
+
+                smaller.Slice(from, length).CopyTo(result.AsSpan(to, length));
+            }
+        }
+
+        return new KeyBitmap(width, height, result);
     }
 }

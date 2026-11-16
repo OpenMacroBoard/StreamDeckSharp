@@ -7,6 +7,8 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
   - `IJpegEncoder`: interface for JPEG encoders, so device providers can let users bring their own encoder.
   - `OmbJpegEncoder`: built-in baseline JPEG encoder without unsafe code or native libraries.
   - `KeyBitmap` extension methods `Resize`, `Rotate90`, `Rotate180`, `Rotate270`, `FlipHorizontal` and `FlipVertical`.
+### Changed
+  - `ButtonPressEffectAdapter` scales the pressed key with the SDK's own code instead of ImageSharp. The result looks the same, but the pixels at edges can differ slightly.
 
 ## [0.4.0] - 2019-06-28
 ### Changed
