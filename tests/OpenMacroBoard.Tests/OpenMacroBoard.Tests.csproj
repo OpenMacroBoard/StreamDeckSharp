@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <LangVersion>default</LangVersion>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ExampleImageText.jpg" />
+    <None Remove="OpenMacroBoard-Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\ExampleImageText.jpg" />
+    <EmbeddedResource Include="Assets\OpenMacroBoard-Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dnSpyLibs" Version="0.0.1" />
+    <PackageReference Include="FakeItEasy" Version="9.0.1" />
+    <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="Verify.XunitV3" Version="31.20.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenMacroBoard.Meta.TestUtils\OpenMacroBoard.Meta.TestUtils.csproj" />
+    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+  </ItemGroup>
+
+</Project>

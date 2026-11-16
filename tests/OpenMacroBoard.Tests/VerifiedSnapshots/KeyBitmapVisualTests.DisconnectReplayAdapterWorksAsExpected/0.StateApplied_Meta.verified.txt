@@ -1,0 +1,3 @@
+﻿IsConnected:   True
+Brightness:    70
+IsLogoShown:   False

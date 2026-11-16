@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Version>11.0.0</Version>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>OmbIcon.ico</ApplicationIcon>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DebugType>none</DebugType>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="glassKey.png" />
+    <None Remove="OpenMacroBoard-Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="OmbIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="glassKey.png" />
+    <EmbeddedResource Include="OpenMacroBoard-Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
+  </ItemGroup>
+
+</Project>

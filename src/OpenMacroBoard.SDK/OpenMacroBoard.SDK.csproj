@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>default</LangVersion>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- nuget stuff -->
+  <PropertyGroup>
+    <Version>11.0.0</Version>
+    <Title>OpenMacroBoard.SDK</Title>
+    <Description>Abstraction for macro boards (with LCD keys)</Description>
+    <RepositoryUrl>https://github.com/OpenMacroBoard/OpenMacroBoard.SDK</RepositoryUrl>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\package-defaults.targets" />
+  <Import Project="..\..\..\analyzers.targets" />
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+
+</Project>

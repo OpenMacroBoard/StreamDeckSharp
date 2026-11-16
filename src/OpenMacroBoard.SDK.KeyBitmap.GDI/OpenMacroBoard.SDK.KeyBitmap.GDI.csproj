@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <LangVersion>default</LangVersion>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <!-- nuget stuff -->
+  <PropertyGroup>
+    <Version>11.0.0</Version>
+    <Title>OpenMacroBoard.SDK.KeyBitmap.GDI+</Title>
+    <Description>KeyBitmap factory extension methods for GDI+ (Windows only).</Description>
+    <RepositoryUrl>https://github.com/OpenMacroBoard/OpenMacroBoard.SDK</RepositoryUrl>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\package-defaults.targets" />
+  <Import Project="..\..\..\analyzers.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
