@@ -1,0 +1,7 @@
+# Keep the build context small and independent of local build output
+**/.git
+**/bin
+**/obj
+**/.vs
+**/*.received.*
+output

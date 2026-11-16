@@ -106,6 +106,29 @@ Play games on a macro board, for example minesweeper (also part of the example p
 _\*The glitches you can see are already fixed._
 
 
+# Building
+
+With Docker, no .NET SDK is needed. This builds everything and runs the tests:
+
+```
+docker build .
+```
+
+To create the NuGet packages in `output/packages` (nothing is published):
+
+```
+docker build --target packages --output type=local,dest=output/packages .
+```
+
+Without Docker you need the .NET 10 SDK:
+
+```
+dotnet build StreamDeckSharp.sln
+dotnet test StreamDeckSharp.sln
+```
+
+A few projects target Windows. On Linux and macOS use the commands from the [Dockerfile](Dockerfile), which also lists more options.
+
 
 ---
  
