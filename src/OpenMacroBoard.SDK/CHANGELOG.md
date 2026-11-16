@@ -7,7 +7,9 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
   - `IJpegEncoder`: interface for JPEG encoders, so device providers can let users bring their own encoder.
   - `OmbJpegEncoder`: built-in baseline JPEG encoder without unsafe code or native libraries.
   - `KeyBitmap` extension methods `Resize`, `Rotate90`, `Rotate180`, `Rotate270`, `FlipHorizontal` and `FlipVertical`.
+  - `ImageDecodingException`: the one exception the built-in decoders throw for unsupported, damaged or too large images.
 ### Changed
+  - `KeyBitmap.Create.FromFile` and `FromStream` (and their async variants) decode BMP and PNG files with built-in decoders instead of ImageSharp. All PNG color types, bit depths and interlacing are supported; animation, color profiles and gamma are ignored. Compressed BMP files are not supported. Other formats still go through ImageSharp for now.
   - `ButtonPressEffectAdapter` scales the pressed key with the SDK's own code instead of ImageSharp. The result looks the same, but the pixels at edges can differ slightly.
 
 ## [0.4.0] - 2019-06-28

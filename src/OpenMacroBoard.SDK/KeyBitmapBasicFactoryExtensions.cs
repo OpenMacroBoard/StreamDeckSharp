@@ -1,3 +1,4 @@
+using OpenMacroBoard.SDK.Imaging;
 using SixLabors.ImageSharp;
 using System;
 using System.IO;
@@ -181,7 +182,12 @@ public static class KeyBitmapBasicFactoryExtensions
     /// </summary>
     public static KeyBitmap FromStream(this IKeyBitmapFactory builder, Stream bitmapStream)
     {
-        return builder.FromImageSharpImage(Image.Load(bitmapStream));
+        ArgumentNullException.ThrowIfNull(bitmapStream);
+
+        using var buffer = new MemoryStream();
+        bitmapStream.CopyTo(buffer);
+
+        return FromEncodedImage(builder, buffer.ToArray());
     }
 
     /// <summary>
@@ -189,7 +195,12 @@ public static class KeyBitmapBasicFactoryExtensions
     /// </summary>
     public static async Task<KeyBitmap> FromStreamAsync(this IKeyBitmapFactory builder, Stream bitmapStream)
     {
-        return builder.FromImageSharpImage(await Image.LoadAsync(bitmapStream));
+        ArgumentNullException.ThrowIfNull(bitmapStream);
+
+        await using var buffer = new MemoryStream();
+        await bitmapStream.CopyToAsync(buffer);
+
+        return FromEncodedImage(builder, buffer.ToArray());
     }
 
     /// <summary>
@@ -197,7 +208,7 @@ public static class KeyBitmapBasicFactoryExtensions
     /// </summary>
     public static KeyBitmap FromFile(this IKeyBitmapFactory builder, string bitmapFile)
     {
-        return builder.FromImageSharpImage(Image.Load(bitmapFile));
+        return FromEncodedImage(builder, File.ReadAllBytes(bitmapFile));
     }
 
     /// <summary>
@@ -205,7 +216,7 @@ public static class KeyBitmapBasicFactoryExtensions
     /// </summary>
     public static async Task<KeyBitmap> FromFileAsync(this IKeyBitmapFactory builder, string bitmapFile)
     {
-        return builder.FromImageSharpImage(await Image.LoadAsync(bitmapFile));
+        return FromEncodedImage(builder, await File.ReadAllBytesAsync(bitmapFile));
     }
 
     /// <summary>
@@ -220,5 +231,21 @@ public static class KeyBitmapBasicFactoryExtensions
         using var ctx = image.WithBgr24();
         var pixelData = ctx.Item.ToBgr24PixelArray();
         return KeyBitmap.Create.FromBgr24Array(image.Width, image.Height, pixelData);
+    }
+
+    /// <summary>
+    /// Decodes an image file. Transparent pixels are blended onto black.
+    /// </summary>
+    private static KeyBitmap FromEncodedImage(IKeyBitmapFactory builder, byte[] data)
+    {
+        if (ImageDecoder.CanDecode(data))
+        {
+            var decoded = ImageDecoder.Decode(data);
+            return new KeyBitmap(decoded.Width, decoded.Height, decoded.ToBgr24OnBlack());
+        }
+
+        // Other formats still go through ImageSharp until the built-in decoders cover JPEG as well.
+        using var image = Image.Load(data);
+        return builder.FromImageSharpImage(image);
     }
 }
