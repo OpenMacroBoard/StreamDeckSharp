@@ -15,6 +15,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\ExampleImageText.jpg" />
     <EmbeddedResource Include="Assets\OpenMacroBoard-Logo.png" />
+    <EmbeddedResource Include="Assets\Jpeg\*" />
   </ItemGroup>
 
   <ItemGroup>

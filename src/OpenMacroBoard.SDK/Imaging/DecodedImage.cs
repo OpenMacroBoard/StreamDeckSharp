@@ -16,7 +16,7 @@ internal sealed class DecodedImage
     /// Images with more pixels are rejected, so a small damaged or hostile file
     /// cannot make the decoder allocate a huge amount of memory.
     /// </summary>
-    public const int MaxPixelCount = 100_000_000;
+    public const int MaxPixelCount = 50_000_000;
 
     public DecodedImage(int width, int height)
     {

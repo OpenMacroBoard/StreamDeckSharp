@@ -178,8 +178,12 @@ public static class KeyBitmapBasicFactoryExtensions
     }
 
     /// <summary>
-    /// Create a bitmap from an encoded given image stream.
+    /// Create a bitmap from an encoded given image stream (BMP, PNG or JPEG).
+    /// Transparent pixels are blended onto black.
     /// </summary>
+    /// <exception cref="ImageDecodingException">
+    /// The format is not supported, the data is damaged or incomplete, or the image is too large.
+    /// </exception>
     public static KeyBitmap FromStream(this IKeyBitmapFactory builder, Stream bitmapStream)
     {
         ArgumentNullException.ThrowIfNull(bitmapStream);
@@ -187,12 +191,16 @@ public static class KeyBitmapBasicFactoryExtensions
         using var buffer = new MemoryStream();
         bitmapStream.CopyTo(buffer);
 
-        return FromEncodedImage(builder, buffer.ToArray());
+        return FromEncodedImage(buffer.ToArray());
     }
 
     /// <summary>
-    /// Create a bitmap from an encoded given image stream.
+    /// Create a bitmap from an encoded given image stream (BMP, PNG or JPEG).
+    /// Transparent pixels are blended onto black.
     /// </summary>
+    /// <exception cref="ImageDecodingException">
+    /// The format is not supported, the data is damaged or incomplete, or the image is too large.
+    /// </exception>
     public static async Task<KeyBitmap> FromStreamAsync(this IKeyBitmapFactory builder, Stream bitmapStream)
     {
         ArgumentNullException.ThrowIfNull(bitmapStream);
@@ -200,23 +208,31 @@ public static class KeyBitmapBasicFactoryExtensions
         await using var buffer = new MemoryStream();
         await bitmapStream.CopyToAsync(buffer);
 
-        return FromEncodedImage(builder, buffer.ToArray());
+        return FromEncodedImage(buffer.ToArray());
     }
 
     /// <summary>
-    /// Create a bitmap from an encoded given image file.
+    /// Create a bitmap from an encoded given image file (BMP, PNG or JPEG).
+    /// Transparent pixels are blended onto black.
     /// </summary>
+    /// <exception cref="ImageDecodingException">
+    /// The format is not supported, the data is damaged or incomplete, or the image is too large.
+    /// </exception>
     public static KeyBitmap FromFile(this IKeyBitmapFactory builder, string bitmapFile)
     {
-        return FromEncodedImage(builder, File.ReadAllBytes(bitmapFile));
+        return FromEncodedImage(File.ReadAllBytes(bitmapFile));
     }
 
     /// <summary>
-    /// Create a bitmap from an encoded given image file.
+    /// Create a bitmap from an encoded given image file (BMP, PNG or JPEG).
+    /// Transparent pixels are blended onto black.
     /// </summary>
+    /// <exception cref="ImageDecodingException">
+    /// The format is not supported, the data is damaged or incomplete, or the image is too large.
+    /// </exception>
     public static async Task<KeyBitmap> FromFileAsync(this IKeyBitmapFactory builder, string bitmapFile)
     {
-        return FromEncodedImage(builder, await File.ReadAllBytesAsync(bitmapFile));
+        return FromEncodedImage(await File.ReadAllBytesAsync(bitmapFile));
     }
 
     /// <summary>
@@ -236,16 +252,9 @@ public static class KeyBitmapBasicFactoryExtensions
     /// <summary>
     /// Decodes an image file. Transparent pixels are blended onto black.
     /// </summary>
-    private static KeyBitmap FromEncodedImage(IKeyBitmapFactory builder, byte[] data)
+    private static KeyBitmap FromEncodedImage(byte[] data)
     {
-        if (ImageDecoder.CanDecode(data))
-        {
-            var decoded = ImageDecoder.Decode(data);
-            return new KeyBitmap(decoded.Width, decoded.Height, decoded.ToBgr24OnBlack());
-        }
-
-        // Other formats still go through ImageSharp until the built-in decoders cover JPEG as well.
-        using var image = Image.Load(data);
-        return builder.FromImageSharpImage(image);
+        var decoded = ImageDecoder.Decode(data);
+        return new KeyBitmap(decoded.Width, decoded.Height, decoded.ToBgr24OnBlack());
     }
 }

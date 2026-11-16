@@ -26,6 +26,16 @@ internal static class JpegForwardDct
     private static readonly double[] Cosines = BuildCosines();
 
     /// <summary>
+    /// Gets the table cos((2n + 1) * u * pi / 16), indexed by u * 8 + n.
+    /// </summary>
+    internal static ReadOnlySpan<double> CosineTable => Cosines;
+
+    /// <summary>
+    /// Gets 1 / sqrt(2), the factor of the first coefficient.
+    /// </summary>
+    internal static double FirstCoefficientScale => C4;
+
+    /// <summary>
     /// Transforms an 8x8 block (64 values, row by row) in place.
     /// </summary>
     public static void Transform(Span<double> block)

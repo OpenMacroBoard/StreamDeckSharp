@@ -13,7 +13,7 @@ internal static class ImageDecoder
     /// </summary>
     public static bool CanDecode(ReadOnlySpan<byte> data)
     {
-        return PngDecoder.IsPng(data) || BmpDecoder.IsBmp(data);
+        return PngDecoder.IsPng(data) || BmpDecoder.IsBmp(data) || JpegDecoder.IsJpeg(data);
     }
 
     /// <summary>
@@ -34,6 +34,11 @@ internal static class ImageDecoder
             if (BmpDecoder.IsBmp(data))
             {
                 return BmpDecoder.Decode(data);
+            }
+
+            if (JpegDecoder.IsJpeg(data))
+            {
+                return JpegDecoder.Decode(data);
             }
         }
         catch (Exception ex) when (IsCausedByBadData(ex))
