@@ -1,0 +1,84 @@
+name: CI
+
+# Builds and tests every push and pull request.
+# The Linux job only calls the Dockerfile, so it does exactly what
+# `docker build .` does on a developer machine. Nothing is published here.
+
+on:
+  push:
+    branches: [main, next]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The ImageSharp version in use has known advisories, and the projects treat
+  # audit warnings as errors. Remove these two settings once ImageSharp is gone.
+  DOCKER_AUDIT_ARG: --build-arg NUGET_AUDIT=false
+  NuGetAudit: false
+
+jobs:
+  docker:
+    name: Build and test (Docker, Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Runs the build and the tests. This step does not fail on test failures,
+      # so the results can be uploaded first; the "Check" step below fails then.
+      - name: Build and run tests
+        run: docker build $DOCKER_AUDIT_ARG --target test-results --output type=local,dest=output/test-results .
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-linux
+          path: output/test-results
+          if-no-files-found: ignore
+
+      - name: Check test outcome
+        run: docker build $DOCKER_AUDIT_ARG .
+
+      # Proves that packing works. The packages get a local pre-release
+      # version and are only kept as a build artifact.
+      - name: Create NuGet packages
+        run: docker build $DOCKER_AUDIT_ARG --target packages --output type=local,dest=output/packages .
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: output/packages
+
+  windows:
+    name: Build and test (.NET SDK, Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      # The same plain commands a Visual Studio user would run. This is also the
+      # only place where the Windows-only projects and their tests run.
+      - name: Build
+        run: dotnet build StreamDeckSharp.sln --configuration Release
+
+      - name: Test
+        run: dotnet test StreamDeckSharp.sln --configuration Release --no-build --logger trx --results-directory output/test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-windows
+          path: output/test-results
+          if-no-files-found: ignore
