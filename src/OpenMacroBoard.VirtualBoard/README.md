@@ -10,7 +10,7 @@ and with a classical Stream Deck configuration (5x3 keys, 72px square keys, 25px
 
 ![screenshot of the virtual board application](readme_assets/virtualboard.png)
 
-Once you started some application that uses `IMacroBoard`s (for example the [Minesweeper](https://github.com/OpenMacroBoard/OpenMacroBoard.ExampleCollection/tree/master/src/OpenMacroBoard.Examples.Minesweeper) example)
+Once you started some application that uses `IMacroBoard`s (for example the [Minesweeper](../../examples/OpenMacroBoard.Examples.Minesweeper) example)
 you can use it just by clicking with your mouse.
 
 ![](readme_assets/minesweeper.webp)

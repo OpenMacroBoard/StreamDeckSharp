@@ -1,0 +1,3 @@
+# Shell scripts run inside Linux containers and must keep LF line endings,
+# also when the repository is checked out on Windows.
+*.sh text eol=lf

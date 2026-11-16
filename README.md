@@ -1,25 +1,27 @@
 
-![StreamDeckSharp Banner](https://raw.githubusercontent.com/OpenStreamDeck/StreamDeckSharp/master/doc/images/banner/StreamDeckSharpBanner_150px.png)
+![StreamDeckSharp Banner](https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/main/doc/images/banner/StreamDeckSharpBanner_150px.png)
 
 -----------------
 
 **StreamDeckSharp is a simple (unofficial) library (.NET 10+) for the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck) family**
 
-[![license](https://img.shields.io/github/license/OpenStreamDeck/StreamDeckSharp.svg)](https://github.com/OpenStreamDeck/StreamDeckSharp/blob/master/LICENSE.md)
-[![GitHub release](https://img.shields.io/github/release/OpenStreamDeck/StreamDeckSharp.svg)](https://github.com/OpenStreamDeck/StreamDeckSharp/releases)
+[![license](https://img.shields.io/github/license/OpenMacroBoard/StreamDeckSharp.svg)](LICENSE.md)
+[![GitHub release](https://img.shields.io/github/release/OpenMacroBoard/StreamDeckSharp.svg)](https://github.com/OpenMacroBoard/StreamDeckSharp/releases)
 [![Nuget version](https://img.shields.io/nuget/v/streamdecksharp.svg)](https://www.nuget.org/packages/StreamDeckSharp/)
 [![AI:W WRITE](https://img.shields.io/badge/AI-WRITE-grey?style=flat&logoSize=auto&labelColor=13171f)](AI-DISCLOSURE.md)
 
 First things first, StreamDeckSharp is not official software by Elgato, nor is it endorsed by them.
 
-StreamDeckSharp is a device provider implementation for [`OpenMacroBoard.SDK`](https://github.com/OpenMacroBoard/OpenMacroBoard.SDK).
+StreamDeckSharp is a device provider implementation for [`OpenMacroBoard.SDK`](src/OpenMacroBoard.SDK).
+The SDK itself is device-neutral: it defines the common types for macro boards, and other boards can be supported by writing a provider for it.
+Both live in this repository, see [What is in this repository](#what-is-in-this-repository).
 
-# AI Disclosure
+## AI Disclosure
 
 I recently started to use AI to help me maintain this project.
 For more about that, see [AI-DISCLOSURE.md](AI-DISCLOSURE.md).
 
-# Quick Start
+## Quick Start
 
 Create a new console project in Visual Studio (.NET 10+), add [`OpenMacroBoard.SDK`](https://www.nuget.org/packages/OpenMacroBoard.SDK/) as a reference and at least one device provider.
 
@@ -76,7 +78,7 @@ static byte GetRandomByte()
 Here is what the example looks like after pressing some keys:
 ![](https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/refs/heads/main/doc/images/rainbow_example.png)
 
-# Supported devices
+## Supported devices
 
 NuGet: [`StreamDeckSharp`](https://www.nuget.org/packages/StreamDeckSharp/)
 
@@ -89,24 +91,36 @@ NuGet: [`StreamDeckSharp`](https://www.nuget.org/packages/StreamDeckSharp/)
 
 Keep in mind that Elgato sometimes releases new revisions of their devices with different PIDs (USB product IDs) which might break compatibility. If you have a device like that, please open an issue on GitHub with the new PID.
 
-# Examples
+## Examples
 
-You can find a lot of examples in our [example collection](https://github.com/OpenMacroBoard/OpenMacroBoard.ExampleCollection)
+You can find a lot of examples in the [examples](examples) folder.
 
 
-## Fullscreen images
+### Fullscreen images
 <img src="https://raw.githubusercontent.com/OpenMacroBoard/openmacroboard.github.io/refs/heads/main/assets/images/lasershow.png" width="500" />
 
-## Play games
+### Play games
 Play games on a macro board, for example minesweeper (also part of the example projects)
 <img src="https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/main/doc/images/minesweeper.jpg" width="500" />
 
-## Videos
+### Videos
 [![Demo video of the example](https://i.imgur.com/8tlkaIg.png)](http://www.youtube.com/watch?v=tNwUG0sPmKw)  
 _\*The glitches you can see are already fixed._
 
 
-# Building
+## What is in this repository
+
+| Folder | Content |
+| ------ | ------- |
+| [`src/OpenMacroBoard.SDK`](src/OpenMacroBoard.SDK) | The device-neutral base library: common types and logic for macro boards. Implements no device itself. |
+| [`src/StreamDeckSharp`](src/StreamDeckSharp) | Device provider for the Elgato Stream Deck family. |
+| [`src/OpenMacroBoard.SocketIO`](src/OpenMacroBoard.SocketIO) | Device provider for boards that are reached over the network, like the virtual board. |
+| [`src/OpenMacroBoard.VirtualBoard`](src/OpenMacroBoard.VirtualBoard) | A virtual macro board, to develop without hardware. |
+| [`src/OpenMacroBoard.SDK.KeyBitmap.GDI`](src/OpenMacroBoard.SDK.KeyBitmap.GDI) | Helpers to create key bitmaps with GDI+ (Windows only). |
+| [`examples`](examples) | Example and showcase projects. |
+| [`tests`](tests) | Test projects. |
+
+## Building
 
 With Docker, no .NET SDK is needed. This builds everything and runs the tests:
 
@@ -114,7 +128,7 @@ With Docker, no .NET SDK is needed. This builds everything and runs the tests:
 docker build .
 ```
 
-To create the NuGet packages in `output/packages` (nothing is published):
+To create NuGet packages for local testing in `output/packages` (nothing is published, and the packages get a local pre-release version):
 
 ```
 docker build --target packages --output type=local,dest=output/packages .
