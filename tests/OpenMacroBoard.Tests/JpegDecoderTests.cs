@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
 using System;
 using System.Globalization;
@@ -91,7 +92,7 @@ public class JpegDecoderTests
         var decoded = KeyBitmap.Create.FromStream(new MemoryStream(jpeg));
 
         using var reference = SixLabors.ImageSharp.Image.Load(jpeg);
-        var expected = ImageDecoderTests.GetData(KeyBitmap.Create.FromImageSharpImage(reference));
+        var expected = ImageDecoderTests.GetData(reference.ToKeyBitmap());
 
         decoded.Width.Should().Be(reference.Width);
         decoded.Height.Should().Be(reference.Height);

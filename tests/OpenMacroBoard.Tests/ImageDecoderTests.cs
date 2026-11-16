@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Bmp;
@@ -193,7 +194,7 @@ public class ImageDecoderTests
     internal static void AssertDecodedLikeImageSharp(byte[] file, int tolerance = 1)
     {
         using var reference = Image.Load(file);
-        var expected = GetData(KeyBitmap.Create.FromImageSharpImage(reference));
+        var expected = GetData(reference.ToKeyBitmap());
 
         var decoded = KeyBitmap.Create.FromStream(new MemoryStream(file));
 

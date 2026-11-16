@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -143,7 +144,7 @@ public class KeyBitmapTransformTests
     {
         using var logo = AssetLoader.LoadImage("OpenMacroBoard-Logo.png");
         using var reference = logo.CloneAs<Bgr24>();
-        var source = KeyBitmap.Create.FromImageSharpImage(reference);
+        var source = reference.ToKeyBitmap();
 
         var expected = WithImageSharp(source, x => x.Resize(width, height, KnownResamplers.Triangle));
         var actual = GetData(source.Resize(width, height));

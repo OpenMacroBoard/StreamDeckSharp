@@ -76,7 +76,7 @@ internal sealed class VirtualBoardViewModel : INotifyPropertyChanged, IMacroBoar
 
         var wb = new WriteableBitmap(bitmapData.Width, bitmapData.Height, 96, 96, PixelFormats.Bgr24, null);
 
-        var data = srcData.ToImage().ToBgr24PixelArray();
+        var data = srcData.GetData().ToArray();
         var sourceStride = bitmapData.Width * 3;
 
         wb.WritePixels(new Int32Rect(0, 0, bitmapData.Width, bitmapData.Height), data, sourceStride, 0);

@@ -8,7 +8,7 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
 - Overloads that take `StreamDeckOptions`: `StreamDeck.OpenDevice`, `StreamDeck.EnumerateDevices` and the constructor of `StreamDeckListener`.
 
 ### Changed
-- StreamDeckSharp no longer uses ImageSharp to prepare key images. Scaling, rotating and encoding (BMP and JPEG) are done with the dependency-free code of `OpenMacroBoard.SDK`. The package still gets ImageSharp indirectly through `OpenMacroBoard.SDK` for now.
+- StreamDeckSharp no longer depends on ImageSharp, directly or through `OpenMacroBoard.SDK`. Scaling, rotating and encoding (BMP and JPEG) are done with the dependency-free code of `OpenMacroBoard.SDK`. If your project used ImageSharp only because StreamDeckSharp brought it in, reference it yourself now. See [Migrating from the ImageSharp based API](doc/migrating-from-imagesharp.md).
 - Key bitmaps that do not have the key size of the device are scaled with a different algorithm than before, so their pixels can differ slightly. Bitmaps that already have the key size are sent unchanged, as before.
 - **Breaking** (only for custom HID drivers): `IStreamDeckHidComDriver.GeneratePayload` now takes a `KeyBitmap` and an `IJpegEncoder` instead of an ImageSharp image. To migrate, scale and rotate with the new `KeyBitmap` extension methods (`Resize`, `Rotate180`, ...) and encode with the given encoder. The helper class `HidComDriverExtensions` was removed.
 

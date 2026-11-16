@@ -51,7 +51,7 @@ public class KeyBitmapVisualTests
         await VerifyBoardStateAsync("BoardCleared");
 
         using var fullImg = AssetLoader.LoadImage("ExampleImageText.jpg");
-        board.DrawFullScreenBitmap(fullImg);
+        board.DrawFullScreenBitmap(fullImg.ToKeyBitmap());
 
         await VerifyBoardStateAsync("FullscreenDrawn");
 
@@ -95,7 +95,7 @@ public class KeyBitmapVisualTests
             x.Fill(Color.Green, circle);
         });
 
-        var key = KeyBitmap.Create.FromImageSharpImage(keyImage);
+        var key = keyImage.ToKeyBitmap();
 
         board.SetKeyBitmap(7, key);
 

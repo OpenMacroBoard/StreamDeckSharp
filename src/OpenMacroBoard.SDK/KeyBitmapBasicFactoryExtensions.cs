@@ -1,5 +1,3 @@
-using OpenMacroBoard.SDK.Imaging;
-using SixLabors.ImageSharp;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -186,12 +184,24 @@ public static class KeyBitmapBasicFactoryExtensions
     /// </exception>
     public static KeyBitmap FromStream(this IKeyBitmapFactory builder, Stream bitmapStream)
     {
+        return builder.FromStream(bitmapStream, OmbImageDecoder.Default);
+    }
+
+    /// <summary>
+    /// Create a bitmap from an encoded given image stream, using a given decoder.
+    /// </summary>
+    /// <param name="builder">The builder that is used to create the <see cref="KeyBitmap"/></param>
+    /// <param name="bitmapStream">The stream with the content of the image file.</param>
+    /// <param name="decoder">The decoder that reads the image, for example to support more formats.</param>
+    public static KeyBitmap FromStream(this IKeyBitmapFactory builder, Stream bitmapStream, IImageDecoder decoder)
+    {
         ArgumentNullException.ThrowIfNull(bitmapStream);
+        ArgumentNullException.ThrowIfNull(decoder);
 
         using var buffer = new MemoryStream();
         bitmapStream.CopyTo(buffer);
 
-        return FromEncodedImage(buffer.ToArray());
+        return decoder.Decode(buffer.ToArray());
     }
 
     /// <summary>
@@ -201,14 +211,30 @@ public static class KeyBitmapBasicFactoryExtensions
     /// <exception cref="ImageDecodingException">
     /// The format is not supported, the data is damaged or incomplete, or the image is too large.
     /// </exception>
-    public static async Task<KeyBitmap> FromStreamAsync(this IKeyBitmapFactory builder, Stream bitmapStream)
+    public static Task<KeyBitmap> FromStreamAsync(this IKeyBitmapFactory builder, Stream bitmapStream)
+    {
+        return builder.FromStreamAsync(bitmapStream, OmbImageDecoder.Default);
+    }
+
+    /// <summary>
+    /// Create a bitmap from an encoded given image stream, using a given decoder.
+    /// </summary>
+    /// <param name="builder">The builder that is used to create the <see cref="KeyBitmap"/></param>
+    /// <param name="bitmapStream">The stream with the content of the image file.</param>
+    /// <param name="decoder">The decoder that reads the image, for example to support more formats.</param>
+    public static async Task<KeyBitmap> FromStreamAsync(
+        this IKeyBitmapFactory builder,
+        Stream bitmapStream,
+        IImageDecoder decoder
+    )
     {
         ArgumentNullException.ThrowIfNull(bitmapStream);
+        ArgumentNullException.ThrowIfNull(decoder);
 
         await using var buffer = new MemoryStream();
         await bitmapStream.CopyToAsync(buffer);
 
-        return FromEncodedImage(buffer.ToArray());
+        return decoder.Decode(buffer.ToArray());
     }
 
     /// <summary>
@@ -220,7 +246,19 @@ public static class KeyBitmapBasicFactoryExtensions
     /// </exception>
     public static KeyBitmap FromFile(this IKeyBitmapFactory builder, string bitmapFile)
     {
-        return FromEncodedImage(File.ReadAllBytes(bitmapFile));
+        return builder.FromFile(bitmapFile, OmbImageDecoder.Default);
+    }
+
+    /// <summary>
+    /// Create a bitmap from an encoded given image file, using a given decoder.
+    /// </summary>
+    /// <param name="builder">The builder that is used to create the <see cref="KeyBitmap"/></param>
+    /// <param name="bitmapFile">The path of the image file.</param>
+    /// <param name="decoder">The decoder that reads the image, for example to support more formats.</param>
+    public static KeyBitmap FromFile(this IKeyBitmapFactory builder, string bitmapFile, IImageDecoder decoder)
+    {
+        ArgumentNullException.ThrowIfNull(decoder);
+        return decoder.Decode(File.ReadAllBytes(bitmapFile));
     }
 
     /// <summary>
@@ -230,31 +268,24 @@ public static class KeyBitmapBasicFactoryExtensions
     /// <exception cref="ImageDecodingException">
     /// The format is not supported, the data is damaged or incomplete, or the image is too large.
     /// </exception>
-    public static async Task<KeyBitmap> FromFileAsync(this IKeyBitmapFactory builder, string bitmapFile)
+    public static Task<KeyBitmap> FromFileAsync(this IKeyBitmapFactory builder, string bitmapFile)
     {
-        return FromEncodedImage(await File.ReadAllBytesAsync(bitmapFile));
+        return builder.FromFileAsync(bitmapFile, OmbImageDecoder.Default);
     }
 
     /// <summary>
-    /// Creates a <see cref="KeyBitmap"/> from a given <see cref="Image{Bgr24}"/>.
+    /// Create a bitmap from an encoded given image file, using a given decoder.
     /// </summary>
-    /// <exception cref="ArgumentNullException">The provided bitmap is null.</exception>
-    /// <exception cref="NotSupportedException">The pixel format of the image is not supported.</exception>
-    public static KeyBitmap FromImageSharpImage(this IKeyBitmapFactory keyFactory, Image image)
+    /// <param name="builder">The builder that is used to create the <see cref="KeyBitmap"/></param>
+    /// <param name="bitmapFile">The path of the image file.</param>
+    /// <param name="decoder">The decoder that reads the image, for example to support more formats.</param>
+    public static async Task<KeyBitmap> FromFileAsync(
+        this IKeyBitmapFactory builder,
+        string bitmapFile,
+        IImageDecoder decoder
+    )
     {
-        ArgumentNullException.ThrowIfNull(image);
-
-        using var ctx = image.WithBgr24();
-        var pixelData = ctx.Item.ToBgr24PixelArray();
-        return KeyBitmap.Create.FromBgr24Array(image.Width, image.Height, pixelData);
-    }
-
-    /// <summary>
-    /// Decodes an image file. Transparent pixels are blended onto black.
-    /// </summary>
-    private static KeyBitmap FromEncodedImage(byte[] data)
-    {
-        var decoded = ImageDecoder.Decode(data);
-        return new KeyBitmap(decoded.Width, decoded.Height, decoded.ToBgr24OnBlack());
+        ArgumentNullException.ThrowIfNull(decoder);
+        return decoder.Decode(await File.ReadAllBytesAsync(bitmapFile));
     }
 }

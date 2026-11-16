@@ -1,5 +1,4 @@
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
 using System;
 using System.Reflection;
 
@@ -44,7 +43,7 @@ internal sealed class DecoratedVirtualBoard : MacroBoardAdapter
 
         ArgumentNullException.ThrowIfNull(logoStream);
 
-        using var logo = Image.Load(logoStream);
+        var logo = KeyBitmap.Create.FromStream(logoStream);
         nakedBoard.DrawFullScreenBitmap(logo);
 
         isLogoShown = true;

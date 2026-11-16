@@ -1,3 +1,4 @@
+using OpenMacroBoard.Meta.TestUtils;
 using OpenMacroBoard.SDK;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -141,7 +142,7 @@ public sealed class FakeMacroBoard : IMacroBoard
             return;
         }
 
-        this.DrawFullScreenBitmap(logoImage);
+        this.DrawFullScreenBitmap(logoImage.ToKeyBitmap());
 
         // set isLogoShown after drawing the image, 
         // because drawing the image calls SetKeyBitmap

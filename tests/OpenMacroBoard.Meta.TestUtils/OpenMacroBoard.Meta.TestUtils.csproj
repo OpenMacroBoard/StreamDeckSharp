@@ -16,4 +16,8 @@
     <PackageReference Include="Verify.XunitV3" Version="31.20.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+  </ItemGroup>
+
 </Project>
