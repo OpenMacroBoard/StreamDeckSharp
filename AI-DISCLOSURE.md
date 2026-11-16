@@ -13,6 +13,12 @@ In the terms of the [0rwx framework](https://0rwx.com) this is the **WRITE** lev
 write access to the work, and I read the code. It is not the EXECUTE level, where nobody reads
 what was generated.
 
+## Why
+
+I did not take this decision lightly. I know that many people are against the use of AI, for
+various reasons. But it was either this or basically abandoning the project, which in practice it
+almost was.
+
 ## Responsibility
 
 I read and review everything before it is merged or pushed, and I am responsible for it. By that I mean:

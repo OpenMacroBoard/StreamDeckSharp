@@ -14,6 +14,11 @@ First things first, StreamDeckSharp is not official software by Elgato, nor is i
 
 StreamDeckSharp is a device provider implementation for [`OpenMacroBoard.SDK`](https://github.com/OpenMacroBoard/OpenMacroBoard.SDK).
 
+# AI Disclosure
+
+I recently started to use AI to help me maintain this project.
+For more about that, see [AI-DISCLOSURE.md](AI-DISCLOSURE.md).
+
 # Quick Start
 
 Create a new console project in Visual Studio (.NET 10+), add [`OpenMacroBoard.SDK`](https://www.nuget.org/packages/OpenMacroBoard.SDK/) as a reference and at least one device provider.
