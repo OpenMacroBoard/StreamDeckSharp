@@ -13,6 +13,7 @@ namespace StreamDeckSharp.Internals.HidComDriver;
 /// </para>
 /// <para>Implementations must be thread-safe.</para>
 /// </remarks>
+[System.Diagnostics.CodeAnalysis.Experimental(StreamDeckSharp.Internals.InternalsDiagnostic.Id, Message = StreamDeckSharp.Internals.InternalsDiagnostic.Message)]
 public interface IStreamDeckHidComDriver
 {
     /// <summary>

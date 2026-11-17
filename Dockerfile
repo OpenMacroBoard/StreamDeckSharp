@@ -22,6 +22,12 @@
 # Copy the test results (.trx) to ./output/test-results, also when tests fail:
 #
 #   docker build --target test-results --output type=local,dest=output/test-results .
+#
+# Packing compares the public API with the last released packages and fails on breaking
+# changes that are not acknowledged in a CompatibilitySuppressions.xml file. To acknowledge
+# the current breaking changes, rewrite those files in the source tree, then review the diff:
+#
+#   docker build --target api-suppressions --output type=local,dest=. .
 
 ARG DOTNET_VERSION=10.0
 
@@ -41,7 +47,13 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT=1 \
     DiffEngine_Disabled=true \
     NuGetAudit=${NUGET_AUDIT} \
     # Some projects target net10.0-windows; this lets them compile on Linux
-    EnableWindowsTargeting=true
+    EnableWindowsTargeting=true \
+    # The projects that are published as NuGet packages
+    PACKAGE_PROJECTS="\
+        src/OpenMacroBoard.SDK/OpenMacroBoard.SDK.csproj \
+        src/OpenMacroBoard.SocketIO/OpenMacroBoard.SocketIO.csproj \
+        src/OpenMacroBoard.SDK.KeyBitmap.GDI/OpenMacroBoard.SDK.KeyBitmap.GDI.csproj \
+        src/StreamDeckSharp/StreamDeckSharp.csproj"
 
 WORKDIR /repo
 COPY . .
@@ -89,16 +101,13 @@ ARG VERSION_SUFFIX=local
 
 # Packing does not depend on the test stage, so packages for local testing can be
 # created while a test is failing. Run the tests before publishing anything.
+# Packing also runs the package validation: it fails if the public API has breaking changes
+# compared to the last release that are not listed in CompatibilitySuppressions.xml.
 RUN --mount=type=cache,target=/root/.nuget/packages \
     set -e; \
     suffix="$VERSION_SUFFIX"; \
     if [ "$suffix" = local ]; then suffix="local.$(date -u +%Y%m%d%H%M%S)"; fi; \
-    for project in \
-        src/OpenMacroBoard.SDK/OpenMacroBoard.SDK.csproj \
-        src/OpenMacroBoard.SocketIO/OpenMacroBoard.SocketIO.csproj \
-        src/OpenMacroBoard.SDK.KeyBitmap.GDI/OpenMacroBoard.SDK.KeyBitmap.GDI.csproj \
-        src/StreamDeckSharp/StreamDeckSharp.csproj \
-    ; do \
+    for project in $PACKAGE_PROJECTS; do \
         dotnet pack "$project" \
             --configuration "${CONFIGURATION}" \
             ${suffix:+--version-suffix "$suffix"} \
@@ -109,6 +118,31 @@ FROM scratch AS packages
 COPY --from=pack /packages /
 
 
-# Default target: build + test. Fails if any test failed.
+FROM build AS api-suppressions-build
+
+# Rewrites the CompatibilitySuppressions.xml files, so they list exactly the breaking changes
+# the code has right now. A project without breaking changes gets no file.
+RUN --mount=type=cache,target=/root/.nuget/packages \
+    set -e; \
+    mkdir /suppressions; \
+    for project in $PACKAGE_PROJECTS; do \
+        dotnet pack "$project" \
+            --configuration "${CONFIGURATION}" \
+            -p:ApiCompatGenerateSuppressionFile=true \
+            --output /tmp/unused-packages; \
+        file="$(dirname "$project")/CompatibilitySuppressions.xml"; \
+        if [ -f "$file" ]; then \
+            mkdir -p "/suppressions/$(dirname "$project")"; \
+            cp "$file" "/suppressions/$file"; \
+        fi; \
+    done
+
+FROM scratch AS api-suppressions
+COPY --from=api-suppressions-build /suppressions /
+
+
+# Default target: build + test + package validation. Fails if any test failed or if the
+# packages have breaking changes that are not acknowledged.
 FROM test AS verify
+COPY --from=pack /packages /tmp/packages
 RUN exit "$(cat /test-exit-code)"

@@ -3,6 +3,7 @@ namespace StreamDeckSharp.Internals.HidComDriver;
 /// <summary>
 /// Collection of typical key mappers.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.Experimental(StreamDeckSharp.Internals.InternalsDiagnostic.Id, Message = StreamDeckSharp.Internals.InternalsDiagnostic.Message)]
 public static class CommonKeyMappers
 {
     /// <summary>

@@ -16,4 +16,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!--
+    Package validation: `dotnet pack` compares the public API with the last released version
+    and fails on source or binary breaking changes. Intended breaks are acknowledged in the
+    CompatibilitySuppressions.xml next to the project file. To (re)create that file run
+    `dotnet pack -p:ApiCompatGenerateSuppressionFile=true` and review the diff.
+  -->
+  <PropertyGroup>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>10.0.0</PackageValidationBaselineVersion>
+  </PropertyGroup>
+
 </Project>

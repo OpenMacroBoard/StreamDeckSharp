@@ -8,6 +8,8 @@
     <RootNamespace>StreamDeckSharp.Tests</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <!-- OMB0001 marks the public types of the Internals namespaces, which this project may use -->
+    <NoWarn>$(NoWarn);OMB0001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

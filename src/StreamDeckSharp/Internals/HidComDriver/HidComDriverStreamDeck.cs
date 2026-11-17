@@ -6,6 +6,7 @@ namespace StreamDeckSharp.Internals.HidComDriver;
 /// <summary>
 /// HID Stream Deck communication driver for the classical Stream Deck.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.Experimental(StreamDeckSharp.Internals.InternalsDiagnostic.Id, Message = StreamDeckSharp.Internals.InternalsDiagnostic.Message)]
 public sealed class HidComDriverStreamDeck
     : IStreamDeckHidComDriver
 {

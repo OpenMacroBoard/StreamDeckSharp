@@ -1,0 +1,116 @@
+﻿namespace StreamDeckSharp.Internals.HidComDriver
+{
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public static class CommonKeyMappers
+    {
+        public static StreamDeckSharp.Internals.HidComDriver.IdentityKeyMapper Identity { get; }
+        public static StreamDeckSharp.Internals.HidComDriver.StreamDeck5HorizontalFlip StreamDeck5HorizontalFlip { get; }
+    }
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public sealed class HidComDriverStreamDeck : StreamDeckSharp.Internals.HidComDriver.IStreamDeckHidComDriver
+    {
+        public HidComDriverStreamDeck() { }
+        public double BytesPerSecondLimit { get; init; }
+        public int ExpectedFeatureReportLength { get; }
+        public int ExpectedInputReportLength { get; }
+        public int ExpectedOutputReportLength { get; }
+        public byte FirmwareVersionFeatureId { get; }
+        public int FirmwareVersionReportSkip { get; }
+        public int HeaderSize { get; }
+        public StreamDeckSharp.Internals.HidComDriver.IKeyIdMapper KeyIdMapper { get; }
+        public required int KeyImageSize { get; init; }
+        public int KeyReportOffset { get; }
+        public int ReportSize { get; }
+        public byte SerialNumberFeatureId { get; }
+        public int SerialNumberReportSkip { get; }
+        public byte[] GeneratePayload(OpenMacroBoard.SDK.KeyBitmap keyBitmap, OpenMacroBoard.SDK.IJpegEncoder jpegEncoder) { }
+        public byte[] GetBrightnessMessage(byte percent) { }
+        public byte[] GetLogoMessage() { }
+        public void PrepareDataForTransmission(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast) { }
+    }
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public sealed class HidComDriverStreamDeckJpeg : StreamDeckSharp.Internals.HidComDriver.IStreamDeckHidComDriver
+    {
+        public HidComDriverStreamDeckJpeg() { }
+        public double BytesPerSecondLimit { get; init; }
+        public int ExpectedFeatureReportLength { get; }
+        public int ExpectedInputReportLength { get; }
+        public int ExpectedOutputReportLength { get; }
+        public byte FirmwareVersionFeatureId { get; }
+        public int FirmwareVersionReportSkip { get; }
+        public int HeaderSize { get; }
+        public StreamDeckSharp.Internals.HidComDriver.IKeyIdMapper KeyIdMapper { get; }
+        public required int KeyImageSize { get; init; }
+        public int KeyReportOffset { get; }
+        public int ReportSize { get; }
+        public byte SerialNumberFeatureId { get; }
+        public int SerialNumberReportSkip { get; }
+        public byte[] GeneratePayload(OpenMacroBoard.SDK.KeyBitmap keyBitmap, OpenMacroBoard.SDK.IJpegEncoder jpegEncoder) { }
+        public byte[] GetBrightnessMessage(byte percent) { }
+        public byte[] GetLogoMessage() { }
+        public void PrepareDataForTransmission(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast) { }
+    }
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public sealed class HidComDriverStreamDeckMini : StreamDeckSharp.Internals.HidComDriver.IStreamDeckHidComDriver
+    {
+        public HidComDriverStreamDeckMini() { }
+        public double BytesPerSecondLimit { get; init; }
+        public int ExpectedFeatureReportLength { get; }
+        public int ExpectedInputReportLength { get; }
+        public int ExpectedOutputReportLength { get; }
+        public byte FirmwareVersionFeatureId { get; }
+        public int FirmwareVersionReportSkip { get; }
+        public int HeaderSize { get; }
+        public StreamDeckSharp.Internals.HidComDriver.IKeyIdMapper KeyIdMapper { get; }
+        public required int KeyImageSize { get; init; }
+        public int KeyReportOffset { get; }
+        public int ReportSize { get; }
+        public byte SerialNumberFeatureId { get; }
+        public int SerialNumberReportSkip { get; }
+        public byte[] GeneratePayload(OpenMacroBoard.SDK.KeyBitmap keyBitmap, OpenMacroBoard.SDK.IJpegEncoder jpegEncoder) { }
+        public byte[] GetBrightnessMessage(byte percent) { }
+        public byte[] GetLogoMessage() { }
+        public void PrepareDataForTransmission(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast) { }
+    }
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public interface IKeyIdMapper
+    {
+        int ExtKeyIdToHardwareKeyId(int extKeyId);
+        int HardwareKeyIdToExtKeyId(int hardwareKeyId);
+    }
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public interface IStreamDeckHidComDriver
+    {
+        double BytesPerSecondLimit { get; }
+        int ExpectedFeatureReportLength { get; }
+        int ExpectedInputReportLength { get; }
+        int ExpectedOutputReportLength { get; }
+        byte FirmwareVersionFeatureId { get; }
+        int FirmwareVersionReportSkip { get; }
+        int HeaderSize { get; }
+        StreamDeckSharp.Internals.HidComDriver.IKeyIdMapper KeyIdMapper { get; }
+        int KeyImageSize { get; }
+        int KeyReportOffset { get; }
+        int ReportSize { get; }
+        byte SerialNumberFeatureId { get; }
+        int SerialNumberReportSkip { get; }
+        byte[] GeneratePayload(OpenMacroBoard.SDK.KeyBitmap keyBitmap, OpenMacroBoard.SDK.IJpegEncoder jpegEncoder);
+        byte[] GetBrightnessMessage(byte percent);
+        byte[] GetLogoMessage();
+        void PrepareDataForTransmission(byte[] data, int pageNumber, int payloadLength, int keyId, bool isLast);
+    }
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public class IdentityKeyMapper : StreamDeckSharp.Internals.HidComDriver.IKeyIdMapper
+    {
+        public IdentityKeyMapper() { }
+        public int ExtKeyIdToHardwareKeyId(int extKeyId) { }
+        public int HardwareKeyIdToExtKeyId(int hardwareKeyId) { }
+    }
+    [System.Diagnostics.CodeAnalysis.Experimental("OMB0001", Message="Internal API of StreamDeckSharp: not covered by semantic versioning.")]
+    public class StreamDeck5HorizontalFlip : StreamDeckSharp.Internals.HidComDriver.IKeyIdMapper
+    {
+        public StreamDeck5HorizontalFlip() { }
+        public int ExtKeyIdToHardwareKeyId(int extKeyId) { }
+        public int HardwareKeyIdToExtKeyId(int hardwareKeyId) { }
+    }
+}

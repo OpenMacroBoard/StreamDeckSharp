@@ -1,0 +1,91 @@
+﻿namespace StreamDeckSharp.Exceptions
+{
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [System.Serializable]
+    public abstract class StreamDeckException : System.Exception
+    {
+        protected StreamDeckException() { }
+        protected StreamDeckException(string message) { }
+        protected StreamDeckException(string message, System.Exception innerException) { }
+    }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [System.Serializable]
+    public class StreamDeckNotFoundException : StreamDeckSharp.Exceptions.StreamDeckException { }
+}
+namespace StreamDeckSharp
+{
+    public static class Hardware
+    {
+        public static StreamDeckSharp.IUsbHidHardware StreamDeck { get; }
+        public static StreamDeckSharp.IUsbHidHardware StreamDeckMK2 { get; }
+        public static StreamDeckSharp.IUsbHidHardware StreamDeckMini { get; }
+        public static StreamDeckSharp.IUsbHidHardware StreamDeckRev2 { get; }
+        public static StreamDeckSharp.IUsbHidHardware StreamDeckXL { get; }
+        public static StreamDeckSharp.IUsbHidHardware RegisterNewHardware(StreamDeckSharp.UsbVendorProductPair usbId, string deviceName, OpenMacroBoard.SDK.GridKeyLayout keyLayout, StreamDeckSharp.Internals.HidComDriver.IStreamDeckHidComDriver driver) { }
+    }
+    public interface IHardware
+    {
+        string DeviceName { get; }
+        OpenMacroBoard.SDK.GridKeyLayout Keys { get; }
+    }
+    public interface IUsbHidHardware : StreamDeckSharp.IHardware
+    {
+        System.Collections.Generic.IReadOnlyList<StreamDeckSharp.UsbVendorProductPair> UsbIds { get; }
+    }
+    public static class StreamDeck
+    {
+        public static System.Collections.Generic.IEnumerable<StreamDeckSharp.StreamDeckDeviceReference> EnumerateDevices(params StreamDeckSharp.IUsbHidHardware[] hardware) { }
+        public static System.Collections.Generic.IEnumerable<StreamDeckSharp.StreamDeckDeviceReference> EnumerateDevices(StreamDeckSharp.StreamDeckOptions options, params StreamDeckSharp.IUsbHidHardware[] hardware) { }
+        public static OpenMacroBoard.SDK.IMacroBoard OpenDevice(params StreamDeckSharp.IUsbHidHardware[] hardware) { }
+        public static OpenMacroBoard.SDK.IMacroBoard OpenDevice(string devicePath) { }
+        public static OpenMacroBoard.SDK.IMacroBoard OpenDevice(StreamDeckSharp.StreamDeckOptions options, params StreamDeckSharp.IUsbHidHardware[] hardware) { }
+        public static OpenMacroBoard.SDK.IMacroBoard OpenDevice(bool useWriteCache, params StreamDeckSharp.IUsbHidHardware[] hardware) { }
+        public static OpenMacroBoard.SDK.IMacroBoard OpenDevice(string devicePath, StreamDeckSharp.StreamDeckOptions options) { }
+        public static OpenMacroBoard.SDK.IMacroBoard OpenDevice(string devicePath, bool useWriteCache) { }
+    }
+    public sealed class StreamDeckDeviceReference : OpenMacroBoard.SDK.IDeviceReference
+    {
+        public string DeviceName { get; set; }
+        public string DevicePath { get; }
+        public OpenMacroBoard.SDK.IKeyLayout Keys { get; }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public OpenMacroBoard.SDK.IMacroBoard Open() { }
+        public OpenMacroBoard.SDK.IMacroBoard Open(bool useWriteCache) { }
+        public override string ToString() { }
+    }
+    public sealed class StreamDeckListener : System.IDisposable, System.IObservable<OpenMacroBoard.SDK.DeviceStateReport>
+    {
+        public StreamDeckListener() { }
+        public StreamDeckListener(StreamDeckSharp.StreamDeckOptions options) { }
+        public void Dispose() { }
+        public System.IDisposable Subscribe(System.IObserver<OpenMacroBoard.SDK.DeviceStateReport> observer) { }
+    }
+    public sealed class StreamDeckOptions : System.IEquatable<StreamDeckSharp.StreamDeckOptions>
+    {
+        public StreamDeckOptions() { }
+        public OpenMacroBoard.SDK.IJpegEncoder JpegEncoder { get; init; }
+        public bool UseWriteCache { get; init; }
+        public static StreamDeckSharp.StreamDeckOptions Default { get; }
+    }
+    public static class UsbConstants
+    {
+        public static StreamDeckSharp.UsbVendorProductPair ElgatoUsbId(int productId) { }
+        public static class VendorIds
+        {
+            public const int ElgatoSystemsGmbH = 4057;
+        }
+    }
+    public readonly struct UsbVendorProductPair : System.IEquatable<StreamDeckSharp.UsbVendorProductPair>
+    {
+        public UsbVendorProductPair(int vendorId, int productId) { }
+        public int UsbProductId { get; }
+        public int UsbVendorId { get; }
+        public bool Equals(StreamDeckSharp.UsbVendorProductPair other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public static bool Equals(StreamDeckSharp.UsbVendorProductPair a, StreamDeckSharp.UsbVendorProductPair b) { }
+        public static bool operator !=(StreamDeckSharp.UsbVendorProductPair a, StreamDeckSharp.UsbVendorProductPair b) { }
+        public static bool operator ==(StreamDeckSharp.UsbVendorProductPair a, StreamDeckSharp.UsbVendorProductPair b) { }
+    }
+}

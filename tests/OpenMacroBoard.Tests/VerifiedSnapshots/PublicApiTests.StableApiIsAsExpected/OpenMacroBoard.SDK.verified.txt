@@ -1,0 +1,466 @@
+﻿namespace OpenMacroBoard.SDK
+{
+    public class ButtonPressEffectAdapter : OpenMacroBoard.SDK.MacroBoardAdapter
+    {
+        public ButtonPressEffectAdapter(OpenMacroBoard.SDK.IMacroBoard macroBoard) { }
+        public ButtonPressEffectAdapter(OpenMacroBoard.SDK.IMacroBoard macroBoard, OpenMacroBoard.SDK.ButtonPressEffectConfig? config) { }
+        public OpenMacroBoard.SDK.ButtonPressEffectConfig Config { get; }
+        public override void SetKeyBitmap(int keyId, OpenMacroBoard.SDK.KeyBitmap bitmapData) { }
+    }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class ButtonPressEffectConfig
+    {
+        public ButtonPressEffectConfig() { }
+        public OpenMacroBoard.SDK.OmbColor BackgroundColor { get; set; }
+        public double OriginX { get; set; }
+        public double OriginY { get; set; }
+        public double Scale { get; set; }
+    }
+    public class ConnectionEventArgs : System.EventArgs
+    {
+        public ConnectionEventArgs(bool newConnectionState) { }
+        public bool NewConnectionState { get; }
+    }
+    public class DeviceConnectionChangedEventArgs : System.EventArgs
+    {
+        public DeviceConnectionChangedEventArgs(OpenMacroBoard.SDK.IDeviceReference deviceReference, bool connected) { }
+        public bool Connected { get; }
+        public OpenMacroBoard.SDK.IDeviceReference DeviceReference { get; }
+    }
+    public static class DeviceContext
+    {
+        public static OpenMacroBoard.SDK.IDeviceContext Create() { }
+    }
+    public static class DeviceContextExtensions
+    {
+        public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.IDeviceReference> GetDeviceReferenceAsync(this OpenMacroBoard.SDK.IDeviceContext context, System.Func<OpenMacroBoard.SDK.IDeviceReference, bool> selector, System.Threading.CancellationToken cancellationToken = default) { }
+        public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.IMacroBoard> OpenAsync(this OpenMacroBoard.SDK.IDeviceContext context, System.Threading.CancellationToken cancellationToken = default) { }
+        public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.IMacroBoard> OpenAsync(this OpenMacroBoard.SDK.IDeviceContext context, System.Func<OpenMacroBoard.SDK.IDeviceReference, bool> selector, System.Threading.CancellationToken cancellationToken = default) { }
+    }
+    public abstract class DeviceListenerBase : System.IObservable<OpenMacroBoard.SDK.DeviceStateReport>
+    {
+        protected DeviceListenerBase() { }
+        public System.Collections.Generic.IReadOnlyList<OpenMacroBoard.SDK.IKnownDevice> KnownDevices { get; }
+        public System.IDisposable Subscribe(System.IObserver<OpenMacroBoard.SDK.DeviceStateReport> observer) { }
+        protected void Update(OpenMacroBoard.SDK.IDeviceReference deviceReference, bool connected) { }
+    }
+    public class DeviceStateReport
+    {
+        public DeviceStateReport(OpenMacroBoard.SDK.IDeviceReference deviceReference, bool connected, bool newDevice) { }
+        public bool Connected { get; }
+        public OpenMacroBoard.SDK.IDeviceReference DeviceReference { get; }
+        public bool NewDevice { get; }
+    }
+    public class DisconnectReplayAdapter : OpenMacroBoard.SDK.MacroBoardAdapter
+    {
+        public DisconnectReplayAdapter(OpenMacroBoard.SDK.IMacroBoard macroBoard) { }
+        public override void SetBrightness(byte percent) { }
+        public override void SetKeyBitmap(int keyId, OpenMacroBoard.SDK.KeyBitmap bitmapData) { }
+    }
+    public static class DrawFullScreenExtensions
+    {
+        public static void DrawFullScreenBitmap(this OpenMacroBoard.SDK.IMacroBoard board, OpenMacroBoard.SDK.KeyBitmap bitmap, OpenMacroBoard.SDK.OmbResizeMode resizeMode = 0) { }
+    }
+    public class GridKeyLayout : OpenMacroBoard.SDK.IKeyLayout, System.Collections.Generic.IEnumerable<OpenMacroBoard.SDK.OmbRectangle>, System.Collections.Generic.IReadOnlyCollection<OpenMacroBoard.SDK.OmbRectangle>, System.Collections.Generic.IReadOnlyList<OpenMacroBoard.SDK.OmbRectangle>, System.Collections.IEnumerable
+    {
+        public GridKeyLayout(int countX, int countY, int keySize, int gapSize) { }
+        public OpenMacroBoard.SDK.OmbRectangle Area { get; }
+        public int Count { get; }
+        public int CountX { get; }
+        public int CountY { get; }
+        public int GapSize { get; }
+        public OpenMacroBoard.SDK.OmbRectangle this[int keyIndex] { get; }
+        public int KeySize { get; }
+        public System.Collections.Generic.IEnumerator<OpenMacroBoard.SDK.OmbRectangle> GetEnumerator() { }
+    }
+    public interface IDeviceContext : System.IDisposable
+    {
+        System.IObservable<OpenMacroBoard.SDK.DeviceStateReport> DeviceStateReports { get; }
+        System.Collections.Generic.IReadOnlyList<OpenMacroBoard.SDK.IKnownDevice> KnownDevices { get; }
+        OpenMacroBoard.SDK.IDeviceContext AddListener(System.IObservable<OpenMacroBoard.SDK.DeviceStateReport> deviceListener);
+        OpenMacroBoard.SDK.IDeviceContext AddListener(System.IObservable<OpenMacroBoard.SDK.DeviceStateReport> deviceListener, bool disposeWithContext);
+        OpenMacroBoard.SDK.IDeviceContext AddListener<TListener>()
+            where TListener : System.IObservable<OpenMacroBoard.SDK.DeviceStateReport>, new ();
+    }
+    public interface IDeviceReference
+    {
+        string DeviceName { get; set; }
+        OpenMacroBoard.SDK.IKeyLayout Keys { get; }
+        OpenMacroBoard.SDK.IMacroBoard Open();
+    }
+    public interface IImageDecoder
+    {
+        OpenMacroBoard.SDK.KeyBitmap Decode(System.ReadOnlySpan<byte> encodedImage);
+    }
+    public interface IJpegEncoder
+    {
+        byte[] Encode(System.ReadOnlySpan<byte> bitmapDataBgr24, int width, int height);
+    }
+    public interface IKeyBitmapDataAccess
+    {
+        int Height { get; }
+        int Width { get; }
+        System.ReadOnlyMemory<byte> GetData();
+    }
+    public interface IKeyBitmapFactory { }
+    public interface IKeyLayout : System.Collections.Generic.IEnumerable<OpenMacroBoard.SDK.OmbRectangle>, System.Collections.Generic.IReadOnlyCollection<OpenMacroBoard.SDK.OmbRectangle>, System.Collections.Generic.IReadOnlyList<OpenMacroBoard.SDK.OmbRectangle>, System.Collections.IEnumerable
+    {
+        OpenMacroBoard.SDK.OmbRectangle Area { get; }
+        int CountX { get; }
+        int CountY { get; }
+        int GapSize { get; }
+        int KeySize { get; }
+    }
+    public interface IKnownDevice : OpenMacroBoard.SDK.IDeviceReference
+    {
+        bool Connected { get; }
+    }
+    public interface IMacroBoard : System.IDisposable
+    {
+        bool IsConnected { get; }
+        OpenMacroBoard.SDK.IKeyLayout Keys { get; }
+        event System.EventHandler<OpenMacroBoard.SDK.ConnectionEventArgs> ConnectionStateChanged;
+        event System.EventHandler<OpenMacroBoard.SDK.KeyEventArgs> KeyStateChanged;
+        string GetFirmwareVersion();
+        string GetSerialNumber();
+        void SetBrightness(byte percent);
+        void SetKeyBitmap(int keyId, OpenMacroBoard.SDK.KeyBitmap bitmapData);
+        void ShowLogo();
+    }
+    public class ImageDecodingException : System.Exception
+    {
+        public ImageDecodingException() { }
+        public ImageDecodingException(string message) { }
+        public ImageDecodingException(string message, System.Exception innerException) { }
+    }
+    public sealed class KeyBitmap : OpenMacroBoard.SDK.IKeyBitmapDataAccess
+    {
+        public int Height { get; }
+        public int Width { get; }
+        public static OpenMacroBoard.SDK.KeyBitmap Black { get; }
+        public static OpenMacroBoard.SDK.IKeyBitmapFactory Create { get; }
+    }
+    public static class KeyBitmapBasicFactoryExtensions
+    {
+        public static OpenMacroBoard.SDK.KeyBitmap FromBgr24Array(this OpenMacroBoard.SDK.IKeyBitmapFactory keyFactory, int width, int height, System.ReadOnlySpan<byte> bitmapDataBgr24) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromBgra32Array(this OpenMacroBoard.SDK.IKeyBitmapFactory keyFactory, int width, int height, System.ReadOnlySpan<byte> bitmapDataBgra32) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromColor(this OpenMacroBoard.SDK.IKeyBitmapFactory keyFactory, OpenMacroBoard.SDK.OmbColor color) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromFile(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, string bitmapFile) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromFile(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, string bitmapFile, OpenMacroBoard.SDK.IImageDecoder decoder) { }
+        public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.KeyBitmap> FromFileAsync(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, string bitmapFile) { }
+        public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.KeyBitmap> FromFileAsync(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, string bitmapFile, OpenMacroBoard.SDK.IImageDecoder decoder) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromRgb(this OpenMacroBoard.SDK.IKeyBitmapFactory keyFactory, byte r, byte g, byte b) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromRgba32Array(this OpenMacroBoard.SDK.IKeyBitmapFactory keyFactory, int width, int height, System.ReadOnlySpan<byte> bitmapDataRgba32) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromStream(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, System.IO.Stream bitmapStream) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromStream(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, System.IO.Stream bitmapStream, OpenMacroBoard.SDK.IImageDecoder decoder) { }
+        public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.KeyBitmap> FromStreamAsync(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, System.IO.Stream bitmapStream) { }
+        public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.KeyBitmap> FromStreamAsync(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, System.IO.Stream bitmapStream, OpenMacroBoard.SDK.IImageDecoder decoder) { }
+    }
+    public static class KeyBitmapTransformExtensions
+    {
+        public static OpenMacroBoard.SDK.KeyBitmap FlipHorizontal(this OpenMacroBoard.SDK.KeyBitmap keyBitmap) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FlipVertical(this OpenMacroBoard.SDK.KeyBitmap keyBitmap) { }
+        public static OpenMacroBoard.SDK.KeyBitmap Resize(this OpenMacroBoard.SDK.KeyBitmap keyBitmap, int width, int height) { }
+        public static OpenMacroBoard.SDK.KeyBitmap Resize(this OpenMacroBoard.SDK.KeyBitmap keyBitmap, int width, int height, OpenMacroBoard.SDK.OmbResizeMode resizeMode) { }
+        public static OpenMacroBoard.SDK.KeyBitmap Rotate180(this OpenMacroBoard.SDK.KeyBitmap keyBitmap) { }
+        public static OpenMacroBoard.SDK.KeyBitmap Rotate270(this OpenMacroBoard.SDK.KeyBitmap keyBitmap) { }
+        public static OpenMacroBoard.SDK.KeyBitmap Rotate90(this OpenMacroBoard.SDK.KeyBitmap keyBitmap) { }
+    }
+    public class KeyEventArgs : System.EventArgs
+    {
+        public KeyEventArgs(int key, bool isDown) { }
+        public bool IsDown { get; }
+        public int Key { get; }
+    }
+    public abstract class MacroBoardAdapter : OpenMacroBoard.SDK.IMacroBoard, System.IDisposable
+    {
+        protected MacroBoardAdapter(OpenMacroBoard.SDK.IMacroBoard macroBoard) { }
+        protected MacroBoardAdapter(OpenMacroBoard.SDK.IMacroBoard macroBoard, bool leaveOpen) { }
+        public virtual bool IsConnected { get; }
+        public virtual OpenMacroBoard.SDK.IKeyLayout Keys { get; }
+        public event System.EventHandler<OpenMacroBoard.SDK.ConnectionEventArgs>? ConnectionStateChanged;
+        public event System.EventHandler<OpenMacroBoard.SDK.KeyEventArgs>? KeyStateChanged;
+        public void Dispose() { }
+        protected virtual void Dispose(bool disposing) { }
+        protected override void Finalize() { }
+        public string GetFirmwareVersion() { }
+        public string GetSerialNumber() { }
+        protected virtual void OnConnectionStateChanged(object? sender, OpenMacroBoard.SDK.ConnectionEventArgs e) { }
+        protected virtual void OnKeyStateChanged(object? sender, OpenMacroBoard.SDK.KeyEventArgs e) { }
+        public virtual void SetBrightness(byte percent) { }
+        public virtual void SetKeyBitmap(int keyId, OpenMacroBoard.SDK.KeyBitmap bitmapData) { }
+        public virtual void ShowLogo() { }
+    }
+    public static class MacroBoardFeatureExtensions
+    {
+        public static OpenMacroBoard.SDK.IMacroBoard WithButtonPressEffect(this OpenMacroBoard.SDK.IMacroBoard macroBoard, OpenMacroBoard.SDK.ButtonPressEffectConfig? config = null) { }
+        public static OpenMacroBoard.SDK.IMacroBoard WithDisconnectReplay(this OpenMacroBoard.SDK.IMacroBoard macroBoard) { }
+    }
+    public readonly struct OmbColor : System.IEquatable<OpenMacroBoard.SDK.OmbColor>
+    {
+        public static readonly OpenMacroBoard.SDK.OmbColor AliceBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor AntiqueWhite;
+        public static readonly OpenMacroBoard.SDK.OmbColor Aqua;
+        public static readonly OpenMacroBoard.SDK.OmbColor Aquamarine;
+        public static readonly OpenMacroBoard.SDK.OmbColor Azure;
+        public static readonly OpenMacroBoard.SDK.OmbColor Beige;
+        public static readonly OpenMacroBoard.SDK.OmbColor Bisque;
+        public static readonly OpenMacroBoard.SDK.OmbColor Black;
+        public static readonly OpenMacroBoard.SDK.OmbColor BlanchedAlmond;
+        public static readonly OpenMacroBoard.SDK.OmbColor Blue;
+        public static readonly OpenMacroBoard.SDK.OmbColor BlueViolet;
+        public static readonly OpenMacroBoard.SDK.OmbColor Brown;
+        public static readonly OpenMacroBoard.SDK.OmbColor BurlyWood;
+        public static readonly OpenMacroBoard.SDK.OmbColor CadetBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor Chartreuse;
+        public static readonly OpenMacroBoard.SDK.OmbColor Chocolate;
+        public static readonly OpenMacroBoard.SDK.OmbColor Coral;
+        public static readonly OpenMacroBoard.SDK.OmbColor CornflowerBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor Cornsilk;
+        public static readonly OpenMacroBoard.SDK.OmbColor Crimson;
+        public static readonly OpenMacroBoard.SDK.OmbColor Cyan;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkCyan;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkGoldenrod;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkGray;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkGrey;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkKhaki;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkMagenta;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkOliveGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkOrange;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkOrchid;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkRed;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkSalmon;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkSeaGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkSlateBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkSlateGray;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkSlateGrey;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkTurquoise;
+        public static readonly OpenMacroBoard.SDK.OmbColor DarkViolet;
+        public static readonly OpenMacroBoard.SDK.OmbColor DeepPink;
+        public static readonly OpenMacroBoard.SDK.OmbColor DeepSkyBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor DimGray;
+        public static readonly OpenMacroBoard.SDK.OmbColor DimGrey;
+        public static readonly OpenMacroBoard.SDK.OmbColor DodgerBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor Firebrick;
+        public static readonly OpenMacroBoard.SDK.OmbColor FloralWhite;
+        public static readonly OpenMacroBoard.SDK.OmbColor ForestGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor Fuchsia;
+        public static readonly OpenMacroBoard.SDK.OmbColor Gainsboro;
+        public static readonly OpenMacroBoard.SDK.OmbColor GhostWhite;
+        public static readonly OpenMacroBoard.SDK.OmbColor Gold;
+        public static readonly OpenMacroBoard.SDK.OmbColor Goldenrod;
+        public static readonly OpenMacroBoard.SDK.OmbColor Gray;
+        public static readonly OpenMacroBoard.SDK.OmbColor Green;
+        public static readonly OpenMacroBoard.SDK.OmbColor GreenYellow;
+        public static readonly OpenMacroBoard.SDK.OmbColor Grey;
+        public static readonly OpenMacroBoard.SDK.OmbColor Honeydew;
+        public static readonly OpenMacroBoard.SDK.OmbColor HotPink;
+        public static readonly OpenMacroBoard.SDK.OmbColor IndianRed;
+        public static readonly OpenMacroBoard.SDK.OmbColor Indigo;
+        public static readonly OpenMacroBoard.SDK.OmbColor Ivory;
+        public static readonly OpenMacroBoard.SDK.OmbColor Khaki;
+        public static readonly OpenMacroBoard.SDK.OmbColor Lavender;
+        public static readonly OpenMacroBoard.SDK.OmbColor LavenderBlush;
+        public static readonly OpenMacroBoard.SDK.OmbColor LawnGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor LemonChiffon;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightCoral;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightCyan;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightGoldenrodYellow;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightGray;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightGrey;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightPink;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightSalmon;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightSeaGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightSkyBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightSlateGray;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightSlateGrey;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightSteelBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor LightYellow;
+        public static readonly OpenMacroBoard.SDK.OmbColor Lime;
+        public static readonly OpenMacroBoard.SDK.OmbColor LimeGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor Linen;
+        public static readonly OpenMacroBoard.SDK.OmbColor Magenta;
+        public static readonly OpenMacroBoard.SDK.OmbColor Maroon;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumAquamarine;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumOrchid;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumPurple;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumSeaGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumSlateBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumSpringGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumTurquoise;
+        public static readonly OpenMacroBoard.SDK.OmbColor MediumVioletRed;
+        public static readonly OpenMacroBoard.SDK.OmbColor MidnightBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor MintCream;
+        public static readonly OpenMacroBoard.SDK.OmbColor MistyRose;
+        public static readonly OpenMacroBoard.SDK.OmbColor Moccasin;
+        public static readonly OpenMacroBoard.SDK.OmbColor NavajoWhite;
+        public static readonly OpenMacroBoard.SDK.OmbColor Navy;
+        public static readonly OpenMacroBoard.SDK.OmbColor OldLace;
+        public static readonly OpenMacroBoard.SDK.OmbColor Olive;
+        public static readonly OpenMacroBoard.SDK.OmbColor OliveDrab;
+        public static readonly OpenMacroBoard.SDK.OmbColor Orange;
+        public static readonly OpenMacroBoard.SDK.OmbColor OrangeRed;
+        public static readonly OpenMacroBoard.SDK.OmbColor Orchid;
+        public static readonly OpenMacroBoard.SDK.OmbColor PaleGoldenrod;
+        public static readonly OpenMacroBoard.SDK.OmbColor PaleGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor PaleTurquoise;
+        public static readonly OpenMacroBoard.SDK.OmbColor PaleVioletRed;
+        public static readonly OpenMacroBoard.SDK.OmbColor PapayaWhip;
+        public static readonly OpenMacroBoard.SDK.OmbColor PeachPuff;
+        public static readonly OpenMacroBoard.SDK.OmbColor Peru;
+        public static readonly OpenMacroBoard.SDK.OmbColor Pink;
+        public static readonly OpenMacroBoard.SDK.OmbColor Plum;
+        public static readonly OpenMacroBoard.SDK.OmbColor PowderBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor Purple;
+        public static readonly OpenMacroBoard.SDK.OmbColor RebeccaPurple;
+        public static readonly OpenMacroBoard.SDK.OmbColor Red;
+        public static readonly OpenMacroBoard.SDK.OmbColor RosyBrown;
+        public static readonly OpenMacroBoard.SDK.OmbColor RoyalBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor SaddleBrown;
+        public static readonly OpenMacroBoard.SDK.OmbColor Salmon;
+        public static readonly OpenMacroBoard.SDK.OmbColor SandyBrown;
+        public static readonly OpenMacroBoard.SDK.OmbColor SeaGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor SeaShell;
+        public static readonly OpenMacroBoard.SDK.OmbColor Sienna;
+        public static readonly OpenMacroBoard.SDK.OmbColor Silver;
+        public static readonly OpenMacroBoard.SDK.OmbColor SkyBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor SlateBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor SlateGray;
+        public static readonly OpenMacroBoard.SDK.OmbColor SlateGrey;
+        public static readonly OpenMacroBoard.SDK.OmbColor Snow;
+        public static readonly OpenMacroBoard.SDK.OmbColor SpringGreen;
+        public static readonly OpenMacroBoard.SDK.OmbColor SteelBlue;
+        public static readonly OpenMacroBoard.SDK.OmbColor Tan;
+        public static readonly OpenMacroBoard.SDK.OmbColor Teal;
+        public static readonly OpenMacroBoard.SDK.OmbColor Thistle;
+        public static readonly OpenMacroBoard.SDK.OmbColor Tomato;
+        public static readonly OpenMacroBoard.SDK.OmbColor Turquoise;
+        public static readonly OpenMacroBoard.SDK.OmbColor Violet;
+        public static readonly OpenMacroBoard.SDK.OmbColor Wheat;
+        public static readonly OpenMacroBoard.SDK.OmbColor White;
+        public static readonly OpenMacroBoard.SDK.OmbColor WhiteSmoke;
+        public static readonly OpenMacroBoard.SDK.OmbColor Yellow;
+        public static readonly OpenMacroBoard.SDK.OmbColor YellowGreen;
+        public byte B { get; }
+        public byte G { get; }
+        public byte R { get; }
+        public bool Equals(OpenMacroBoard.SDK.OmbColor other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static OpenMacroBoard.SDK.OmbColor FromRgb(byte r, byte g, byte b) { }
+        public static bool operator !=(OpenMacroBoard.SDK.OmbColor left, OpenMacroBoard.SDK.OmbColor right) { }
+        public static bool operator ==(OpenMacroBoard.SDK.OmbColor left, OpenMacroBoard.SDK.OmbColor right) { }
+    }
+    public sealed class OmbImageDecoder : OpenMacroBoard.SDK.IImageDecoder
+    {
+        public OmbImageDecoder() { }
+        public static OpenMacroBoard.SDK.OmbImageDecoder Default { get; }
+        public OpenMacroBoard.SDK.KeyBitmap Decode(System.ReadOnlySpan<byte> encodedImage) { }
+    }
+    public sealed class OmbJpegEncoder : OpenMacroBoard.SDK.IJpegEncoder
+    {
+        public const int DefaultQuality = 75;
+        public OmbJpegEncoder() { }
+        public OmbJpegEncoder(int quality) { }
+        public int Quality { get; }
+        public static OpenMacroBoard.SDK.OmbJpegEncoder Default { get; }
+        public byte[] Encode(System.ReadOnlySpan<byte> bitmapDataBgr24, int width, int height) { }
+    }
+    public readonly struct OmbPoint : System.IEquatable<OpenMacroBoard.SDK.OmbPoint>
+    {
+        public static readonly OpenMacroBoard.SDK.OmbPoint Empty;
+        public OmbPoint(OpenMacroBoard.SDK.OmbSize size) { }
+        public OmbPoint(int x, int y) { }
+        public bool IsEmpty { get; }
+        public int X { get; }
+        public int Y { get; }
+        public void Deconstruct(out int x, out int y) { }
+        public bool Equals(OpenMacroBoard.SDK.OmbPoint other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static OpenMacroBoard.SDK.OmbSize op_Explicit(OpenMacroBoard.SDK.OmbPoint point) { }
+        public static bool operator !=(OpenMacroBoard.SDK.OmbPoint left, OpenMacroBoard.SDK.OmbPoint right) { }
+        public static OpenMacroBoard.SDK.OmbPoint operator /(OpenMacroBoard.SDK.OmbPoint left, int right) { }
+        public static bool operator ==(OpenMacroBoard.SDK.OmbPoint left, OpenMacroBoard.SDK.OmbPoint right) { }
+    }
+    public readonly struct OmbRectangle : System.IEquatable<OpenMacroBoard.SDK.OmbRectangle>
+    {
+        public static readonly OpenMacroBoard.SDK.OmbRectangle Empty;
+        public OmbRectangle(OpenMacroBoard.SDK.OmbPoint point, OpenMacroBoard.SDK.OmbSize size) { }
+        public OmbRectangle(int x, int y, int width, int height) { }
+        public int Bottom { get; }
+        public int Height { get; }
+        public bool IsEmpty { get; }
+        public int Left { get; }
+        public OpenMacroBoard.SDK.OmbPoint Location { get; }
+        public int Right { get; }
+        public OpenMacroBoard.SDK.OmbSize Size { get; }
+        public int Top { get; }
+        public int Width { get; }
+        public int X { get; }
+        public int Y { get; }
+        public void Deconstruct(out int x, out int y, out int width, out int height) { }
+        public bool Equals(OpenMacroBoard.SDK.OmbRectangle other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static OpenMacroBoard.SDK.OmbRectangle FromLTRB(int left, int top, int right, int bottom) { }
+        public static bool operator !=(OpenMacroBoard.SDK.OmbRectangle left, OpenMacroBoard.SDK.OmbRectangle right) { }
+        public static bool operator ==(OpenMacroBoard.SDK.OmbRectangle left, OpenMacroBoard.SDK.OmbRectangle right) { }
+    }
+    public enum OmbResizeMode
+    {
+        BoxPad = 0,
+        Pad = 1,
+        Crop = 2,
+        Stretch = 3,
+    }
+    public readonly struct OmbSize : System.IEquatable<OpenMacroBoard.SDK.OmbSize>
+    {
+        public static readonly OpenMacroBoard.SDK.OmbSize Empty;
+        public OmbSize(OpenMacroBoard.SDK.OmbPoint point) { }
+        public OmbSize(OpenMacroBoard.SDK.OmbSize size) { }
+        public OmbSize(int value) { }
+        public OmbSize(int width, int height) { }
+        public int Height { get; }
+        public bool IsEmpty { get; }
+        public int Width { get; }
+        public void Deconstruct(out int width, out int height) { }
+        public bool Equals(OpenMacroBoard.SDK.OmbSize other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static OpenMacroBoard.SDK.OmbPoint op_Explicit(OpenMacroBoard.SDK.OmbSize size) { }
+        public static bool operator !=(OpenMacroBoard.SDK.OmbSize left, OpenMacroBoard.SDK.OmbSize right) { }
+        public static bool operator ==(OpenMacroBoard.SDK.OmbSize left, OpenMacroBoard.SDK.OmbSize right) { }
+    }
+    public static class SetKeyExtensions
+    {
+        public static void ClearKey(this OpenMacroBoard.SDK.IMacroBoard board, int keyId) { }
+        public static void ClearKeys(this OpenMacroBoard.SDK.IMacroBoard board) { }
+        public static void SetKeyBitmap(this OpenMacroBoard.SDK.IMacroBoard board, OpenMacroBoard.SDK.KeyBitmap bitmap) { }
+    }
+}
+namespace OpenMacroBoard.SDK.Helper
+{
+    public static class KeyLayoutAreaHelperExtensions
+    {
+        public static OpenMacroBoard.SDK.OmbRectangle GetFullArea(this OpenMacroBoard.SDK.IKeyLayout keyLayout) { }
+    }
+}
+namespace OpenMacroBoard.SDK.Utils
+{
+    public static class LinqExtensions
+    {
+        public static System.Collections.Generic.IEnumerable<TOut> SelectWhere<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> source, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "Success",
+                "Output"})] System.Func<TIn, System.ValueTuple<bool, TOut>> selector) { }
+    }
+}

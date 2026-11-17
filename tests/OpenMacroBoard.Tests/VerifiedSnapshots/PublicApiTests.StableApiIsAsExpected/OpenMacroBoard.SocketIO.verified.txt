@@ -1,0 +1,39 @@
+﻿namespace OpenMacroBoard.SocketIO
+{
+    public class KeyDetails
+    {
+        public KeyDetails() { }
+        [Newtonsoft.Json.JsonProperty("x")]
+        public int CountX { get; set; }
+        [Newtonsoft.Json.JsonProperty("y")]
+        public int CountY { get; set; }
+        [Newtonsoft.Json.JsonProperty("g")]
+        public int GapSize { get; set; }
+        [Newtonsoft.Json.JsonProperty("s")]
+        public int KeySize { get; set; }
+    }
+    public sealed class SocketIOBoardListener : System.IDisposable, System.IObservable<OpenMacroBoard.SDK.DeviceStateReport>
+    {
+        public SocketIOBoardListener() { }
+        public SocketIOBoardListener(System.Net.IPAddress bindIpAddress) { }
+        public void Dispose() { }
+        public System.IDisposable Subscribe(System.IObserver<OpenMacroBoard.SDK.DeviceStateReport> observer) { }
+    }
+    public sealed class SocketIODeviceReference : OpenMacroBoard.SDK.IDeviceReference, System.IEquatable<OpenMacroBoard.SocketIO.SocketIODeviceReference>
+    {
+        public SocketIODeviceReference(string deviceName, System.Net.IPEndPoint ipEndPoint, OpenMacroBoard.SDK.GridKeyLayout keyLayout) { }
+        public string DeviceName { get; set; }
+        public System.Net.IPEndPoint IPEndPoint { get; }
+        public OpenMacroBoard.SDK.IKeyLayout Keys { get; }
+        public bool Equals(OpenMacroBoard.SocketIO.SocketIODeviceReference? other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public OpenMacroBoard.SDK.IMacroBoard Open() { }
+    }
+    public sealed class SocketIOMacroBoardHost : System.IDisposable
+    {
+        public SocketIOMacroBoardHost(OpenMacroBoard.SDK.IMacroBoard macroBoard, string deviceName, System.Net.IPAddress bindIpAddress, ushort port = 0) { }
+        public System.Net.IPEndPoint HostEndpoint { get; }
+        public void Dispose() { }
+    }
+}

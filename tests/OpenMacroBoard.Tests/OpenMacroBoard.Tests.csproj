@@ -41,6 +41,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenMacroBoard.Meta.TestUtils\OpenMacroBoard.Meta.TestUtils.csproj" />
     <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
   </ItemGroup>
 
 </Project>

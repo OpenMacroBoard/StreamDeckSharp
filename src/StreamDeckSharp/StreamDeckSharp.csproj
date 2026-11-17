@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>default</LangVersion>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <!-- OMB0001 marks the public types of the Internals namespaces, which this project may use -->
+    <NoWarn>$(NoWarn);OMB0001</NoWarn>
   </PropertyGroup>
 
   <!-- nuget stuff -->
