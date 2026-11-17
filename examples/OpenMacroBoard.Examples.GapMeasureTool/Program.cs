@@ -41,7 +41,7 @@ internal static class Program
                 x.Fill(Color.White, rect);
             });
 
-            deck.DrawFullScreenBitmap(fullScreenBmp);
+            deck.DrawFullScreenBitmap(ImageSharpConversions.ToKeyBitmap(fullScreenBmp));
 
             var k = Console.ReadKey(true);
 

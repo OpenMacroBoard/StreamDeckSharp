@@ -30,7 +30,7 @@ internal static class Program
 
         image.Mutate(x => x.DrawText("Your Text", font, Color.White, new PointF(5, 20)));
 
-        var key = KeyBitmap.Create.FromImageSharpImage(image);
+        var key = ImageSharpConversions.ToKeyBitmap(image);
 
         deck.SetKeyBitmap(key);
     }

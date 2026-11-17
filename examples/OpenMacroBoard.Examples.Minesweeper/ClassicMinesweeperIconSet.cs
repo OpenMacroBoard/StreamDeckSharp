@@ -1,3 +1,4 @@
+using OpenMacroBoard.Examples.CommonStuff;
 using OpenMacroBoard.SDK;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -35,7 +36,7 @@ internal class ClassicMinesweeperIconSet : IMinesweeperIconSet
         using var resStream = asm.GetManifestResourceStream(resourceName);
         using var bmp = Image.Load(resStream);
 
-        return KeyBitmap.Create.FromImageSharpImage(bmp);
+        return ImageSharpConversions.ToKeyBitmap(bmp);
     }
 
     private void InitializeBitmaps()
@@ -51,7 +52,7 @@ internal class ClassicMinesweeperIconSet : IMinesweeperIconSet
                 new PointF(30, 18)
             ));
 
-            numberBitmaps[i] = KeyBitmap.Create.FromImageSharpImage(keyImage);
+            numberBitmaps[i] = ImageSharpConversions.ToKeyBitmap(keyImage);
         }
 
         numberBitmaps[0] = KeyBitmap.Black;

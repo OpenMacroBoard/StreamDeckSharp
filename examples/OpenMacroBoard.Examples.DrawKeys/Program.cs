@@ -61,7 +61,7 @@ internal static class Program
             var image = new Image<Bgr24>(KeySize, KeySize);
             image.Mutate(x => x.DrawText($"{kId,2}", font, Color.White, origin));
 
-            var bmp = KeyBitmap.Create.FromImageSharpImage(image);
+            var bmp = ImageSharpConversions.ToKeyBitmap(image);
 
             deck.SetKeyBitmap(kId, bmp);
         }

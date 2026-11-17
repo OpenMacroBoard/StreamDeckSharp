@@ -1,8 +1,6 @@
 using Emgu.CV;
 using OpenMacroBoard.Examples.CommonStuff;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -73,7 +71,7 @@ internal static class Program
         }
     }
 
-    private static Image<Bgr24> ConvertFrame(System.Drawing.Bitmap b)
+    private static KeyBitmap ConvertFrame(System.Drawing.Bitmap b)
     {
         var rect = new System.Drawing.Rectangle(0, 0, b.Width, b.Height);
 
@@ -110,7 +108,7 @@ internal static class Program
                 data = newData;
             }
 
-            return Image.LoadPixelData<Bgr24>(data, b.Width, b.Height);
+            return KeyBitmap.Create.FromBgr24Array(b.Width, b.Height, data);
         }
         finally
         {

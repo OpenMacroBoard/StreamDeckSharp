@@ -82,7 +82,7 @@ internal static class Program
             );
         });
 
-        var key = KeyBitmap.Create.FromImageSharpImage(keyImage);
+        var key = ImageSharpConversions.ToKeyBitmap(keyImage);
 
         d.SetKeyBitmap(e.Key, key);
     }

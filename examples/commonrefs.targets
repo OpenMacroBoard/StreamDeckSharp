@@ -1,19 +1,17 @@
 <Project>
-  <Import Project="settings.targets" />
-  <Choose>
-    <When Condition="'$(ReferenceType)' == 'local'">
-      <ItemGroup>
-        <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
-        <ProjectReference Include="..\..\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
-        <ProjectReference Include="..\..\src\StreamDeckSharp\StreamDeckSharp.csproj" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="OpenMacroBoard.SDK" Version="10.0.0" />
-        <PackageReference Include="OpenMacroBoard.SocketIO" Version="10.0.0" />
-        <PackageReference Include="StreamDeckSharp" Version="10.0.0" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
+  <PropertyGroup>
+    <!--
+      The examples use ImageSharp for drawing. Its known vulnerabilities are reported as
+      warnings here, not as errors, so they stay visible without breaking the build.
+      The libraries do not use ImageSharp.
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <!-- The examples always build against the libraries in this repository -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
+    <ProjectReference Include="..\..\src\StreamDeckSharp\StreamDeckSharp.csproj" />
+  </ItemGroup>
 </Project>
