@@ -21,6 +21,9 @@ The SDK no longer depends on ImageSharp. See [Migrating from the ImageSharp base
 
   - VirtualBoard is a web application now and runs on Windows, Linux and macOS. It shows the board on a page in the browser (default `http://127.0.0.1:28621/`) instead of a window. Applications reach it through SocketIO as before, and the CLI parameters are the same, plus `--web-port` and `--open-browser`. There is no Windows executable to download any more; start it with `dotnet run --project src/OpenMacroBoard.VirtualBoard`.
 
+### Fixed
+  - SocketIO: on Linux and macOS, applications did not find boards that are hosted on a loopback address (the default, `127.0.0.1`), because these systems do not deliver the discovery broadcast to a socket bound to that address. The host now answers discovery requests there too, but only requests that come from the same machine. The board itself is still reachable only on the address it is bound to.
+
 ### Removed
   - **Breaking:** `KeyBitmap.Create.FromImageSharpImage`, `ToImage`, `ImageSharpExtensions` and `ConditionalDisposable<T>`. The migration page shows the few lines that replace them.
 

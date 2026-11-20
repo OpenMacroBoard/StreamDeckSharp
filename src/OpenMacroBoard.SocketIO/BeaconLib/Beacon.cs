@@ -22,6 +22,7 @@ internal sealed class Beacon : IDisposable
 {
     internal const int DiscoveryPort = 35891;
     private readonly UdpClient udp;
+    private readonly bool loopbackOnly;
 
     public Beacon(string beaconType, ushort advertisedPort, IPAddress bindIpAddress)
     {
@@ -31,7 +32,7 @@ internal sealed class Beacon : IDisposable
 
         udp = new UdpClient();
         udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-        udp.Client.Bind(new IPEndPoint(bindIpAddress, DiscoveryPort));
+        udp.Client.Bind(new IPEndPoint(GetDiscoveryAddress(bindIpAddress, out loopbackOnly), DiscoveryPort));
         udp.EnableNatTraversal();
     }
 
@@ -92,6 +93,26 @@ internal sealed class Beacon : IDisposable
             haystack.Zip(prefix, (a, b) => Equals(a, b)).All(_ => _);
     }
 
+    /// <summary>
+    /// Gets the address the discovery socket has to bind to, so that it receives the probe broadcasts.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Probes are sent to the broadcast address. Windows also delivers them to a socket that is
+    /// bound to the loopback address, Linux and macOS only to sockets bound to the wildcard address.
+    /// There a beacon for the loopback address binds to the wildcard address and answers
+    /// only probes that come from the loopback address, so it stays invisible to other machines.
+    /// </para>
+    /// </remarks>
+    private static IPAddress GetDiscoveryAddress(IPAddress bindIpAddress, out bool loopbackOnly)
+    {
+        loopbackOnly = !OperatingSystem.IsWindows()
+            && bindIpAddress.AddressFamily == AddressFamily.InterNetwork
+            && IPAddress.IsLoopback(bindIpAddress);
+
+        return loopbackOnly ? IPAddress.Any : bindIpAddress;
+    }
+
     private void ProbeReceived(IAsyncResult ar)
     {
         var remote = new IPEndPoint(IPAddress.Any, 0);
@@ -109,7 +130,9 @@ internal sealed class Beacon : IDisposable
         // Compare beacon type to probe type
         var typeBytes = Encode(BeaconType);
 
-        if (HasPrefix(bytes, typeBytes))
+        var allowedSender = !loopbackOnly || (remote is not null && IPAddress.IsLoopback(remote.Address));
+
+        if (allowedSender && HasPrefix(bytes, typeBytes))
         {
             // If true, respond again with our type, port and payload
             var responseData = Encode(BeaconType)
