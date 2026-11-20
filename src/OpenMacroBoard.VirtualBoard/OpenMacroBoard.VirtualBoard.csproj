@@ -1,35 +1,36 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <Version>11.0.0</Version>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>default</LangVersion>
     <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
+    <ImplicitUsings>disable</ImplicitUsings>
     <ApplicationIcon>OmbIcon.ico</ApplicationIcon>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-    <DebugType>none</DebugType>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <PublishSingleFile>true</PublishSingleFile>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
+  <Import Project="..\..\analyzers.targets" />
+
+  <!-- The page and its images are part of the assembly, so the tool is a single unit -->
   <ItemGroup>
-    <None Remove="glassKey.png" />
-    <None Remove="OpenMacroBoard-Logo.png" />
+    <Content Remove="Web\**" />
+    <EmbeddedResource Include="Web\index.html" LogicalName="OpenMacroBoard.VirtualBoard.Web.index.html" />
+    <EmbeddedResource Include="Web\glassKey.png" LogicalName="OpenMacroBoard.VirtualBoard.Web.glassKey.png" />
+    <EmbeddedResource Include="OmbIcon.ico" LogicalName="OpenMacroBoard.VirtualBoard.Web.favicon.ico" />
+    <EmbeddedResource Include="OpenMacroBoard-Logo.png" LogicalName="OpenMacroBoard.VirtualBoard.OpenMacroBoard-Logo.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="OmbIcon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="glassKey.png" />
-    <EmbeddedResource Include="OpenMacroBoard-Logo.png" />
+    <InternalsVisibleTo Include="OpenMacroBoard.Tests" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="System.Reactive" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>

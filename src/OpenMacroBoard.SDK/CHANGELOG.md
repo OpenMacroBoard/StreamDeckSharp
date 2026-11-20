@@ -19,6 +19,8 @@ The SDK no longer depends on ImageSharp. See [Migrating from the ImageSharp base
   - **Breaking:** `DrawFullScreenBitmap` takes a `KeyBitmap` and an `OmbResizeMode` instead of an ImageSharp image and ImageSharp's `ResizeMode`. The image is scaled with the SDK's own code, so it looks slightly softer than before.
   - `ButtonPressEffectAdapter` scales the pressed key with the SDK's own code instead of ImageSharp. The result looks the same, but the pixels at edges can differ slightly.
 
+  - VirtualBoard is a web application now and runs on Windows, Linux and macOS. It shows the board on a page in the browser (default `http://127.0.0.1:28621/`) instead of a window. Applications reach it through SocketIO as before, and the CLI parameters are the same, plus `--web-port` and `--open-browser`. There is no Windows executable to download any more; start it with `dotnet run --project src/OpenMacroBoard.VirtualBoard`.
+
 ### Removed
   - **Breaking:** `KeyBitmap.Create.FromImageSharpImage`, `ToImage`, `ImageSharpExtensions` and `ConditionalDisposable<T>`. The migration page shows the few lines that replace them.
 

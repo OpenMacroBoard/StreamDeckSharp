@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Board</title>
+<link rel="icon" href="favicon.ico">
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: #141414;
+    color: #8a8a8a;
+    font: 13px system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  canvas {
+    display: block;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  #caption {
+    padding: 6px 12px 8px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #status {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: #7a1f1f;
+    color: #fff;
+  }
+
+  #status[hidden] {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="board" width="1" height="1"></canvas></div>
+<div id="caption"></div>
+<div id="status" role="status" hidden>Not connected to the virtual board. Trying again …</div>
+
+<script>
+'use strict';
+
+// Protocol (see the README of OpenMacroBoard.VirtualBoard):
+//   server -> page, text:   {"type":"board", ...}, {"type":"keyState","key":n,"down":bool},
+//                           {"type":"brightness","percent":n}
+//   server -> page, binary: [1][key u16][width u16][height u16][RGBA pixels], little endian
+//   page -> server, text:   {"type":"key","key":n,"down":bool}
+
+const KEY_CORNER_RADIUS = 10;      // in key image pixels
+const GLASS_SCALE = 1.125;         // the glass overlay is a bit larger than the key image
+const GLASS_SCALE_PRESSED = 1.1;
+const RECONNECT_DELAY_MS = 1000;
+
+const canvas = document.getElementById('board');
+const stage = document.getElementById('stage');
+const caption = document.getElementById('caption');
+const statusBox = document.getElementById('status');
+const context = canvas.getContext('2d');
+
+const glass = new Image();
+glass.src = 'glassKey.png';
+glass.addEventListener('load', requestDraw);
+
+let board = null;                  // the "board" message, or null before the first connection
+let keyImages = [];                // one small canvas per key, or null for a black key
+let keysDown = new Set();          // keys that are down on the board (any viewer)
+const heldByPointer = new Map();   // pointer ID -> key this page holds with that pointer
+let brightness = 100;
+let socket = null;
+let drawRequested = false;
+
+function connect() {
+  const scheme = location.protocol === 'https:' ? 'wss://' : 'ws://';
+  socket = new WebSocket(scheme + location.host + '/ws');
+  socket.binaryType = 'arraybuffer';
+
+  socket.addEventListener('open', () => { statusBox.hidden = true; });
+  socket.addEventListener('message', onMessage);
+
+  socket.addEventListener('close', () => {
+    // The server releases the keys of this page itself when the connection ends.
+    heldByPointer.clear();
+    keysDown = new Set();
+    statusBox.hidden = false;
+    requestDraw();
+    setTimeout(connect, RECONNECT_DELAY_MS);
+  });
+}
+
+function onMessage(event) {
+  if (typeof event.data !== 'string') {
+    onKeyImage(new DataView(event.data));
+    return;
+  }
+
+  const message = JSON.parse(event.data);
+
+  if (message.type === 'board') {
+    board = message;
+    brightness = message.brightness;
+    keyImages = new Array(board.countX * board.countY).fill(null);
+    keysDown = new Set();
+
+    const title = board.endpoint ? `${board.deviceName} (${board.endpoint})` : board.deviceName;
+    document.title = title;
+    caption.textContent = title;
+    resize();
+  } else if (message.type === 'keyState') {
+    if (message.down) {
+      keysDown.add(message.key);
+    } else {
+      keysDown.delete(message.key);
+    }
+  } else if (message.type === 'brightness') {
+    brightness = message.percent;
+  }
+
+  requestDraw();
+}
+
+function onKeyImage(view) {
+  if (view.getUint8(0) !== 1 || !board) {
+    return;
+  }
+
+  const key = view.getUint16(1, true);
+  const width = view.getUint16(3, true);
+  const height = view.getUint16(5, true);
+
+  if (key >= keyImages.length) {
+    return;
+  }
+
+  if (width === 0 || height === 0) {
+    keyImages[key] = null;
+  } else {
+    const pixels = new Uint8ClampedArray(view.buffer, view.byteOffset + 7, width * height * 4);
+    const image = document.createElement('canvas');
+    image.width = width;
+    image.height = height;
+    image.getContext('2d').putImageData(new ImageData(pixels, width, height), 0, 0);
+    keyImages[key] = image;
+  }
+
+  requestDraw();
+}
+
+// --- layout: all coordinates below are in key image pixels ---------------------------------
+
+function boardWidth() {
+  return board.countX * board.keySize + (board.countX + 1) * board.gapSize;
+}
+
+function boardHeight() {
+  return board.countY * board.keySize + (board.countY + 1) * board.gapSize;
+}
+
+function keyRect(key) {
+  const column = key % board.countX;
+  const row = Math.floor(key / board.countX);
+
+  return {
+    x: board.gapSize + column * (board.keySize + board.gapSize),
+    y: board.gapSize + row * (board.keySize + board.gapSize),
+    size: board.keySize,
+  };
+}
+
+function keyAt(clientX, clientY) {
+  const bounds = canvas.getBoundingClientRect();
+  const x = (clientX - bounds.left) * boardWidth() / bounds.width;
+  const y = (clientY - bounds.top) * boardHeight() / bounds.height;
+
+  for (let key = 0; key < keyImages.length; key++) {
+    const rect = keyRect(key);
+
+    if (x >= rect.x && x <= rect.x + rect.size && y >= rect.y && y <= rect.y + rect.size) {
+      return key;
+    }
+  }
+
+  return -1;
+}
+
+function resize() {
+  if (!board) {
+    return;
+  }
+
+  // Fit the board into the available space and keep its proportions.
+  const scale = Math.min(stage.clientWidth / boardWidth(), stage.clientHeight / boardHeight());
+  const cssWidth = Math.max(1, Math.floor(boardWidth() * scale));
+  const cssHeight = Math.max(1, Math.floor(boardHeight() * scale));
+  const pixelRatio = window.devicePixelRatio || 1;
+
+  canvas.style.width = cssWidth + 'px';
+  canvas.style.height = cssHeight + 'px';
+  canvas.width = Math.round(cssWidth * pixelRatio);
+  canvas.height = Math.round(cssHeight * pixelRatio);
+
+  requestDraw();
+}
+
+// --- drawing -------------------------------------------------------------------------------
+
+function requestDraw() {
+  if (!drawRequested) {
+    drawRequested = true;
+    requestAnimationFrame(draw);
+  }
+}
+
+function draw() {
+  drawRequested = false;
+
+  if (!board) {
+    return;
+  }
+
+  context.setTransform(canvas.width / boardWidth(), 0, 0, canvas.height / boardHeight(), 0, 0);
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
+
+  context.fillStyle = '#141414';
+  context.fillRect(0, 0, boardWidth(), boardHeight());
+
+  for (let key = 0; key < keyImages.length; key++) {
+    const rect = keyRect(key);
+    const pressed = keysDown.has(key) || isHeldHere(key);
+
+    context.save();
+    context.beginPath();
+    context.roundRect(rect.x, rect.y, rect.size, rect.size, KEY_CORNER_RADIUS);
+    context.clip();
+
+    context.fillStyle = '#000';
+    context.fillRect(rect.x, rect.y, rect.size, rect.size);
+
+    if (keyImages[key]) {
+      context.drawImage(keyImages[key], rect.x, rect.y, rect.size, rect.size);
+    }
+
+    if (brightness < 100) {
+      // Brightness 0 is not fully black, a real display still glows a little.
+      context.fillStyle = `rgba(0, 0, 0, ${(100 - brightness) / 100 * 0.9})`;
+      context.fillRect(rect.x, rect.y, rect.size, rect.size);
+    }
+
+    context.restore();
+
+    if (glass.complete && glass.naturalWidth > 0) {
+      const glassSize = rect.size * (pressed ? GLASS_SCALE_PRESSED : GLASS_SCALE);
+      const offset = (glassSize - rect.size) / 2;
+      context.drawImage(glass, rect.x - offset, rect.y - offset, glassSize, glassSize);
+    }
+  }
+}
+
+// --- input ---------------------------------------------------------------------------------
+
+function isHeldHere(key) {
+  for (const held of heldByPointer.values()) {
+    if (held === key) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function sendKey(key, down) {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: 'key', key: key, down: down }));
+  }
+}
+
+// A pointer (mouse button, finger, pen) holds at most one key. Dragging onto another key
+// releases the first one and presses the other, like on the old virtual board.
+function moveHold(pointerId, key) {
+  const before = heldByPointer.has(pointerId) ? heldByPointer.get(pointerId) : -1;
+
+  if (before === key) {
+    return;
+  }
+
+  if (key >= 0) {
+    heldByPointer.set(pointerId, key);
+  } else {
+    heldByPointer.delete(pointerId);
+  }
+
+  if (before >= 0 && !isHeldHere(before)) {
+    sendKey(before, false);
+  }
+
+  if (key >= 0) {
+    sendKey(key, true);
+  }
+
+  requestDraw();
+}
+
+canvas.addEventListener('pointerdown', event => {
+  if (!board || (event.pointerType === 'mouse' && event.button !== 0)) {
+    return;
+  }
+
+  canvas.setPointerCapture(event.pointerId);
+  moveHold(event.pointerId, keyAt(event.clientX, event.clientY));
+  event.preventDefault();
+});
+
+canvas.addEventListener('pointermove', event => {
+  if (board && canvas.hasPointerCapture(event.pointerId)) {
+    moveHold(event.pointerId, keyAt(event.clientX, event.clientY));
+  }
+});
+
+for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  canvas.addEventListener(type, event => moveHold(event.pointerId, -1));
+}
+
+canvas.addEventListener('contextmenu', event => event.preventDefault());
+window.addEventListener('resize', resize);
+
+connect();
+</script>
+</body>
+</html>
