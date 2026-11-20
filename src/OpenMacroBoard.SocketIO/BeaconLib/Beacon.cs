@@ -126,10 +126,17 @@ internal sealed class Beacon : IDisposable
         {
             return;
         }
+        catch (SocketException)
+        {
+            // Disposing the socket ends a pending receive with this exception on some systems.
+            // Anything else (for example a "connection reset" after an answer that nobody
+            // received) must not end the discovery, and certainly not the process.
+            ContinueReceiving();
+            return;
+        }
 
         // Compare beacon type to probe type
         var typeBytes = Encode(BeaconType);
-
         var allowedSender = !loopbackOnly || (remote is not null && IPAddress.IsLoopback(remote.Address));
 
         if (allowedSender && HasPrefix(bytes, typeBytes))
@@ -140,12 +147,41 @@ internal sealed class Beacon : IDisposable
                 .Concat(Encode(BeaconData))
                 .ToArray();
 
-            udp.Send(responseData, responseData.Length, remote);
+            try
+            {
+                udp.Send(responseData, responseData.Length, remote);
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+            catch (SocketException)
+            {
+                // The answer could not be sent; the probe asks again in a moment.
+            }
         }
 
-        if (!Stopped)
+        ContinueReceiving();
+    }
+
+    private void ContinueReceiving()
+    {
+        if (Stopped)
+        {
+            return;
+        }
+
+        try
         {
             udp.BeginReceive(ProbeReceived, null);
+        }
+        catch (ObjectDisposedException)
+        {
+            // The beacon was disposed in the meantime.
+        }
+        catch (SocketException)
+        {
+            // Same, the socket is closed.
         }
     }
 }

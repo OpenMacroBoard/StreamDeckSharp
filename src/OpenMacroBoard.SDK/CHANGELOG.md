@@ -23,6 +23,7 @@ The SDK no longer depends on ImageSharp. See [Migrating from the ImageSharp base
 
 ### Fixed
   - SocketIO: on Linux and macOS, applications did not find boards that are hosted on a loopback address (the default, `127.0.0.1`), because these systems do not deliver the discovery broadcast to a socket bound to that address. The host now answers discovery requests there too, but only requests that come from the same machine. The board itself is still reachable only on the address it is bound to.
+  - SocketIO: disposing a `SocketIOMacroBoardHost` or a `SocketIOBoardListener` could end the whole process with an unhandled `SocketException` ("Operation canceled") from the discovery socket. Socket errors there are handled now.
 
 ### Removed
   - **Breaking:** `KeyBitmap.Create.FromImageSharpImage`, `ToImage`, `ImageSharpExtensions` and `ConditionalDisposable<T>`. The migration page shows the few lines that replace them.

@@ -87,6 +87,13 @@ internal sealed class Probe : IDisposable
             // ignore
             return;
         }
+        catch (SocketException)
+        {
+            // Disposing the socket ends a pending receive with this exception on some systems.
+            // Other socket errors must not end the search, and certainly not the process.
+            ContinueReceiving();
+            return;
+        }
 
         var typeBytes = Beacon.Encode(BeaconType).ToList();
         Debug.WriteLine(string.Join(", ", typeBytes.Select(x => (char)x)));
@@ -113,7 +120,28 @@ internal sealed class Probe : IDisposable
             }
         }
 
-        udp.BeginReceive(ResponseReceived, null);
+        ContinueReceiving();
+    }
+
+    private void ContinueReceiving()
+    {
+        if (!running)
+        {
+            return;
+        }
+
+        try
+        {
+            udp.BeginReceive(ResponseReceived, null);
+        }
+        catch (ObjectDisposedException)
+        {
+            // The probe was disposed in the meantime.
+        }
+        catch (SocketException)
+        {
+            // Same, the socket is closed.
+        }
     }
 
     private void BackgroundLoop()
