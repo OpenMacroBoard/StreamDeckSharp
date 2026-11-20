@@ -104,7 +104,13 @@ public class VirtualBoardTests
 
         var events = new BlockingCollection<KeyEventArgs>();
         board.KeyStateChanged += (_, e) => events.Add(e);
-        await WaitForAsync(() => app.Board.HasKeyStateSubscribers);
+
+        // Key events only reach an application and a page once the board has set up their
+        // connections, which happens a moment after connecting. A brightness change that went
+        // from the application to both pages proves that all three are set up.
+        board.SetBrightness(37);
+        await presser.ReceiveUntilAsync(IsBrightness37);
+        await watcher.ReceiveUntilAsync(IsBrightness37);
 
         await presser.SendAsync("""{"type":"key","key":2,"down":true}""");
 
@@ -245,6 +251,13 @@ public class VirtualBoardTests
         settings.KeySize.Should().Be(72);
         settings.KeyGap.Should().Be(25);
         settings.ShowBoardEndpoint.Should().BeTrue();
+    }
+
+    private static bool IsBrightness37(Message message)
+    {
+        return message.Json is not null
+            && message.Json.RootElement.GetProperty("type").GetString() == "brightness"
+            && message.Json.RootElement.GetProperty("percent").GetInt32() == 37;
     }
 
     private static Task<VirtualBoardApp> StartBoardAsync()

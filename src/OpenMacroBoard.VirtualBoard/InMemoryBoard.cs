@@ -84,11 +84,6 @@ internal sealed class InMemoryBoard : IMacroBoard
         }
     }
 
-    /// <summary>
-    /// Whether anyone listens for key events, for example a connected application.
-    /// </summary>
-    public bool HasKeyStateSubscribers => KeyStateChanged is not null;
-
     /// <inheritdoc/>
     public void SetBrightness(byte percent)
     {
