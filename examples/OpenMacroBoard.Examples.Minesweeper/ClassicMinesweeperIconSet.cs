@@ -13,7 +13,7 @@ namespace OpenMacroBoard.Examples.Minesweeper;
 internal class ClassicMinesweeperIconSet : IMinesweeperIconSet
 {
     private readonly KeyBitmap[] numberBitmaps = new KeyBitmap[9];
-    private readonly Font font = SystemFonts.CreateFont("Arial", 55);
+    private readonly Font font = ExampleFonts.Create(55);
 
     public ClassicMinesweeperIconSet()
     {

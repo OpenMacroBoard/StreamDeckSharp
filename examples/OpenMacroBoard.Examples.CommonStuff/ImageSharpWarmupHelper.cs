@@ -17,12 +17,12 @@ public static class ImageSharpWarmupHelper
         // https://github.com/SixLabors/ImageSharp.Drawing/issues/187
 
         // It likely doesn't depend on the font family or size
-        // so we just use Arial 12pt for warm-up.
+        // so we just use the example font in 12pt for warm-up.
 
         new Image<Bgr24>(128, 128)
             .Mutate(x => x.DrawText(
                 "Random Text",
-                SystemFonts.CreateFont("Arial", 12),
+                ExampleFonts.Create(12),
                 Color.White,
                 new PointF(10, 10)
              ));

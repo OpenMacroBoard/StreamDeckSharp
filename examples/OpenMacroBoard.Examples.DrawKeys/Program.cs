@@ -12,8 +12,8 @@ internal static class Program
 {
     private const int KeySize = 100;
 
-    private static readonly Font Regular = SystemFonts.CreateFont("Arial", 20);
-    private static readonly Font Large = SystemFonts.CreateFont("Arial", 60, FontStyle.Bold);
+    private static readonly Font Regular = ExampleFonts.Create(20);
+    private static readonly Font Large = ExampleFonts.Create(60, FontStyle.Bold);
 
     private static readonly PointF RegularOrigin = new(35, 40);
     private static readonly PointF LargeOrigin = new(15, 18);

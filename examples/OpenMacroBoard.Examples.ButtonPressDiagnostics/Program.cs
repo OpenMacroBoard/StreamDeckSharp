@@ -13,7 +13,7 @@ namespace OpenMacroBoard.Examples.ButtonPressDiagnostics;
 
 internal static class Program
 {
-    private static readonly Font Font = SystemFonts.CreateFont("Arial", 24);
+    private static readonly Font Font = ExampleFonts.Create(24);
     private static int[] counter;
 
     private static void Main(string[] args)
