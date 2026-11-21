@@ -112,7 +112,8 @@
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(Destination)));
         File.WriteAllText(Destination, string.Join("\n", lines));
 
-        return !failed;
+        // The task factory adds "return Success;" after this code.
+        Success = !failed;
       ]]></Code>
     </Task>
   </UsingTask>
