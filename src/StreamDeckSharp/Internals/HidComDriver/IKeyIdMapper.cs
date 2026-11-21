@@ -9,6 +9,7 @@ namespace StreamDeckSharp.Internals.HidComDriver;
 /// and top to bottom. Most developers would expect it to be left-to-right
 /// instead of right-to-left, so we change that ;-)</para>
 /// </remarks>
+[System.Diagnostics.CodeAnalysis.Experimental(StreamDeckSharp.Internals.InternalsDiagnostic.Id, Message = StreamDeckSharp.Internals.InternalsDiagnostic.Message)]
 public interface IKeyIdMapper
 {
     /// <summary>

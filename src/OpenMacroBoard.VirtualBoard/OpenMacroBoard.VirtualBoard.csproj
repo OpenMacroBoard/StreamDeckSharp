@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Version>11.0.0</Version>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>default</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <ApplicationIcon>OmbIcon.ico</ApplicationIcon>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\analyzers.targets" />
+
+  <!-- The page and its images are part of the assembly, so the tool is a single unit -->
+  <ItemGroup>
+    <Content Remove="Web\**" />
+    <EmbeddedResource Include="Web\index.html" LogicalName="OpenMacroBoard.VirtualBoard.Web.index.html" />
+    <EmbeddedResource Include="Web\glassKey.png" LogicalName="OpenMacroBoard.VirtualBoard.Web.glassKey.png" />
+    <EmbeddedResource Include="OmbIcon.ico" LogicalName="OpenMacroBoard.VirtualBoard.Web.favicon.ico" />
+    <EmbeddedResource Include="OpenMacroBoard-Logo.png" LogicalName="OpenMacroBoard.VirtualBoard.OpenMacroBoard-Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenMacroBoard.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
+  </ItemGroup>
+
+</Project>

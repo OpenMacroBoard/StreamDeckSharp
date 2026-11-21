@@ -3,6 +3,7 @@ namespace StreamDeckSharp.Internals.HidComDriver;
 /// <summary>
 /// Classic StreamDeck ID mapper to fix RTL native device IDs.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.Experimental(StreamDeckSharp.Internals.InternalsDiagnostic.Id, Message = StreamDeckSharp.Internals.InternalsDiagnostic.Message)]
 public class StreamDeck5HorizontalFlip : IKeyIdMapper
 {
     /// <inheritdoc/>

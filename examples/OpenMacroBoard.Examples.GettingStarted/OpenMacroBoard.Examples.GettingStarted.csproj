@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
+    <ProjectReference Include="..\..\src\StreamDeckSharp\StreamDeckSharp.csproj" />
+  </ItemGroup>
+
+</Project>

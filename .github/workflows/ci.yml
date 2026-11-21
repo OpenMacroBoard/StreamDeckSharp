@@ -1,0 +1,105 @@
+name: CI
+
+# Builds and tests every push and pull request.
+# The Linux job only calls the Dockerfile, so it does exactly what
+# `docker build .` does on a developer machine. Nothing is published here.
+#
+# The release workflow (release.yml) calls this workflow with a release tag. Then
+# the same jobs run on that tag, and the packages get the release version.
+
+on:
+  push:
+    branches: [main, next]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      release-tag:
+        description: Tag of a release, for example v11.0. Builds that tag and creates the release packages.
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+# When the release workflow calls this workflow, github.workflow is "Release",
+# so a release and a normal CI run on the same branch do not cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker:
+    name: Build and test (Docker, Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Empty for a normal run: then the commit that started the run is used
+          ref: ${{ inputs.release-tag && format('refs/tags/{0}', inputs.release-tag) || '' }}
+
+      # Runs the build and the tests. This step does not fail on test failures,
+      # so the results can be uploaded first; the "Check" step below fails then.
+      - name: Build and run tests
+        run: docker build --target test-results --output type=local,dest=output/test-results .
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-linux
+          path: output/test-results
+          if-no-files-found: ignore
+
+      - name: Check test outcome
+        run: docker build .
+
+      # Proves that packing works. The packages get a local pre-release
+      # version and are only kept as a build artifact. For a release they get
+      # the version of the tag instead; the script fails if that does not match
+      # the version in the project files.
+      - name: Create NuGet packages
+        env:
+          RELEASE_TAG: ${{ inputs.release-tag }}
+        run: |
+          if [ -n "$RELEASE_TAG" ]; then
+            sh scripts/pack-release.sh "$RELEASE_TAG" output/packages
+          else
+            docker build --target packages --output type=local,dest=output/packages .
+          fi
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: output/packages
+
+  windows:
+    name: Build and test (.NET SDK, Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Empty for a normal run: then the commit that started the run is used
+          ref: ${{ inputs.release-tag && format('refs/tags/{0}', inputs.release-tag) || '' }}
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      # The same plain commands a Visual Studio user would run. This is also the
+      # only place where the Windows-only projects and their tests run.
+      - name: Build
+        run: dotnet build StreamDeckSharp.sln --configuration Release
+
+      - name: Test
+        run: dotnet test StreamDeckSharp.sln --configuration Release --no-build --logger trx --results-directory output/test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-windows
+          path: output/test-results
+          if-no-files-found: ignore

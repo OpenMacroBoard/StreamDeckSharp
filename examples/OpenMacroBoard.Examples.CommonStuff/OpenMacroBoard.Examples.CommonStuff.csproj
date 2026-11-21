@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>default</LangVersion>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <Import Project="..\commonrefs.targets" />
+
+  <!--
+    The examples draw with SkiaSharp. On Linux SkiaSharp needs an extra package with its
+    native part; on Windows and macOS that comes with SkiaSharp itself.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK.KeyBitmap.SkiaSharp\OpenMacroBoard.SDK.KeyBitmap.SkiaSharp.csproj" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.157.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,4 @@
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using OpenMacroBoard.SDK;
 using System;
 
 namespace StreamDeckSharp.Internals.HidComDriver;
@@ -8,6 +6,7 @@ namespace StreamDeckSharp.Internals.HidComDriver;
 /// <summary>
 /// HID Stream Deck communication driver for the classical Stream Deck.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.Experimental(StreamDeckSharp.Internals.InternalsDiagnostic.Id, Message = StreamDeckSharp.Internals.InternalsDiagnostic.Message)]
 public sealed class HidComDriverStreamDeck
     : IStreamDeckHidComDriver
 {
@@ -51,15 +50,15 @@ public sealed class HidComDriverStreamDeck
     public IKeyIdMapper KeyIdMapper => CommonKeyMappers.StreamDeck5HorizontalFlip;
 
     /// <inheritdoc/>
-    public byte[] GeneratePayload(Image<Bgr24> image)
+    public byte[] GeneratePayload(KeyBitmap keyBitmap, IJpegEncoder jpegEncoder)
     {
-        image.Mutate(x =>
-        {
-            x.Resize(KeyImageSize, KeyImageSize);
-            x.Rotate(RotateMode.Rotate180);
-        });
+        ArgumentNullException.ThrowIfNull(keyBitmap);
 
-        return StreamHelper.WriteArray(image.SaveAsBmp);
+        var deviceBitmap = keyBitmap
+            .Resize(KeyImageSize, KeyImageSize)
+            .Rotate180();
+
+        return Bgr24BmpWriter.Write(deviceBitmap);
     }
 
     /// <inheritdoc/>

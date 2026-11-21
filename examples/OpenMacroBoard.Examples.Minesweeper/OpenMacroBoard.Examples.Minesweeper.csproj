@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\examplerefs.targets" />
+
+  <ItemGroup>
+    <None Remove="icons\check.png" />
+    <None Remove="icons\cross.png" />
+    <None Remove="icons\flag.png" />
+    <None Remove="icons\mine.png" />
+    <None Remove="icons\unknown.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="icons\check.png" />
+    <EmbeddedResource Include="icons\cross.png" />
+    <EmbeddedResource Include="icons\flag.png" />
+    <EmbeddedResource Include="icons\mine.png" />
+    <EmbeddedResource Include="icons\unknown.png" />
+  </ItemGroup>
+</Project>

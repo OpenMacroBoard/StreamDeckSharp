@@ -4,23 +4,24 @@
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>default</LangVersion>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <!-- OMB0001 marks the public types of the Internals namespaces, which this project may use -->
+    <NoWarn>$(NoWarn);OMB0001</NoWarn>
   </PropertyGroup>
 
   <!-- nuget stuff -->
   <PropertyGroup>
     <Title>StreamDeckSharp</Title>
-    <Version>11.0.0</Version>
+    <VersionPrefix>11.0.0</VersionPrefix>
     <Description>A simple .NET wrapper for StreamDeck (using OpenMacroBoard.SDK)</Description>
     <RepositoryUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</RepositoryUrl>
   </PropertyGroup>
 
-  <Import Project="..\..\..\package-defaults.targets" />
-  <Import Project="..\..\..\analyzers.targets" />
+  <Import Project="..\..\package-defaults.targets" />
+  <Import Project="..\..\analyzers.targets" />
 
   <ItemGroup>
     <PackageReference Include="HidSharp" Version="2.6.4" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
-    <ProjectReference Include="..\..\..\OpenMacroBoard.SDK\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
+    <ProjectReference Include="..\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
   </ItemGroup>
   
   <ItemGroup>

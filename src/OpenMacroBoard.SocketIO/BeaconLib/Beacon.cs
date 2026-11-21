@@ -1,0 +1,187 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+
+#pragma warning disable AV1505 // Namespace should match with assembly name
+#pragma warning disable AV1710 // Member name includes the name of its containing type
+
+namespace BeaconLib;
+
+/// <summary>
+/// Instances of this class can be auto-discovered on the local network through UDP broadcasts
+/// </summary>
+/// <remarks>
+/// <para>
+/// The advertisement consists of the beacon's application type and a short beacon-specific string.
+/// </para>
+/// </remarks>
+internal sealed class Beacon : IDisposable
+{
+    internal const int DiscoveryPort = 35891;
+    private readonly UdpClient udp;
+    private readonly bool loopbackOnly;
+
+    public Beacon(string beaconType, ushort advertisedPort, IPAddress bindIpAddress)
+    {
+        BeaconType = beaconType;
+        AdvertisedPort = advertisedPort;
+        BeaconData = string.Empty;
+
+        udp = new UdpClient();
+        udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+        udp.Client.Bind(new IPEndPoint(GetDiscoveryAddress(bindIpAddress, out loopbackOnly), DiscoveryPort));
+        udp.EnableNatTraversal();
+    }
+
+    public string BeaconType { get; }
+    public ushort AdvertisedPort { get; }
+    public bool Stopped { get; private set; }
+    public string BeaconData { get; set; }
+
+    public void Start()
+    {
+        Stopped = false;
+        udp.BeginReceive(ProbeReceived, null);
+    }
+
+    public void Stop()
+    {
+        Stopped = true;
+    }
+
+    public void Dispose()
+    {
+        Stop();
+        udp.Dispose();
+    }
+
+    /// <summary>
+    /// Convert a string to network bytes
+    /// </summary>
+    internal static IEnumerable<byte> Encode(string data)
+    {
+        var bytes = Encoding.UTF8.GetBytes(data);
+        var len = IPAddress.HostToNetworkOrder((short)bytes.Length);
+
+        return BitConverter.GetBytes(len).Concat(bytes);
+    }
+
+    /// <summary>
+    /// Convert network bytes to a string
+    /// </summary>
+    /// <exception cref="ArgumentException">Is thrown for invalid data.</exception>
+    internal static string Decode(IEnumerable<byte> data)
+    {
+        var listData = data as IList<byte> ?? data.ToList();
+
+        var len = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(listData.Take(2).ToArray(), 0));
+
+        if (listData.Count < 2 + len)
+        {
+            throw new ArgumentException("Too few bytes in packet");
+        }
+
+        return Encoding.UTF8.GetString(listData.Skip(2).Take(len).ToArray());
+    }
+
+    internal static bool HasPrefix<T>(IEnumerable<T> haystack, IEnumerable<T> prefix)
+    {
+        return haystack.Count() >= prefix.Count() &&
+            haystack.Zip(prefix, (a, b) => Equals(a, b)).All(_ => _);
+    }
+
+    /// <summary>
+    /// Gets the address the discovery socket has to bind to, so that it receives the probe broadcasts.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Probes are sent to the broadcast address. Windows also delivers them to a socket that is
+    /// bound to the loopback address, Linux and macOS only to sockets bound to the wildcard address.
+    /// There a beacon for the loopback address binds to the wildcard address and answers
+    /// only probes that come from the loopback address, so it stays invisible to other machines.
+    /// </para>
+    /// </remarks>
+    private static IPAddress GetDiscoveryAddress(IPAddress bindIpAddress, out bool loopbackOnly)
+    {
+        loopbackOnly = !OperatingSystem.IsWindows()
+            && bindIpAddress.AddressFamily == AddressFamily.InterNetwork
+            && IPAddress.IsLoopback(bindIpAddress);
+
+        return loopbackOnly ? IPAddress.Any : bindIpAddress;
+    }
+
+    private void ProbeReceived(IAsyncResult ar)
+    {
+        var remote = new IPEndPoint(IPAddress.Any, 0);
+        byte[] bytes;
+
+        try
+        {
+            bytes = udp.EndReceive(ar, ref remote);
+        }
+        catch (ObjectDisposedException)
+        {
+            return;
+        }
+        catch (SocketException)
+        {
+            // Disposing the socket ends a pending receive with this exception on some systems.
+            // Anything else (for example a "connection reset" after an answer that nobody
+            // received) must not end the discovery, and certainly not the process.
+            ContinueReceiving();
+            return;
+        }
+
+        // Compare beacon type to probe type
+        var typeBytes = Encode(BeaconType);
+        var allowedSender = !loopbackOnly || (remote is not null && IPAddress.IsLoopback(remote.Address));
+
+        if (allowedSender && HasPrefix(bytes, typeBytes))
+        {
+            // If true, respond again with our type, port and payload
+            var responseData = Encode(BeaconType)
+                .Concat(BitConverter.GetBytes((ushort)IPAddress.HostToNetworkOrder((short)AdvertisedPort)))
+                .Concat(Encode(BeaconData))
+                .ToArray();
+
+            try
+            {
+                udp.Send(responseData, responseData.Length, remote);
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+            catch (SocketException)
+            {
+                // The answer could not be sent; the probe asks again in a moment.
+            }
+        }
+
+        ContinueReceiving();
+    }
+
+    private void ContinueReceiving()
+    {
+        if (Stopped)
+        {
+            return;
+        }
+
+        try
+        {
+            udp.BeginReceive(ProbeReceived, null);
+        }
+        catch (ObjectDisposedException)
+        {
+            // The beacon was disposed in the meantime.
+        }
+        catch (SocketException)
+        {
+            // Same, the socket is closed.
+        }
+    }
+}

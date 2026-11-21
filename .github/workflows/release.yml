@@ -1,0 +1,100 @@
+name: Release
+
+# Publishes a release. Started by hand only (Actions > Release > Run workflow).
+#
+# Before the first run, once:
+#
+#   1. On nuget.org (your account > Trusted Publishing) add a policy for this
+#      repository with the workflow file "release.yml" and the environment "nuget".
+#      No API key is stored on GitHub; each run gets a key that is valid for a
+#      short time only.
+#   2. On GitHub (Settings > Secrets and variables > Actions > Variables) add the
+#      repository variable NUGET_USER with your nuget.org user name (not the email
+#      address).
+#
+# For each release:
+#
+#   1. Set the version in the project files and the changelogs, merge to main.
+#   2. Create a tag on that commit and push it, for example v11.0 (version 11.0.0),
+#      v11.0.1, or v11.1-beta.1 for a pre-release.
+#   3. Run this workflow with that tag and without "publish". It builds the tag,
+#      runs all tests on Linux and Windows and creates the packages. Download the
+#      artifact "packages" from the run and look at it.
+#   4. Run it again with "publish" ticked. That uploads the packages to nuget.org
+#      and creates a draft release on GitHub with the packages attached. Give the
+#      draft a title and text, then publish it by hand.
+#
+# A package version on nuget.org can never be replaced, only hidden. Running the
+# workflow twice for the same tag is harmless: packages that are already there
+# are skipped.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to release (must already exist), for example v11.0
+        type: string
+        required: true
+      publish:
+        description: Publish to nuget.org and create a draft GitHub release. Leave off for a trial run.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  # The same jobs as for every push, on the tag: build, all tests on Linux and
+  # Windows, package validation. The packages are created with the release
+  # version and stored as the artifact "packages".
+  build:
+    name: Build
+    uses: ./.github/workflows/ci.yml
+    with:
+      release-tag: ${{ inputs.tag }}
+
+  publish:
+    name: Publish
+    needs: build
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      id-token: write # to get the short-lived nuget.org key
+      contents: write # to create the draft release
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: packages
+          path: packages
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Sign in to nuget.org
+        id: nuget
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push packages to nuget.org
+        env:
+          NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "packages/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key "$NUGET_API_KEY" \
+            --skip-duplicate
+
+      - name: Create draft release on GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "A release for $TAG exists already, it is left as it is."
+          else
+            gh release create "$TAG" packages/*.nupkg --draft --verify-tag --title "$TAG" --generate-notes
+          fi

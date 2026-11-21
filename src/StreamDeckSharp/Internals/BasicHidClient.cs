@@ -14,9 +14,11 @@ internal class BasicHidClient : IMacroBoard
     public BasicHidClient(
         IStreamDeckHid deckHid,
         IKeyLayout keys,
-        IStreamDeckHidComDriver hidComDriver
+        IStreamDeckHidComDriver hidComDriver,
+        IJpegEncoder jpegEncoder
     )
     {
+        JpegEncoder = jpegEncoder;
         DeckHid = deckHid;
         Keys = keys;
 
@@ -37,6 +39,7 @@ internal class BasicHidClient : IMacroBoard
 
     protected IStreamDeckHid DeckHid { get; }
     protected IStreamDeckHidComDriver HidComDriver { get; }
+    protected IJpegEncoder JpegEncoder { get; }
     protected byte[] Buffer { get; }
 
     public void Dispose()
@@ -65,7 +68,7 @@ internal class BasicHidClient : IMacroBoard
     {
         keyId = HidComDriver.KeyIdMapper.ExtKeyIdToHardwareKeyId(keyId);
 
-        var payload = HidComDriver.GeneratePayload(bitmapData);
+        var payload = HidComDriver.GeneratePayload(bitmapData, JpegEncoder);
 
         var reports = OutputReportSplitter.Split(
             payload,

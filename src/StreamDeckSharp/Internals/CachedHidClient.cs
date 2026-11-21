@@ -13,9 +13,10 @@ internal class CachedHidClient : BasicHidClient
     public CachedHidClient(
         IStreamDeckHid deckHid,
         IKeyLayout keys,
-        IStreamDeckHidComDriver hidComDriver
+        IStreamDeckHidComDriver hidComDriver,
+        IJpegEncoder jpegEncoder
     )
-        : base(deckHid, keys, hidComDriver)
+        : base(deckHid, keys, hidComDriver, jpegEncoder)
     {
         imageQueue = new();
         writerTask = StartBitmapWriterTask();
@@ -26,7 +27,7 @@ internal class CachedHidClient : BasicHidClient
         ThrowIfAlreadyDisposed();
         keyId = HidComDriver.KeyIdMapper.ExtKeyIdToHardwareKeyId(keyId);
 
-        var payload = HidComDriver.GeneratePayload(bitmapData);
+        var payload = HidComDriver.GeneratePayload(bitmapData, JpegEncoder);
         imageQueue.Add(keyId, payload);
     }
 

@@ -1,0 +1,30 @@
+using OpenMacroBoard.SDK;
+using StreamDeckSharp.Internals;
+using System;
+using System.IO;
+
+namespace StreamDeckSharp.Tests;
+
+internal sealed class StreamDeckHidTestContext : IDisposable
+{
+    public StreamDeckHidTestContext(UsbHardwareIdAndDriver hardware)
+    {
+        ArgumentNullException.ThrowIfNull(hardware);
+
+        Hardware = hardware;
+
+        Log = new StringWriter();
+        Hid = new FakeStreamDeckHid(Log, Hardware);
+        Board = new BasicHidClient(Hid, Hardware.Keys, Hardware.Driver, OmbJpegEncoder.Default);
+    }
+
+    public TextWriter Log { get; }
+    public FakeStreamDeckHid Hid { get; }
+    public BasicHidClient Board { get; }
+    public UsbHardwareIdAndDriver Hardware { get; }
+
+    public void Dispose()
+    {
+        Log.Dispose();
+    }
+}

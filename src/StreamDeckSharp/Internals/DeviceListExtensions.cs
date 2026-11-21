@@ -10,6 +10,7 @@ internal static class DeviceListExtensions
 {
     public static IEnumerable<StreamDeckDeviceReference> GetStreamDecks(
         this DeviceList deviceList,
+        StreamDeckOptions options,
         params IUsbHidHardware[]? hardware
     )
     {
@@ -50,7 +51,8 @@ internal static class DeviceListExtensions
             .Select(i => new StreamDeckDeviceReference(
                 i.Device.DevicePath,
                 i.HardwareInfo.DeviceName,
-                i.HardwareInfo.Keys
+                i.HardwareInfo.Keys,
+                options
             ));
     }
 }
