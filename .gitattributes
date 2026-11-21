@@ -1,3 +1,19 @@
+# Text files are stored with LF in the repository. On checkout everyone gets the
+# line endings of their platform (CRLF on Windows, unless configured otherwise).
+* text=auto
+
 # Shell scripts run inside Linux containers and must keep LF line endings,
 # also when the repository is checked out on Windows.
 *.sh text eol=lf
+
+# Snapshot files of the Verify tests, as recommended by Verify.
+*.verified.txt text eol=lf
+
+# Images and test data: never convert.
+*.png binary
+*.jpg binary
+*.bmp binary
+*.webp binary
+*.ico binary
+*.ppm binary
+*.rgba binary
