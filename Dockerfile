@@ -14,10 +14,9 @@
 #
 #   docker build --target packages --output type=local,dest=output/packages .
 #
-# Create packages with the release version (for publishing; pass an empty suffix):
+# Create the packages of a release (the version of the tag, README links to the tag):
 #
-#   docker build --target packages --build-arg VERSION_SUFFIX= \
-#       --output type=local,dest=output/packages .
+#   sh scripts/pack-release.sh v11.0
 #
 # Copy the test results (.trx) to ./output/test-results, also when tests fail:
 #

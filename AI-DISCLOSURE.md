@@ -14,6 +14,9 @@ November 2026. For each history, this is the last commit that was never touched 
 | OpenMacroBoard.ExampleCollection | [`04ab5de`](https://github.com/OpenMacroBoard/OpenMacroBoard.ExampleCollection/commit/04ab5de4fb308121c16aadfca1aa2a8608a20988) | 2026-06-21 |
 | MetaProject | [`fad34ab`](https://github.com/OpenMacroBoard/MetaProject/commit/fad34abf770d901b32eaacb64d31fd6ffc9d516c) | 2026-07-23 |
 
+In this repository each of those commits has a tag: `pre-ai/streamdecksharp`, `pre-ai/sdk`,
+`pre-ai/examples` and `pre-ai/metaproject`.
+
 Everything up to and including those commits was written by people only. The merge itself was
 done with AI.
 
