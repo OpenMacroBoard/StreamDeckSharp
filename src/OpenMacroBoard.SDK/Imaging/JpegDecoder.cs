@@ -25,6 +25,7 @@ internal sealed class JpegDecoder
     private const int MarkerHuffman = 0xC4;
     private const int MarkerRestartInterval = 0xDD;
     private const int MarkerAdobe = 0xEE;
+    private const int MarkerExif = 0xE1;
     private const int MarkerFirstRestart = 0xD0;
     private const int MarkerLastRestart = 0xD7;
 
@@ -42,6 +43,7 @@ internal sealed class JpegDecoder
     private int maxVertical;
     private int restartInterval;
     private int adobeTransform = -1;
+    private int orientation = ExifOrientation.Normal;
     private bool anyScanDecoded;
 
     private int bitBuffer;
@@ -69,7 +71,7 @@ internal sealed class JpegDecoder
         var decoder = new JpegDecoder(data.ToArray());
 
         decoder.ReadSegments();
-        return decoder.CreateImage();
+        return ExifOrientation.Apply(decoder.CreateImage(), decoder.orientation);
     }
 
     private static int Clamp(double value)
@@ -246,6 +248,10 @@ internal sealed class JpegDecoder
                 ReadAdobeSegment(segmentEnd);
                 break;
 
+            case MarkerExif:
+                ReadExifSegment(segmentEnd);
+                break;
+
             case 0xC0 or 0xC1 or 0xC2:
                 progressive = marker == 0xC2;
                 ReadFrameHeader();
@@ -310,6 +316,17 @@ internal sealed class JpegDecoder
     /// <summary>
     /// Reads the segment that Adobe software writes. It says whether a color image is stored as RGB.
     /// </summary>
+    private void ReadExifSegment(int segmentEnd)
+    {
+        var end = Math.Min(segmentEnd, data.Length);
+
+        // The first orientation that is found counts.
+        if (orientation == ExifOrientation.Normal && end > position)
+        {
+            orientation = ExifOrientation.ReadFromJpegSegment(data.AsSpan(position, end - position));
+        }
+    }
+
     private void ReadAdobeSegment(int segmentEnd)
     {
         const int transformOffset = 11;

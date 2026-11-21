@@ -48,6 +48,45 @@ public class JpegDecoderTests
         largest.Should().BeLessThanOrEqualTo(1);
     }
 
+    /// <summary>
+    /// The same 48 x 32 image with every EXIF orientation (written with exiftool). The reference
+    /// images come from ImageMagick ("convert -auto-orient"), which turns them for display.
+    /// </summary>
+    [Theory]
+    [InlineData("orient_1", 48, 32)]
+    [InlineData("orient_2", 48, 32)]
+    [InlineData("orient_3", 48, 32)]
+    [InlineData("orient_4", 48, 32)]
+    [InlineData("orient_5", 32, 48)]
+    [InlineData("orient_6", 32, 48)]
+    [InlineData("orient_7", 32, 48)]
+    [InlineData("orient_8", 32, 48)]
+    [InlineData("orient_6_le", 32, 48)]
+    public void JpegIsTurnedLikeItsExifOrientationSays(string name, int expectedWidth, int expectedHeight)
+    {
+        var decoded = KeyBitmap.Create.FromStream(new MemoryStream(AssetLoader.LoadBytes($"Jpeg.{name}.jpg")));
+        var (width, height, expected) = LoadReference(name);
+
+        width.Should().Be(expectedWidth);
+        height.Should().Be(expectedHeight);
+        decoded.Width.Should().Be(width);
+        decoded.Height.Should().Be(height);
+
+        var (largest, _) = Compare(ImageDecoderTests.GetData(decoded), expected);
+
+        // ImageMagick decodes with other settings of libjpeg than the reference images above, so
+        // values can differ a little more. A wrong orientation differs by more than 100.
+        largest.Should().BeLessThanOrEqualTo(3);
+    }
+
+    [Theory]
+    [InlineData("orient_6")]
+    [InlineData("orient_6_le")]
+    public void JpegWithDamagedExifDataEitherDecodesOrFailsWithTheDocumentedException(string name)
+    {
+        ImageDecoderTests.AssertDamagedDataIsHandled(AssetLoader.LoadBytes($"Jpeg.{name}.jpg"));
+    }
+
     [Fact]
     public void ArithmeticCodedJpegIsRejected()
     {

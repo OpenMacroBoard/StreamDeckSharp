@@ -10,8 +10,9 @@ namespace OpenMacroBoard.SDK;
 /// <para>The format is detected from the content of the file, not from its name.
 /// Transparent pixels are blended onto black.</para>
 /// <para>Supported are uncompressed BMP files, PNG files with all color types and bit depths,
-/// and baseline and progressive JPEG files in grayscale and color. Animation, color profiles,
-/// gamma and the EXIF orientation are ignored. Images with more than 50 million pixels are rejected.</para>
+/// and baseline and progressive JPEG files in grayscale and color. JPEG files are turned the way
+/// their EXIF orientation says, like image viewers do. Animation, color profiles and gamma are
+/// ignored. Images with more than 50 million pixels are rejected.</para>
 /// <para>The decoder is written for safety and simplicity, not for speed: it uses no unsafe code.
 /// It has no state and can be used from several threads.</para>
 /// </remarks>
