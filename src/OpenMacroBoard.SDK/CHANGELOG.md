@@ -18,14 +18,20 @@ The SDK no longer depends on ImageSharp. See [Migrating from the ImageSharp base
   - **Breaking:** `KeyBitmap.Create.FromFile` and `FromStream` (and their async variants) decode images with the built-in decoder instead of ImageSharp. Supported are BMP (uncompressed), PNG (all color types and bit depths, interlaced or not) and JPEG (baseline and progressive, grayscale and color). Other formats that ImageSharp could read (GIF, WebP, TIFF, ...) and CMYK JPEG files are rejected with `ImageDecodingException`. Animation, color profiles, gamma and the EXIF orientation are ignored. Images with more than 50 million pixels are rejected. To load other formats, pass your own `IImageDecoder`.
   - **Breaking:** `DrawFullScreenBitmap` takes a `KeyBitmap` and an `OmbResizeMode` instead of an ImageSharp image and ImageSharp's `ResizeMode`. The image is scaled with the SDK's own code, so it looks slightly softer than before.
   - `ButtonPressEffectAdapter` scales the pressed key with the SDK's own code instead of ImageSharp. The result looks the same, but the pixels at edges can differ slightly.
+  - **Breaking:** a `KeyBitmap` always contains pixels now. Before, a bitmap could be "empty" (no pixel data, shown as black), and code that read the pixels had to check for that first. `KeyBitmap.Black` is a real black bitmap of one pixel now. See "Removed" for the two members that went away with this.
+  - **Breaking** (silent, the code still compiles): `KeyBitmap` no longer compares by content. `==`, `!=`, `Equals` and `GetHashCode` now tell whether two variables refer to the same object; before they compared the size and every pixel. `KeyBitmap` also no longer implements `IEquatable<KeyBitmap>`. Code that skips an update "if the image did not change" still works, but no longer skips for two separately created, identical images. To compare the content, compare the pixels: `((IKeyBitmapDataAccess)a).GetData().Span.SequenceEqual(((IKeyBitmapDataAccess)b).GetData().Span)` (and the width and height).
+  - **Breaking** (only for device providers): `IKeyBitmapDataAccess.GetData()` returns `ReadOnlyMemory<byte>` instead of `ReadOnlySpan<byte>`, so the pixels can be stored and used in asynchronous code. To migrate, use `GetData().Span`.
 
   - VirtualBoard is a web application now and runs on Windows, Linux and macOS. It shows the board on a page in the browser (default `http://127.0.0.1:28621/`) instead of a window. Applications reach it through SocketIO as before, and the CLI parameters are the same, plus `--web-port` and `--open-browser`. There is no Windows executable to download any more; start it with `dotnet run --project src/OpenMacroBoard.VirtualBoard`.
 
 ### Fixed
+  - `KeyBitmap.Create.FromBgra32Array` and `FromRgba32Array` created bitmaps with a pixel buffer that was a third too large (four bytes per pixel instead of three).
   - SocketIO: on Linux and macOS, applications did not find boards that are hosted on a loopback address (the default, `127.0.0.1`), because these systems do not deliver the discovery broadcast to a socket bound to that address. The host now answers discovery requests there too, but only requests that come from the same machine. The board itself is still reachable only on the address it is bound to.
   - SocketIO: disposing a `SocketIOMacroBoardHost` or a `SocketIOBoardListener` could end the whole process with an unhandled `SocketException` ("Operation canceled") from the discovery socket. Socket errors there are handled now.
 
 ### Removed
+  - **Breaking:** `KeyBitmap.Create.Empty(width, height)`. Use `KeyBitmap.Black`, it is scaled to the size of the key.
+  - **Breaking** (only for device providers): `IKeyBitmapDataAccess.IsEmpty`. Bitmaps are never empty any more, so the check can be deleted.
   - **Breaking:** `KeyBitmap.Create.FromImageSharpImage`, `ToImage`, `ImageSharpExtensions` and `ConditionalDisposable<T>`. The migration page shows the few lines that replace them.
 
 ## [0.4.0] - 2019-06-28
