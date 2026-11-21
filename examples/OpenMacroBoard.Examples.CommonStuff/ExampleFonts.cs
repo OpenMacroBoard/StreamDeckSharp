@@ -1,4 +1,4 @@
-using SixLabors.Fonts;
+using SkiaSharp;
 using System;
 using System.Linq;
 
@@ -26,41 +26,32 @@ public static class ExampleFonts
         "FreeSans",
     ];
 
-    private static readonly Lazy<FontFamily> Family = new(FindFamily);
+    private static readonly Lazy<SKTypeface> Regular = new(() => FindTypeface(SKFontStyle.Normal));
+    private static readonly Lazy<SKTypeface> Bold = new(() => FindTypeface(SKFontStyle.Bold));
 
-    public static Font Create(float size, FontStyle style = FontStyle.Regular)
+    /// <summary>
+    /// Creates a font with the given size in pixels.
+    /// </summary>
+    public static SKFont Create(float size, bool bold = false)
     {
-        var family = Family.Value;
-
-        // A fallback font may not have every style (for example no bold variant).
-        if (!family.GetAvailableStyles().Contains(style))
-        {
-            style = family.GetAvailableStyles().First();
-        }
-
-        return family.CreateFont(size, style);
+        return new SKFont(bold ? Bold.Value : Regular.Value, size);
     }
 
-    private static FontFamily FindFamily()
+    private static SKTypeface FindTypeface(SKFontStyle style)
     {
-        foreach (var name in PreferredFamilies)
-        {
-            if (SystemFonts.TryGet(name, out var family))
-            {
-                return family;
-            }
-        }
+        var fontManager = SKFontManager.Default;
 
-        var installed = SystemFonts.Families.OrderBy(f => f.Name, StringComparer.Ordinal).ToList();
+        // A fallback font may not have every style (for example no bold variant),
+        // the font manager then returns the closest one it has.
+        var typeface = PreferredFamilies
+            .Concat(fontManager.FontFamilies.Order(StringComparer.Ordinal))
+            .Where(family => !string.IsNullOrEmpty(family))
+            .Select(family => fontManager.MatchFamily(family, style))
+            .FirstOrDefault(candidate => candidate is not null && candidate.GlyphCount > 0);
 
-        if (installed.Count == 0)
-        {
-            throw new InvalidOperationException(
-                "This example draws text and needs a font, but no font is installed on this system. "
-                + "Install any TrueType or OpenType font (for example the package 'fonts-dejavu' or 'fonts-liberation' on Debian and Ubuntu)."
-            );
-        }
-
-        return installed[0];
+        return typeface ?? throw new InvalidOperationException(
+            "This example draws text and needs a font, but no font is installed on this system. "
+            + "Install any TrueType or OpenType font (for example the package 'fonts-dejavu' or 'fonts-liberation' on Debian and Ubuntu)."
+        );
     }
 }

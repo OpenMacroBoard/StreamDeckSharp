@@ -1,9 +1,6 @@
 using OpenMacroBoard.Examples.CommonStuff;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 using System;
 
 namespace OpenMacroBoard.Examples.GapMeasureTool;
@@ -22,7 +19,7 @@ internal static class Program
 
         var secondKeyRect = deck.Keys[deck.Keys.Count / 2];
 
-        var rect = new Rectangle(
+        var rect = SKRectI.Create(
             secondKeyRect.X,
             secondKeyRect.Y,
             secondKeyRect.Width,
@@ -31,17 +28,20 @@ internal static class Program
 
         var keyArea = deck.Keys.Area;
 
-        var fullScreenBmp = new Image<Bgr24>(keyArea.Width, keyArea.Height);
+        // no anti-aliasing: the edges of the rectangle have to be sharp to measure with it
+        using var white = new SKPaint { Color = SKColors.White, IsAntialias = false };
 
         while (true)
         {
-            fullScreenBmp.Mutate(x =>
-            {
-                x.Fill(Color.Black);
-                x.Fill(Color.White, rect);
-            });
+            var current = rect;
 
-            deck.DrawFullScreenBitmap(ImageSharpConversions.ToKeyBitmap(fullScreenBmp));
+            var fullScreenBmp = KeyBitmap.Create.FromSkiaCanvas(
+                keyArea.Width,
+                keyArea.Height,
+                canvas => canvas.DrawRect(current, white)
+            );
+
+            deck.DrawFullScreenBitmap(fullScreenBmp);
 
             var k = Console.ReadKey(true);
 
@@ -52,35 +52,35 @@ internal static class Program
 
             if (k.Key == ConsoleKey.A)
             {
-                rect.X--;
+                rect.Offset(-1, 0);
             }
             else if (k.Key == ConsoleKey.D)
             {
-                rect.X++;
+                rect.Offset(1, 0);
             }
             else if (k.Key == ConsoleKey.W)
             {
-                rect.Y--;
+                rect.Offset(0, -1);
             }
             else if (k.Key == ConsoleKey.S)
             {
-                rect.Y++;
+                rect.Offset(0, 1);
             }
             else if (k.Key == ConsoleKey.J)
             {
-                rect.Width--;
+                rect.Right--;
             }
             else if (k.Key == ConsoleKey.L)
             {
-                rect.Width++;
+                rect.Right++;
             }
             else if (k.Key == ConsoleKey.I)
             {
-                rect.Height++;
+                rect.Bottom++;
             }
             else if (k.Key == ConsoleKey.K)
             {
-                rect.Height--;
+                rect.Bottom--;
             }
         }
     }

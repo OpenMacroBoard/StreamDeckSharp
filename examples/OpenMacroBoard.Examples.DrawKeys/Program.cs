@@ -1,10 +1,6 @@
 using OpenMacroBoard.Examples.CommonStuff;
 using OpenMacroBoard.SDK;
-using SixLabors.Fonts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 
 namespace OpenMacroBoard.Examples.DrawKeys;
 
@@ -12,11 +8,15 @@ internal static class Program
 {
     private const int KeySize = 100;
 
-    private static readonly Font Regular = ExampleFonts.Create(20);
-    private static readonly Font Large = ExampleFonts.Create(60, FontStyle.Bold);
+    private static readonly SKFont Regular = ExampleFonts.Create(20);
+    private static readonly SKFont Large = ExampleFonts.Create(60, bold: true);
+    private static readonly SKPaint White = new() { Color = SKColors.White, IsAntialias = true };
 
-    private static readonly PointF RegularOrigin = new(35, 40);
-    private static readonly PointF LargeOrigin = new(15, 18);
+    /// <summary>
+    /// SkiaSharp places text by its baseline, this is the left end of it.
+    /// </summary>
+    private static readonly SKPoint RegularOrigin = new(35, 58);
+    private static readonly SKPoint LargeOrigin = new(15, 72);
 
     private static void Main()
     {
@@ -58,10 +58,13 @@ internal static class Program
                 origin = LargeOrigin;
             }
 
-            var image = new Image<Bgr24>(KeySize, KeySize);
-            image.Mutate(x => x.DrawText($"{kId,2}", font, Color.White, origin));
+            var text = $"{kId,2}";
 
-            var bmp = ImageSharpConversions.ToKeyBitmap(image);
+            var bmp = KeyBitmap.Create.FromSkiaCanvas(
+                KeySize,
+                KeySize,
+                canvas => canvas.DrawText(text, origin.X, origin.Y, SKTextAlign.Left, font, White)
+            );
 
             deck.SetKeyBitmap(kId, bmp);
         }

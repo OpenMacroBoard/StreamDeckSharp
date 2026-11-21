@@ -1,10 +1,6 @@
 using OpenMacroBoard.Examples.CommonStuff;
 using OpenMacroBoard.SDK;
-using SixLabors.Fonts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 using System.Globalization;
 using System.Reflection;
 
@@ -13,7 +9,7 @@ namespace OpenMacroBoard.Examples.Minesweeper;
 internal class ClassicMinesweeperIconSet : IMinesweeperIconSet
 {
     private readonly KeyBitmap[] numberBitmaps = new KeyBitmap[9];
-    private readonly Font font = ExampleFonts.Create(55);
+    private readonly SKFont font = ExampleFonts.Create(55);
 
     public ClassicMinesweeperIconSet()
     {
@@ -34,25 +30,25 @@ internal class ClassicMinesweeperIconSet : IMinesweeperIconSet
         var resourceName = $"OpenMacroBoard.Examples.Minesweeper.icons.{name}";
 
         using var resStream = asm.GetManifestResourceStream(resourceName);
-        using var bmp = Image.Load(resStream);
 
-        return ImageSharpConversions.ToKeyBitmap(bmp);
+        // The SDK reads PNG files itself; transparent parts become black.
+        return KeyBitmap.Create.FromStream(resStream);
     }
 
     private void InitializeBitmaps()
     {
+        using var paint = new SKPaint { Color = SKColors.White, IsAntialias = true };
+
         for (var i = 0; i < numberBitmaps.Length; i++)
         {
-            using var keyImage = new Image<Bgr24>(96, 96);
+            var number = i.ToString(CultureInfo.InvariantCulture);
 
-            keyImage.Mutate(x => x.DrawText(
-                i.ToString(CultureInfo.InvariantCulture),
-                font,
-                Color.White,
-                new PointF(30, 18)
-            ));
-
-            numberBitmaps[i] = ImageSharpConversions.ToKeyBitmap(keyImage);
+            // SkiaSharp places text by its baseline
+            numberBitmaps[i] = KeyBitmap.Create.FromSkiaCanvas(
+                96,
+                96,
+                canvas => canvas.DrawText(number, 30, 68, SKTextAlign.Left, font, paint)
+            );
         }
 
         numberBitmaps[0] = KeyBitmap.Black;

@@ -7,9 +7,13 @@
 
   <Import Project="..\commonrefs.targets" />
 
+  <!--
+    The examples draw with SkiaSharp. On Linux SkiaSharp needs an extra package with its
+    native part; on Windows and macOS that comes with SkiaSharp itself.
+  -->
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK.KeyBitmap.SkiaSharp\OpenMacroBoard.SDK.KeyBitmap.SkiaSharp.csproj" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.157.0" />
   </ItemGroup>
 
 </Project>

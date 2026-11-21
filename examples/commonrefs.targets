@@ -1,13 +1,4 @@
 <Project>
-  <PropertyGroup>
-    <!--
-      The examples use ImageSharp for drawing. Its known vulnerabilities are reported as
-      warnings here, not as errors, so they stay visible without breaking the build.
-      The libraries do not use ImageSharp.
-    -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
-  </PropertyGroup>
-
   <!-- The examples always build against the libraries in this repository -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />

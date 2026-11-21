@@ -15,8 +15,6 @@ public static class ExampleHelper
 
     static ExampleHelper()
     {
-        ImageSharpWarmupHelper.RunWarmup();
-
         Console.CancelKeyPress += (s, e) =>
         {
             e.Cancel = true;

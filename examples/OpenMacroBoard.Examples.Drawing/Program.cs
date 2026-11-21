@@ -1,9 +1,6 @@
 using OpenMacroBoard.Examples.CommonStuff;
 using OpenMacroBoard.SDK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 using System;
 
 namespace OpenMacroBoard.Examples.Drawing;
@@ -17,18 +14,21 @@ internal static class Program
     {
         using var deck = ExampleHelper.OpenBoard();
 
-        ExampleWithSystemDrawing(deck);
+        ExampleWithSkiaSharp(deck);
         ExampleHelper.WaitForKeyToExit();
     }
 
-    private static void ExampleWithSystemDrawing(IMacroBoard deck)
+    private static void ExampleWithSkiaSharp(IMacroBoard deck)
     {
-        var image = new Image<Bgr24>(KeySize, KeySize);
-        var font = ExampleFonts.Create(13);
+        using var font = ExampleFonts.Create(13);
+        using var paint = new SKPaint { Color = SKColors.White, IsAntialias = true };
 
-        image.Mutate(x => x.DrawText("Your Text", font, Color.White, new PointF(5, 20)));
-
-        var key = ImageSharpConversions.ToKeyBitmap(image);
+        // The canvas starts black. SkiaSharp places text by its baseline (here at y = 32).
+        var key = KeyBitmap.Create.FromSkiaCanvas(
+            KeySize,
+            KeySize,
+            canvas => canvas.DrawText("Your Text", 5, 32, SKTextAlign.Left, font, paint)
+        );
 
         deck.SetKeyBitmap(key);
     }

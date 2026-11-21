@@ -1,11 +1,6 @@
 using OpenMacroBoard.Examples.CommonStuff;
 using OpenMacroBoard.SDK;
-using SixLabors.Fonts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 using System;
 using System.Globalization;
 
@@ -13,7 +8,8 @@ namespace OpenMacroBoard.Examples.ButtonPressDiagnostics;
 
 internal static class Program
 {
-    private static readonly Font Font = ExampleFonts.Create(24);
+    private static readonly SKFont Font = ExampleFonts.Create(24);
+    private static readonly SKPaint White = new() { Color = SKColors.White, IsAntialias = true };
     private static int[] counter;
 
     private static void Main(string[] args)
@@ -64,25 +60,18 @@ internal static class Program
             counter[e.Key]++;
         }
 
-        var keyImage = new Image<Bgr24>(96, 96);
+        var count = counter[e.Key].ToString(CultureInfo.InvariantCulture);
 
-        keyImage.Mutate(img =>
+        var key = KeyBitmap.Create.FromSkiaCanvas(96, 96, canvas =>
         {
             if (e.IsDown)
             {
-                var circle = new EllipsePolygon(72, 20, 5);
-                img.Fill(Color.White, circle);
+                canvas.DrawCircle(72, 20, 5, White);
             }
 
-            img.DrawText(
-                counter[e.Key].ToString(CultureInfo.InvariantCulture),
-                Font,
-                Color.White,
-                new PointF(10, 10)
-            );
+            // SkiaSharp places text by its baseline
+            canvas.DrawText(count, 10, 32, SKTextAlign.Left, Font, White);
         });
-
-        var key = ImageSharpConversions.ToKeyBitmap(keyImage);
 
         d.SetKeyBitmap(e.Key, key);
     }
