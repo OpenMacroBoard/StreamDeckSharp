@@ -3,6 +3,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System;
 
 namespace OpenMacroBoard.Examples.CommonStuff;
 
@@ -19,12 +20,20 @@ public static class ImageSharpWarmupHelper
         // It likely doesn't depend on the font family or size
         // so we just use the example font in 12pt for warm-up.
 
-        new Image<Bgr24>(128, 128)
-            .Mutate(x => x.DrawText(
-                "Random Text",
-                ExampleFonts.Create(12),
-                Color.White,
-                new PointF(10, 10)
-             ));
+        try
+        {
+            new Image<Bgr24>(128, 128)
+                .Mutate(x => x.DrawText(
+                    "Random Text",
+                    ExampleFonts.Create(12),
+                    Color.White,
+                    new PointF(10, 10)
+                 ));
+        }
+        catch (InvalidOperationException)
+        {
+            // No font is installed. Examples that draw no text work without one,
+            // and the others report the missing font themselves.
+        }
     }
 }
