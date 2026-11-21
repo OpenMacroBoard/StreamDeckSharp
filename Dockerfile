@@ -99,6 +99,11 @@ FROM build AS pack
 #   anything else    used as given, for example beta.1
 ARG VERSION_SUFFIX=local
 
+# The READMEs inside the packages get absolute links, because nuget.org cannot resolve
+# relative ones. They point to this branch or tag of the repository. For a release pass
+# the tag of the release, so the links keep showing the files of that version.
+ARG README_LINK_REF=main
+
 # Packing does not depend on the test stage, so packages for local testing can be
 # created while a test is failing. Run the tests before publishing anything.
 # Packing also runs the package validation: it fails if the public API has breaking changes
@@ -111,6 +116,7 @@ RUN --mount=type=cache,target=/root/.nuget/packages \
         dotnet pack "$project" \
             --configuration "${CONFIGURATION}" \
             ${suffix:+--version-suffix "$suffix"} \
+            -p:ReadmeLinkRef="$README_LINK_REF" \
             --output /packages; \
     done
 

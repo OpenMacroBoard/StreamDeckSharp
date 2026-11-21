@@ -65,7 +65,7 @@ static byte GetRandomByte()
 ```
 
 Here is what the example looks like after pressing some keys:
-![](https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/refs/heads/main/doc/images/rainbow_example.png)
+![](../../doc/images/rainbow_example.png)
 
 ## Providers and supported devices
 
@@ -106,15 +106,15 @@ If you want me to implement it, you can donate hardware (or the money so I can b
 
 ## Examples
 
-You can find a lot of examples in our [example collection](https://github.com/OpenMacroBoard/OpenMacroBoard.ExampleCollection)
+You can find a lot of examples in our [example collection](../../examples)
 
 
 ### Fullscreen images
-<img src="https://raw.githubusercontent.com/OpenMacroBoard/openmacroboard.github.io/refs/heads/main/assets/images/lasershow.png" width="500" />
+<img src="../../doc/images/lasershow.png" width="500" />
 
 ### Play games
 Play games on a macro board, for example minesweeper (also part of the example projects)
-<img src="https://raw.githubusercontent.com/OpenMacroBoard/StreamDeckSharp/main/doc/images/minesweeper.jpg" width="500" />
+<img src="../../doc/images/minesweeper.jpg" width="500" />
 
 ### Videos
 [![Demo video of the example](https://i.imgur.com/8tlkaIg.png)](http://www.youtube.com/watch?v=tNwUG0sPmKw)  

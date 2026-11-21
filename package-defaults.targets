@@ -27,4 +27,114 @@
     <PackageValidationBaselineVersion>10.0.0</PackageValidationBaselineVersion>
   </PropertyGroup>
 
+  <!--
+    README links: the READMEs in the repository use relative links (to files, folders and
+    images), so they work on GitHub on every branch. nuget.org cannot resolve relative links,
+    so the copy that goes into the package gets absolute ones. They point to $(ReadmeLinkRef),
+    a branch or tag of $(RepositoryUrl). Packing fails if a relative link leads nowhere.
+  -->
+  <PropertyGroup>
+    <ReadmeLinkRef Condition="'$(ReadmeLinkRef)' == ''">main</ReadmeLinkRef>
+  </PropertyGroup>
+
+  <UsingTask
+    TaskName="RewriteReadmeLinks"
+    TaskFactory="RoslynCodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Source ParameterType="System.String" Required="true" />
+      <Destination ParameterType="System.String" Required="true" />
+      <RepositoryRoot ParameterType="System.String" Required="true" />
+      <RepositoryUrl ParameterType="System.String" Required="true" />
+      <LinkRef ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var root = Path.GetFullPath(RepositoryRoot).TrimEnd('/', '\\');
+        var readmeDirectory = Path.GetDirectoryName(Path.GetFullPath(Source));
+        var pageBase = RepositoryUrl.TrimEnd('/') + "/blob/" + LinkRef + "/";
+        var rawBase = RepositoryUrl.TrimEnd('/').Replace("://github.com/", "://raw.githubusercontent.com/") + "/" + LinkRef + "/";
+        var imageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg" };
+        var failed = false;
+
+        // Targets of markdown links and images "](target)", and of HTML attributes src="target" and href="target".
+        var pattern = new Regex(@"(?<before>\]\(|\b(?:src|href)="")(?<target>[^)\s""]+)(?<after>\)|"")");
+
+        MatchEvaluator rewrite = match =>
+        {
+            var target = match.Groups["target"].Value;
+
+            // Absolute links (with a scheme), links inside the page and protocol relative links stay.
+            if (Regex.IsMatch(target, @"^([a-zA-Z][a-zA-Z0-9+.-]*:|#|//)"))
+            {
+                return match.Value;
+            }
+
+            var fragmentStart = target.IndexOf('#');
+            var fragment = fragmentStart < 0 ? string.Empty : target.Substring(fragmentStart);
+            var relative = fragmentStart < 0 ? target : target.Substring(0, fragmentStart);
+            var fullPath = Path.GetFullPath(Path.Combine(readmeDirectory, Uri.UnescapeDataString(relative)));
+
+            if (!fullPath.StartsWith(root + Path.DirectorySeparatorChar) || !(File.Exists(fullPath) || Directory.Exists(fullPath)))
+            {
+                Log.LogError("README link '{0}' in {1} does not lead to a file or folder in the repository.", target, Source);
+                failed = true;
+                return match.Value;
+            }
+
+            var repositoryPath = fullPath.Substring(root.Length + 1).Replace('\\', '/');
+            var isImage = imageExtensions.Contains(Path.GetExtension(fullPath));
+            var url = (isImage ? rawBase : pageBase) + Uri.EscapeUriString(repositoryPath) + fragment;
+
+            return match.Groups["before"].Value + url + match.Groups["after"].Value;
+        };
+
+        var lines = File.ReadAllText(Source).Replace("\r\n", "\n").Split('\n');
+        var insideCode = false;
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            // Code blocks are left alone, code can contain things that look like links.
+            if (lines[i].TrimStart().StartsWith("```"))
+            {
+                insideCode = !insideCode;
+            }
+            else if (!insideCode)
+            {
+                lines[i] = pattern.Replace(lines[i], rewrite);
+            }
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(Destination)));
+        File.WriteAllText(Destination, string.Join("\n", lines));
+
+        return !failed;
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="RewriteReadmeLinksForPackage" BeforeTargets="_GetPackageFiles" Condition="'$(IsPackable)' != 'false'">
+    <ItemGroup>
+      <_PackageReadmeSource Include="@(None)" Condition="'%(None.Pack)' == 'true' and '%(Filename)%(Extension)' == '$(PackageReadmeFile)'" />
+      <None Remove="@(_PackageReadmeSource)" />
+    </ItemGroup>
+
+    <Error Condition="'@(_PackageReadmeSource->Count())' != '1'" Text="Expected exactly one README to pack, found: @(_PackageReadmeSource)" />
+
+    <RewriteReadmeLinks
+      Source="@(_PackageReadmeSource->'%(FullPath)')"
+      Destination="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)package-readme\$(PackageReadmeFile)"
+      RepositoryRoot="$(MSBuildThisFileDirectory)"
+      RepositoryUrl="$(RepositoryUrl)"
+      LinkRef="$(ReadmeLinkRef)" />
+
+    <ItemGroup>
+      <None Include="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)package-readme\$(PackageReadmeFile)" Pack="true" PackagePath="" />
+    </ItemGroup>
+  </Target>
+
 </Project>

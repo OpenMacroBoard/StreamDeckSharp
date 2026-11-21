@@ -11,7 +11,7 @@
     <VersionPrefix>11.0.0</VersionPrefix>
     <Title>OpenMacroBoard.SDK</Title>
     <Description>Abstraction for macro boards (with LCD keys)</Description>
-    <RepositoryUrl>https://github.com/OpenMacroBoard/OpenMacroBoard.SDK</RepositoryUrl>
+    <RepositoryUrl>https://github.com/OpenMacroBoard/StreamDeckSharp</RepositoryUrl>
   </PropertyGroup>
 
   <Import Project="..\..\package-defaults.targets" />
