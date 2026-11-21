@@ -117,6 +117,7 @@ _\*The glitches you can see are already fixed._
 | [`src/OpenMacroBoard.SocketIO`](src/OpenMacroBoard.SocketIO) | Device provider for boards that are reached over the network, like the virtual board. |
 | [`src/OpenMacroBoard.VirtualBoard`](src/OpenMacroBoard.VirtualBoard) | A virtual macro board, to develop without hardware. |
 | [`src/OpenMacroBoard.SDK.KeyBitmap.GDI`](src/OpenMacroBoard.SDK.KeyBitmap.GDI) | Helpers to create key bitmaps with GDI+ (Windows only). |
+| [`src/OpenMacroBoard.SDK.KeyBitmap.SkiaSharp`](src/OpenMacroBoard.SDK.KeyBitmap.SkiaSharp) | Helpers to create key bitmaps with SkiaSharp, for drawing text and shapes on every platform. |
 | [`examples`](examples) | Example and showcase projects. |
 | [`tests`](tests) | Test projects. |
 

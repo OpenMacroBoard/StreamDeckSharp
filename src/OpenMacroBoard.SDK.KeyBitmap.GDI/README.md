@@ -46,4 +46,5 @@ Not for loading image files. The SDK reads BMP, PNG and JPEG files on every plat
 var key = KeyBitmap.Create.FromFile("icon.png");
 ```
 
-You need it when you want to draw at run time and GDI+ is your drawing library.
+You need it when you want to draw at run time and GDI+ is your drawing library. For drawing
+on Linux and macOS too, see [OpenMacroBoard.SDK.KeyBitmap.SkiaSharp](../OpenMacroBoard.SDK.KeyBitmap.SkiaSharp).

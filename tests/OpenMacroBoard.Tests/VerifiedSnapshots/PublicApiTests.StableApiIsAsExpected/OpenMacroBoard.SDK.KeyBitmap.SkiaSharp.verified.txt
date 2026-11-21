@@ -1,0 +1,8 @@
+﻿namespace OpenMacroBoard.SDK
+{
+    public static class KeyBitmapSkiaFactoryExtensions
+    {
+        public static OpenMacroBoard.SDK.KeyBitmap FromSkiaBitmap(this OpenMacroBoard.SDK.IKeyBitmapFactory keyFactory, SkiaSharp.SKBitmap bitmap) { }
+        public static OpenMacroBoard.SDK.KeyBitmap FromSkiaCanvas(this OpenMacroBoard.SDK.IKeyBitmapFactory keyFactory, int width, int height, System.Action<SkiaSharp.SKCanvas> drawAction) { }
+    }
+}

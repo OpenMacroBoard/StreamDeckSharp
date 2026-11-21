@@ -28,6 +28,7 @@ public class VersionBumpTests
         "src/OpenMacroBoard.SDK/OpenMacroBoard.SDK.csproj",
         "src/OpenMacroBoard.SocketIO/OpenMacroBoard.SocketIO.csproj",
         "src/OpenMacroBoard.SDK.KeyBitmap.GDI/OpenMacroBoard.SDK.KeyBitmap.GDI.csproj",
+        "src/OpenMacroBoard.SDK.KeyBitmap.SkiaSharp/OpenMacroBoard.SDK.KeyBitmap.SkiaSharp.csproj",
         "src/StreamDeckSharp/StreamDeckSharp.csproj",
     ];
 

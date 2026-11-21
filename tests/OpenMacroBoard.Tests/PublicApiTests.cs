@@ -16,6 +16,7 @@ public class PublicApiTests
     [
         "OpenMacroBoard.SDK",
         "OpenMacroBoard.SocketIO",
+        "OpenMacroBoard.SDK.KeyBitmap.SkiaSharp",
     ];
 
     public ExtendedVerifySettings Verifier { get; } = DefaultVerifySettings.Build();
@@ -42,8 +43,11 @@ public class PublicApiTests
 
     private static Assembly GetAssembly(string library)
     {
-        return library == "OpenMacroBoard.SDK"
-            ? typeof(KeyBitmap).Assembly
-            : typeof(SocketIOBoardListener).Assembly;
+        return library switch
+        {
+            "OpenMacroBoard.SDK" => typeof(KeyBitmap).Assembly,
+            "OpenMacroBoard.SocketIO" => typeof(SocketIOBoardListener).Assembly,
+            _ => typeof(KeyBitmapSkiaFactoryExtensions).Assembly,
+        };
     }
 }

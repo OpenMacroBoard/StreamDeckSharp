@@ -26,6 +26,8 @@
     <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <!-- The native part of SkiaSharp for Linux; the variant that needs no system libraries. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.157.0" />
     <PackageReference Include="Verify.XunitV3" Version="31.20.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
@@ -42,6 +44,7 @@
     <ProjectReference Include="..\OpenMacroBoard.Meta.TestUtils\OpenMacroBoard.Meta.TestUtils.csproj" />
     <ProjectReference Include="..\..\src\OpenMacroBoard.SDK\OpenMacroBoard.SDK.csproj" />
     <ProjectReference Include="..\..\src\OpenMacroBoard.SocketIO\OpenMacroBoard.SocketIO.csproj" />
+    <ProjectReference Include="..\..\src\OpenMacroBoard.SDK.KeyBitmap.SkiaSharp\OpenMacroBoard.SDK.KeyBitmap.SkiaSharp.csproj" />
     <ProjectReference Include="..\..\src\OpenMacroBoard.VirtualBoard\OpenMacroBoard.VirtualBoard.csproj" />
   </ItemGroup>
 
