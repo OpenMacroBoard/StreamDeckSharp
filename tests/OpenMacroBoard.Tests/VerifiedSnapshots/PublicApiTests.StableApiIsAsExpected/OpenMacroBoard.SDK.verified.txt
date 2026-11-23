@@ -133,6 +133,30 @@
         public ImageDecodingException(string message) { }
         public ImageDecodingException(string message, System.Exception innerException) { }
     }
+    public sealed class InMemoryMacroBoard : OpenMacroBoard.SDK.IMacroBoard, System.IDisposable
+    {
+        public InMemoryMacroBoard(OpenMacroBoard.SDK.IKeyLayout keys) { }
+        public byte Brightness { get; }
+        public string FirmwareVersion { get; init; }
+        public bool IsConnected { get; set; }
+        public bool IsDisposed { get; }
+        public bool IsLogoShown { get; }
+        public OpenMacroBoard.SDK.IKeyLayout Keys { get; }
+        public string SerialNumber { get; init; }
+        public event System.EventHandler? BrightnessChanged;
+        public event System.EventHandler<OpenMacroBoard.SDK.ConnectionEventArgs>? ConnectionStateChanged;
+        public event System.EventHandler<OpenMacroBoard.SDK.KeyBitmapChangedEventArgs>? KeyBitmapChanged;
+        public event System.EventHandler<OpenMacroBoard.SDK.KeyEventArgs>? KeyStateChanged;
+        public void Dispose() { }
+        public string GetFirmwareVersion() { }
+        public OpenMacroBoard.SDK.KeyBitmap GetKeyBitmap(int keyId) { }
+        public string GetSerialNumber() { }
+        public bool IsKeyDown(int keyId) { }
+        public void SetBrightness(byte percent) { }
+        public void SetKeyBitmap(int keyId, OpenMacroBoard.SDK.KeyBitmap bitmapData) { }
+        public void SetKeyState(int keyId, bool isDown) { }
+        public void ShowLogo() { }
+    }
     public sealed class KeyBitmap : OpenMacroBoard.SDK.IKeyBitmapDataAccess
     {
         public int Height { get; }
@@ -155,6 +179,11 @@
         public static OpenMacroBoard.SDK.KeyBitmap FromStream(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, System.IO.Stream bitmapStream, OpenMacroBoard.SDK.IImageDecoder decoder) { }
         public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.KeyBitmap> FromStreamAsync(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, System.IO.Stream bitmapStream) { }
         public static System.Threading.Tasks.Task<OpenMacroBoard.SDK.KeyBitmap> FromStreamAsync(this OpenMacroBoard.SDK.IKeyBitmapFactory builder, System.IO.Stream bitmapStream, OpenMacroBoard.SDK.IImageDecoder decoder) { }
+    }
+    public class KeyBitmapChangedEventArgs : System.EventArgs
+    {
+        public KeyBitmapChangedEventArgs(int key) { }
+        public int Key { get; }
     }
     public static class KeyBitmapTransformExtensions
     {

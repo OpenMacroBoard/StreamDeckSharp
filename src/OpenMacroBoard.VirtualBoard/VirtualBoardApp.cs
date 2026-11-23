@@ -25,7 +25,7 @@ internal sealed class VirtualBoardApp : IAsyncDisposable
     private readonly WebApplication web;
     private readonly SocketIOMacroBoardHost boardHost;
 
-    private VirtualBoardApp(WebApplication web, SocketIOMacroBoardHost boardHost, InMemoryBoard board, Uri pageUrl)
+    private VirtualBoardApp(WebApplication web, SocketIOMacroBoardHost boardHost, InMemoryMacroBoard board, Uri pageUrl)
     {
         this.web = web;
         this.boardHost = boardHost;
@@ -35,9 +35,9 @@ internal sealed class VirtualBoardApp : IAsyncDisposable
     }
 
     /// <summary>
-    /// The board in memory, without the logo behaviour.
+    /// The board in memory, without the logo image.
     /// </summary>
-    public InMemoryBoard Board { get; }
+    public InMemoryMacroBoard Board { get; }
 
     /// <summary>
     /// The address applications use to reach the board through SocketIO.
@@ -54,7 +54,7 @@ internal sealed class VirtualBoardApp : IAsyncDisposable
         ArgumentNullException.ThrowIfNull(settings);
 
         var keyLayout = new GridKeyLayout(settings.KeysX, settings.KeysY, settings.KeySize, settings.KeyGap);
-        var board = new InMemoryBoard(keyLayout);
+        var board = new InMemoryMacroBoard(keyLayout);
 
         var boardHost = new SocketIOMacroBoardHost(
             new DecoratedVirtualBoard(board),
@@ -91,7 +91,7 @@ internal sealed class VirtualBoardApp : IAsyncDisposable
         boardHost.Dispose();
     }
 
-    private static WebApplication BuildWebApplication(VirtualBoardSettings settings, InMemoryBoard board, string? boardEndpoint)
+    private static WebApplication BuildWebApplication(VirtualBoardSettings settings, InMemoryMacroBoard board, string? boardEndpoint)
     {
         var builder = WebApplication.CreateSlimBuilder();
 
@@ -105,6 +105,7 @@ internal sealed class VirtualBoardApp : IAsyncDisposable
         builder.WebHost.ConfigureKestrel(kestrel => kestrel.Listen(settings.BindAddress, settings.WebPort));
 
         var web = builder.Build();
+        var viewerKeys = new ViewerKeys(board);
 
         web.Use(RequestGuard.RejectForeignRequestsAsync);
         web.UseWebSockets();
@@ -122,7 +123,7 @@ internal sealed class VirtualBoardApp : IAsyncDisposable
             }
 
             using var socket = await context.WebSockets.AcceptWebSocketAsync();
-            using var viewer = new ViewerConnection(socket, board);
+            using var viewer = new ViewerConnection(socket, board, viewerKeys);
 
             var boardMessage = ViewerProtocol.BoardMessage(settings, boardEndpoint, board.Brightness);
             await viewer.RunAsync(boardMessage, lifetime.ApplicationStopping);

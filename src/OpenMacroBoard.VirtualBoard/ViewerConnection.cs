@@ -29,12 +29,14 @@ internal sealed class ViewerConnection : IDisposable
     private readonly SortedSet<int> changedKeys = [];
 
     private readonly WebSocket socket;
-    private readonly InMemoryBoard board;
+    private readonly InMemoryMacroBoard board;
+    private readonly ViewerKeys viewerKeys;
 
-    public ViewerConnection(WebSocket socket, InMemoryBoard board)
+    public ViewerConnection(WebSocket socket, InMemoryMacroBoard board, ViewerKeys viewerKeys)
     {
         this.socket = socket;
         this.board = board;
+        this.viewerKeys = viewerKeys;
     }
 
     /// <summary>
@@ -44,7 +46,7 @@ internal sealed class ViewerConnection : IDisposable
     {
         using var connectionEnd = CancellationTokenSource.CreateLinkedTokenSource(stopping);
 
-        board.KeyImageChanged += MarkKeyChanged;
+        board.KeyBitmapChanged += OnKeyBitmapChanged;
         board.KeyStateChanged += QueueKeyState;
         board.BrightnessChanged += QueueBrightness;
 
@@ -76,12 +78,12 @@ internal sealed class ViewerConnection : IDisposable
         }
         finally
         {
-            board.KeyImageChanged -= MarkKeyChanged;
+            board.KeyBitmapChanged -= OnKeyBitmapChanged;
             board.KeyStateChanged -= QueueKeyState;
             board.BrightnessChanged -= QueueBrightness;
 
             // A key this viewer still holds must not stay down forever.
-            board.ReleaseViewer(viewerId);
+            viewerKeys.ReleaseViewer(viewerId);
         }
     }
 
@@ -111,9 +113,14 @@ internal sealed class ViewerConnection : IDisposable
         QueueText(ViewerProtocol.KeyStateMessage(e.Key, e.IsDown));
     }
 
-    private void QueueBrightness(byte percent)
+    private void QueueBrightness(object? sender, EventArgs e)
     {
-        QueueText(ViewerProtocol.BrightnessMessage(percent));
+        QueueText(ViewerProtocol.BrightnessMessage(board.Brightness));
+    }
+
+    private void OnKeyBitmapChanged(object? sender, KeyBitmapChangedEventArgs e)
+    {
+        MarkKeyChanged(e.Key);
     }
 
     private void QueueText(byte[] message)
@@ -166,7 +173,7 @@ internal sealed class ViewerConnection : IDisposable
 
             foreach (var keyId in keys)
             {
-                var message = ViewerProtocol.KeyImageMessage(keyId, board.GetKeyImage(keyId));
+                var message = ViewerProtocol.KeyImageMessage(keyId, board.GetKeyBitmap(keyId));
                 await socket.SendAsync(message, WebSocketMessageType.Binary, endOfMessage: true, cancellationToken);
             }
         }
@@ -205,7 +212,7 @@ internal sealed class ViewerConnection : IDisposable
                 && result.MessageType == WebSocketMessageType.Text
                 && ViewerProtocol.TryReadKeyMessage(buffer.AsSpan(0, length), out var keyId, out var isDown))
             {
-                board.SetViewerKeyState(viewerId, keyId, isDown);
+                viewerKeys.SetViewerKeyState(viewerId, keyId, isDown);
             }
 
             length = 0;

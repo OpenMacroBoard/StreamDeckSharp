@@ -104,6 +104,26 @@ NuGet: [`OpenMacroBoard.SocketIO`](https://www.nuget.org/packages/OpenMacroBoard
 If I find the time I'd love to add more, but you can also implement one yourself by referencing `OpenMacroBoard.SDK` and writing a class that implements `IObservable<DeviceStateReport>`. This class can then be added as a device listener in a `DeviceContext`.
 If you want me to implement it, you can donate hardware (or the money so I can buy that specific hardware you want implemented) - just create a ticket and we talk about it ;-)
 
+## Testing without a device
+
+`InMemoryMacroBoard` is a board that only exists in memory. Pass it to your code wherever an
+`IMacroBoard` is expected, press its keys from the test and check what your code showed:
+
+```csharp
+using var board = new InMemoryMacroBoard(new GridKeyLayout(5, 3, 72, 25));
+var red = KeyBitmap.Create.FromRgb(255, 0, 0);
+
+// Your application: lights a key while it is held.
+board.KeyStateChanged += (_, e) => board.SetKeyBitmap(e.Key, e.IsDown ? red : KeyBitmap.Black);
+
+// The test: press the key, look at the result.
+board.SetKeyState(2, isDown: true);
+Debug.Assert(board.GetKeyBitmap(2) == red);
+```
+
+It needs no hardware, no network and no other package. To see a board on screen instead, use the
+[virtual board](../OpenMacroBoard.VirtualBoard).
+
 ## Examples
 
 You can find a lot of examples in our [example collection](../../examples)

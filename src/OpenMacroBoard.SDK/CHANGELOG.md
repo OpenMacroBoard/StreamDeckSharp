@@ -6,6 +6,7 @@ I'm trying to keep it up to date, but I'm a lazy bastard - when in doubt - check
 The SDK no longer depends on ImageSharp. See [Migrating from the ImageSharp based API](../../doc/migrating-from-imagesharp.md).
 
 ### Added
+  - `InMemoryMacroBoard`: a board that only exists in memory, to test an application without a device and without SocketIO. It remembers the key images and the brightness (`GetKeyBitmap`, `Brightness`, `IsLogoShown`), and a test presses keys with `SetKeyState` and unplugs the board with `IsConnected = false`. The events `KeyBitmapChanged` (with the new `KeyBitmapChangedEventArgs`) and `BrightnessChanged` tell about changes; the virtual board is built on this class now.
   - New package `OpenMacroBoard.SDK.KeyBitmap.SkiaSharp`: `KeyBitmap.Create.FromSkiaCanvas` (draw text and shapes on a SkiaSharp canvas) and `KeyBitmap.Create.FromSkiaBitmap`. It is the counterpart of the GDI package for Windows, Linux and macOS. The examples draw with it now and no longer use ImageSharp.
   - `IJpegEncoder`: interface for JPEG encoders, so device providers can let users bring their own encoder.
   - `OmbJpegEncoder`: built-in baseline JPEG encoder without unsafe code or native libraries.

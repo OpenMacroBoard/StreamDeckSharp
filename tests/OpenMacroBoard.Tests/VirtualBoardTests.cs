@@ -74,7 +74,7 @@ public class VirtualBoardTests
         image.Rgba.Should().HaveCount(image.Width * image.Height * 4);
 
         // The first image of an application replaces the logo, the other keys turn black.
-        app.Board.GetKeyImage(0).Should().Be(KeyBitmap.Black);
+        app.Board.GetKeyBitmap(0).Should().Be(KeyBitmap.Black);
     }
 
     [Fact]

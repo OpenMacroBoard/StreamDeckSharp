@@ -12,11 +12,11 @@ namespace OpenMacroBoard.VirtualBoard;
 internal sealed class DecoratedVirtualBoard : MacroBoardAdapter
 {
     private readonly Lock gate = new();
-    private readonly InMemoryBoard nakedBoard;
+    private readonly InMemoryMacroBoard nakedBoard;
 
     private bool isLogoShown;
 
-    public DecoratedVirtualBoard(InMemoryBoard virtualBoard)
+    public DecoratedVirtualBoard(InMemoryMacroBoard virtualBoard)
         : base(virtualBoard)
     {
         ArgumentNullException.ThrowIfNull(virtualBoard);
